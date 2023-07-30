@@ -1,17 +1,17 @@
-import pymunk               # Import pymunk..
+import pymunk
 
-space = pymunk.Space()      # Create a Space which contain the simulation
-space.gravity = 0,-981      # Set its gravity
+space = pymunk.Space()
+space.gravity = 0,-981
 
-body = pymunk.Body()        # Create a Body
-body.position = 50,100      # Set the position of the body
+body = pymunk.Body()
+body.position = 50,100
 
-poly = pymunk.Poly.create_box(body) # Create a box shape and attach to body
-poly.mass = 10              # Set the mass on the shape
-space.add(body, poly)       # Add both body and shape to the simulation
+poly = pymunk.Poly.create_box(body)
+poly.mass = 10
+space.add(body, poly)
 
-print_options = pymunk.SpaceDebugDrawOptions() # For easy printing
+print_options = pymunk.SpaceDebugDrawOptions()
 
-for _ in range(100):        # Run simulation 100 steps in total
-    space.step(0.02)        # Step the simulation one step forward
-    space.debug_draw(print_options) # Print the state of the simulation
+for _ in range(100):
+    space.step(0.02)
+    space.debug_draw(print_options)
