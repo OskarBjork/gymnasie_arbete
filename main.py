@@ -1,12 +1,12 @@
 import pygame
 import pyng
 
-FPS = 60
-RED = (255, 0, 0)
+from pyng.config import FPS, RED
+
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((1280/2, 720/2))
+    screen = pygame.display.set_mode((1280 / 2, 720 / 2))
     clock = pygame.time.Clock()
 
     running = True
@@ -20,6 +20,7 @@ def main():
         clock.tick(FPS)
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
