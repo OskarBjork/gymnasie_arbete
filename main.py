@@ -1,17 +1,25 @@
-import pymunk
+import pygame
+import pyng
 
-space = pymunk.Space()
-space.gravity = 0,-981
+FPS = 60
+RED = (255, 0, 0)
 
-body = pymunk.Body()
-body.position = 50,100
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((1280/2, 720/2))
+    clock = pygame.time.Clock()
 
-poly = pymunk.Poly.create_box(body)
-poly.mass = 10
-space.add(body, poly)
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        screen.fill(RED)
 
-print_options = pymunk.SpaceDebugDrawOptions()
+        pygame.display.update()
+        clock.tick(FPS)
 
-for _ in range(100):
-    space.step(0.02)
-    space.debug_draw(print_options)
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
