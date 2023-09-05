@@ -5,6 +5,7 @@ from pyng.space.phys_world import PhysWorld
 from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import TwoDimensionalVector
 from pyng.config import FPS, RED
+from pyng.time.events.event_handler import EventHandler
 
 
 def main():
@@ -19,11 +20,11 @@ def main():
 
     world = PhysWorld(screen_width, screen_height)
 
+    event_handler = EventHandler()
+
     running = True
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+        event_handler.handle_events(pygame.event.get())
         screen.fill(RED)
 
         pygame.display.update()
