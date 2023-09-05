@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 from pyng.space.phys_world import PhysWorld
@@ -16,14 +18,20 @@ def main():
     world = PhysWorld()
 
     running = True
+    prev_time = time.time()
     while running:
+        clock.tick(FPS)
+        now = time.time()
+        dt = now - prev_time
+        prev_time = now
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
         screen.fill(RED)
 
+        world.step(dt)
         pygame.display.update()
-        clock.tick(FPS)
 
     pygame.quit()
 
