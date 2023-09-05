@@ -9,10 +9,15 @@ from pyng.config import FPS, RED
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((1280 / 2, 720 / 2))
+
+    info = pygame.display.Info()
+    screen_width = info.current_w
+    screen_height = info.current_h
+
+    screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
 
-    world = PhysWorld(1280, 720)
+    world = PhysWorld(screen_width, screen_height)
 
     running = True
     while running:
