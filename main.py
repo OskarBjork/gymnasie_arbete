@@ -4,7 +4,7 @@ import pygame
 from pyng.space.phys_world import PhysWorld
 from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import TwoDimensionalVector
-from pyng.config import FPS, RED
+from pyng.config import FPS, RED, BLACK
 from pyng.time.events.event_handler import EventHandler
 
 
@@ -25,7 +25,7 @@ def main():
     running = True
     while running:
         event_handler.handle_events(pygame.event.get())
-        screen.fill(RED)
+        screen.fill(BLACK)
 
         pygame.display.update()
         clock.tick(FPS)
