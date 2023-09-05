@@ -4,6 +4,7 @@ import pygame
 from pyng.space.phys_world import PhysWorld
 from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import TwoDimensionalVector
+from pyng.space.interface.view_model import ViewModel
 from pyng.config import FPS, RED, BLACK
 from pyng.time.events.event_handler import EventHandler
 
@@ -22,9 +23,14 @@ def main():
 
     event_handler = EventHandler()
 
+    view_model = ViewModel(screen)
+
     running = True
     while running:
         event_handler.handle_events(pygame.event.get())
+
+        view_model.render_objects(world.objects)
+
         screen.fill(BLACK)
 
         pygame.display.update()
