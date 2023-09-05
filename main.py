@@ -1,7 +1,8 @@
 import pygame
 
 from pyng.space.phys_world import PhysWorld
-from pyng.space.grid import Grid
+from pyng.space.phys_obj import PhysObj
+from pyng.space.vectors import TwoDimensionalVector
 
 FPS = 60
 RED = (255, 0, 0)
@@ -12,7 +13,7 @@ def main():
     screen = pygame.display.set_mode((1280 / 2, 720 / 2))
     clock = pygame.time.Clock()
 
-    world = PhysWorld(Grid(screen.get_width(), screen.get_height()))
+    world = PhysWorld()
 
     running = True
     while running:

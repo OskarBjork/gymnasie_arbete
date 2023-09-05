@@ -25,22 +25,26 @@ class TwoDimensionalVector:
         return TwoDimensionalVector(self.x + other.x, self.y + other.y)
 
     def __sub__(self, other):
-        pass
+        return TwoDimensionalVector(self.x - other.x, self.y - other.y)
 
     def __mul__(self, other):
-        pass
+        return TwoDimensionalVector(self.x * other.x, self.y * other.y)
 
     def __truediv__(self, other):
         pass
 
     def __iadd__(self, other):
-        pass
+        self.x += other.x
+        self.y += other.y
 
     def __isub__(self, other):
-        pass
+        self.x -= other.x
+        self.y -= other.y
 
     def __imul__(self, other):
-        pass
+        self.x *= other.x
+        self.y *= other.y
 
     def __idiv__(self, other):
-        pass
+        self.x /= other.x
+        self.y /= other.y
