@@ -9,12 +9,13 @@ class PhysObj:
         position: TwoDimensionalVector,  # koordinater
         velocity: TwoDimensionalVector,
         force: TwoDimensionalVector,
+        color: tuple,
     ):
         self.mass = mass
         self.position = position
         self.velocity = velocity
         self.force = force
-        self.color = RED
+        self.color = color
 
 
 class Point(PhysObj):
@@ -24,6 +25,6 @@ class Point(PhysObj):
         position: TwoDimensionalVector,
         velocity: TwoDimensionalVector,
         force: TwoDimensionalVector,
+        color: tuple,
     ):
-        super().__init__(mass, position, velocity, force)
-        self.color = RED
+        super().__init__(mass, position, velocity, force, color)

@@ -29,13 +29,13 @@ def main():
 
     state.create_objects(world)
 
+    screen.fill(BLACK)
+
     running = True
     while running:
         event_handler.handle_events(pygame.event.get())
 
         view_model.render_objects(world.objects)
-
-        screen.fill(BLACK)
 
         pygame.display.update()
         clock.tick(FPS)

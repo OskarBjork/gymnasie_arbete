@@ -15,14 +15,6 @@ class PhysWorld:
         self.grid = Grid(width=width, height=height)
         self.width = width
         self.height = height
-        self.add_object(
-            Point(
-                1,
-                TwoDimensionalVector(50, 100),
-                TwoDimensionalVector(0, 0),
-                TwoDimensionalVector(0, 0),
-            )
-        )
 
     def step(self, delta_time: float):
         for obj in self.objects:

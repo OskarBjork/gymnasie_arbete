@@ -23,6 +23,7 @@ class State:
                     mass=1,
                     velocity=TwoDimensionalVector(0, 0),
                     force=TwoDimensionalVector(0, 0),
+                    color=(randint(0, 255), randint(0, 255), randint(0, 255)),
                 )
             )
 
