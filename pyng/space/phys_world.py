@@ -13,6 +13,8 @@ class PhysWorld:
         self.objects = objects
         self.gravity = TwoDimensionalVector(0, -9.82)
         self.grid = Grid(width=width, height=height)
+        self.width = width
+        self.height = height
         self.add_object(
             Point(
                 1,
@@ -28,6 +30,7 @@ class PhysWorld:
 
     def add_object(self, obj: PhysObj):
         self.objects.append(obj)
+        self.grid.set_coordinate_value(obj.position.x, obj.position.y, obj)
 
     def del_object(self, obj: PhysObj):
         self.objects.remove(obj)

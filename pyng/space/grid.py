@@ -9,3 +9,6 @@ class Grid:
 
     def get_coordinate_value(self, x: int, y: int) -> int:
         return self.grid[y][x]
+
+    def set_coordinate_value(self, x: int, y: int, value) -> None:
+        self.grid[x][y] = 1

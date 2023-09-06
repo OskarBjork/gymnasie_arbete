@@ -1,10 +1,10 @@
 import pygame
 
-
 from pyng.space.phys_world import PhysWorld
 from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import TwoDimensionalVector
 from pyng.space.interface.view_model import ViewModel
+from pyng.space.data.state import State
 from pyng.config import FPS, RED, BLACK
 from pyng.time.events.event_handler import EventHandler
 
@@ -24,6 +24,10 @@ def main():
     event_handler = EventHandler()
 
     view_model = ViewModel(screen)
+
+    state = State()
+
+    state.create_objects(world)
 
     running = True
     while running:
