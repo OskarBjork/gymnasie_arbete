@@ -18,7 +18,7 @@ class State:
             world.add_object(
                 Point(
                     position=TwoDimensionalVector(
-                        randint(0, world.width), randint(0, 100)
+                        randint(0, world.width), randint(0, world.height)
                     ),
                     mass=1,
                     velocity=TwoDimensionalVector(1, 0),
