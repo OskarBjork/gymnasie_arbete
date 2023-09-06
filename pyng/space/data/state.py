@@ -21,7 +21,7 @@ class State:
                         randint(0, world.width), randint(0, 100)
                     ),
                     mass=1,
-                    velocity=TwoDimensionalVector(0, 0),
+                    velocity=TwoDimensionalVector(1, 0),
                     force=TwoDimensionalVector(0, 0),
                     color=(randint(0, 255), randint(0, 255), randint(0, 255)),
                 )
