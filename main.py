@@ -11,6 +11,7 @@ from pyng.space.interface.view_model import ViewModel
 from pyng.config import FPS, RED, BLACK
 from pyng.time.events.event_handler import EventHandler
 
+
 def main():
     pygame.init()
 
@@ -27,7 +28,13 @@ def main():
 
     view_model = ViewModel(screen)
 
-    obj = PhysObj(10, (255, 0, 0), TwoDimensionalVector(500, 250))
+    obj = PhysObj(
+        mass=10,
+        color=RED,
+        position=TwoDimensionalVector(100, 100),
+        velocity=TwoDimensionalVector(0, 0),
+        force=TwoDimensionalVector(0, 0),
+    )
     world.add_object(obj)
 
     screen.fill((0, 0, 0))
