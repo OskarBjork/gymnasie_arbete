@@ -12,8 +12,8 @@ class ViewModel:
 
     def place_pixel(self, x: int, y: int, color: tuple) -> None:
         converted_x, converted_y = convert_coordinates(x, y, self.screen)
-        pygame.draw.rect(self.screen, color, (converted_x, converted_y, 10, 10))
+        pygame.draw.rect(self.screen, color, (converted_x, converted_y, 1, 1))
 
     def render_objects(self, objects: list) -> None:
         for obj in objects:
-            self.place_pixel(obj.position.x, obj.position.y, obj.color)
+            obj.render(self)
