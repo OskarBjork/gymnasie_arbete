@@ -8,21 +8,26 @@ class PhysWorld:
         self,
         width,
         height,
-        objects: [PhysObj] = [],
+        gravity=TwoDimensionalVector(0, -9.82),
+        objects: [PhysObj] =[],
     ):
         self.objects = objects
-        self.gravity = TwoDimensionalVector(0, -9.82)
-        self.grid = Grid(width=width, height=height)
+        self.gravity = gravity
         self.width = width
         self.height = height
 
     def step(self, delta_time: float):
         for obj in self.objects:
-            pass
+            # TODO: Fixa +=
+            # Lägger till gravitationskraften
+            obj.force = obj.force + (self.gravity * obj.mass)
+            # TODO: Kommentera
+            obj.velocity = obj.velocity + (obj.force / obj.mass) * delta_time
+            obj.position = obj.position + (obj.velocity * delta_time)
+            obj.force = TwoDimensionalVector(0, 0)
 
     def add_object(self, obj: PhysObj):
         self.objects.append(obj)
-        self.grid.set_coordinate_value(obj.position.x, obj.position.y, obj)
 
     def del_object(self, obj: PhysObj):
         self.objects.remove(obj)
