@@ -10,9 +10,12 @@ class PhysWorld:
 
     def step(self, delta_time: float):
         for obj in self.objects:
-            obj.force += obj.mass * self.gravity
-            obj.velocity += (obj.force / obj.mass) * delta_time
-            obj.position += obj.velocity * delta_time
+            # TODO: Fixa +=
+            # Lägger till gravitationskraften
+            obj.force = obj.force + (self.gravity * obj.mass)
+            # TODO: Kommentera
+            obj.velocity = obj.velocity + (obj.force / obj.mass) * delta_time
+            obj.position = obj.position + (obj.velocity * delta_time)
             obj.force = TwoDimensionalVector(0, 0)
 
     def add_object(self, obj: PhysObj):
