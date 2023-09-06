@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 from pyng.space.phys_world import PhysWorld
@@ -9,6 +11,9 @@ from pyng.space.data.space_analyzer import SpaceAnalyzer
 from pyng.config import FPS, RED, BLACK
 from pyng.time.events.event_handler import EventHandler
 
+
+def convert_coordinates(vec: TwoDimensionalVector) -> (float, float):
+    return vec.x, (1280 / 2) - vec.y
 
 def main():
     pygame.init()
@@ -27,21 +32,28 @@ def main():
 
     view_model = ViewModel(screen)
 
-    state = State()
+    world = PhysWorld()
+    obj = PhysObj(10, TwoDimensionalVector(500, 250))
+    world.add_object(obj)
 
-    state.create_objects(world)
-
+    screen.fill((0, 0, 0))
     running = True
+    prev_time = time.time()
     while running:
+        clock.tick(FPS)
+        now = time.time()
+        dt = now - prev_time
+        prev_time = now
+
         screen.fill(BLACK)
         event_handler.handle_events(pygame.event.get())
 
         space_analyzer.analyze(world)
 
+        world.step(dt)
+        x, y = convert_coordinates(obj.position)
         view_model.render_objects(world.objects)
-
         pygame.display.update()
-        clock.tick(FPS)
 
     pygame.quit()
 
