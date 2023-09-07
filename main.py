@@ -8,7 +8,7 @@ from pyng.space.phys_world import PhysWorld
 from pyng.space.phys_obj import PhysObj, Point, Square, Circle
 from pyng.space.vectors import TwoDimensionalVector
 from pyng.space.interface.view_model import ViewModel, convert_coordinates
-from pyng.config import FPS, RED, BLACK
+from pyng.config import FPS, RED, BLACK, TEST_COORDINATE
 from pyng.time.events.event_handler import EventHandler
 
 
@@ -29,12 +29,12 @@ def main():
     view_model = ViewModel(screen)
 
     obj = Circle(
-        mass=10, color=RED, position=TwoDimensionalVector(1000, 1000), radius=100
+        mass=10, color=RED, position=TwoDimensionalVector(*TEST_COORDINATE), radius=100
     )
 
     world.add_object(obj)
 
-    screen.fill((0, 0, 0))
+    screen.fill(BLACK)
     running = True
     prev_time = time.time()
     while running:

@@ -1,6 +1,7 @@
 import pygame
+from math import ceil
 
-from pyng.config import RED, BLACK, WHITE, GRID_SCALE
+from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER
 
 
 # TODO: Flytta
@@ -25,20 +26,39 @@ class ViewModel:
         pygame.draw.rect(self.screen, color, (converted_x, converted_y, 1, 1))
 
     def show_grid(self):
+        """Till för att visa rutnätet."""
         origo = self.width // GRID_SCALE, self.height // GRID_SCALE
-        pygame.draw.line(
-            surface=self.screen,
-            color=BLACK,
-            start_pos=convert_coordinates(*origo, self.screen),
-            end_pos=(convert_coordinates(origo[0], self.height, self.screen)),
-        )
-        pygame.draw.line(
-            surface=self.screen,
-            color=BLACK,
-            start_pos=convert_coordinates(*origo, self.screen),
-            end_pos=(convert_coordinates(self.width, origo[1], self.screen)),
-        )
-        pass
+
+        num_of_lines_vertical = ceil(self.width / PIXELS_PER_METER)
+        num_of_lines_horizontal = ceil(self.height / PIXELS_PER_METER)
+
+        for i in range(num_of_lines_vertical):
+            x_offset = i * PIXELS_PER_METER
+
+            pygame.draw.line(
+                surface=self.screen,
+                color=BLACK,
+                start_pos=convert_coordinates(
+                    origo[0] + x_offset, origo[1], self.screen
+                ),
+                end_pos=convert_coordinates(
+                    origo[0] + x_offset, self.height, self.screen
+                ),
+            )
+
+        for i in range(num_of_lines_horizontal):
+            y_offset = i * PIXELS_PER_METER
+
+            pygame.draw.line(
+                surface=self.screen,
+                color=BLACK,
+                start_pos=convert_coordinates(
+                    origo[0], origo[1] + y_offset, self.screen
+                ),
+                end_pos=convert_coordinates(
+                    self.width, origo[1] + y_offset, self.screen
+                ),
+            )
 
     def render_objects(self, objects: list) -> None:
         for obj in objects:
