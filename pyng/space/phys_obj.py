@@ -1,5 +1,6 @@
 from pyng.space.vectors import TwoDimensionalVector
 from pyng.config import RED
+from pyng.space.interface.view_model import convert_coordinates
 
 
 class PhysObj:
@@ -7,7 +8,7 @@ class PhysObj:
         self,
         mass: float,
         color: (int, int, int),
-        position: TwoDimensionalVector,
+        position: TwoDimensionalVector,  # Centrumet av formen
         velocity=TwoDimensionalVector(0, 0),
         force=TwoDimensionalVector(0, 0),
     ):
@@ -36,6 +37,9 @@ class PhysObj:
     def update_position(self, delta_time: float):
         self.position.x = self.position.x + self.velocity.x * delta_time
         self.position.y = self.position.y + self.velocity.y * delta_time
+
+    def render(self, view_model):
+        view_model.render_polygon(self)
 
 
 class Point(PhysObj):
@@ -67,12 +71,12 @@ class Square(PhysObj):
         super().__init__(mass, color, position, velocity, force)
         self.width = width
         self.height = height
+        self.update_points()
 
-    def render(self, view_model):
-        for pixel_x in range(1, self.width):
-            for pixel_y in range(1, self.height):
-                view_model.place_pixel(
-                    self.position.x + pixel_x,
-                    self.position.y + pixel_y,
-                    self.color,
-                )
+    def update_points(self):
+        self.points = [
+            (self.position.x - self.width // 2, self.position.y - self.height // 2),
+            (self.position.x + self.width // 2, self.position.y - self.height // 2),
+            (self.position.x + self.width // 2, self.position.y + self.height // 2),
+            (self.position.x - self.width // 2, self.position.y + self.height // 2),
+        ]

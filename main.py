@@ -7,7 +7,7 @@ import pygame
 from pyng.space.phys_world import PhysWorld
 from pyng.space.phys_obj import PhysObj, Point, Square
 from pyng.space.vectors import TwoDimensionalVector
-from pyng.space.interface.view_model import ViewModel
+from pyng.space.interface.view_model import ViewModel, convert_coordinates
 from pyng.config import FPS, RED, BLACK
 from pyng.time.events.event_handler import EventHandler
 

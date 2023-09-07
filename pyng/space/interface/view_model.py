@@ -17,3 +17,14 @@ class ViewModel:
     def render_objects(self, objects: list) -> None:
         for obj in objects:
             obj.render(self)
+
+    def render_polygon(self, polygon):
+        polygon.update_points()
+        converted_points = []
+        for point in polygon.points:
+            converted_points.append(
+                convert_coordinates(point[0], point[1], self.screen)
+            )
+        pygame.draw.polygon(
+            surface=self.screen, color=polygon.color, points=converted_points
+        )
