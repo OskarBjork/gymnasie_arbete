@@ -5,7 +5,7 @@ import time
 import pygame
 
 from pyng.space.phys_world import PhysWorld
-from pyng.space.phys_obj import PhysObj, Point, Square
+from pyng.space.phys_obj import PhysObj, Point, Square, Circle
 from pyng.space.vectors import TwoDimensionalVector
 from pyng.space.interface.view_model import ViewModel, convert_coordinates
 from pyng.config import FPS, RED, BLACK
@@ -28,12 +28,8 @@ def main():
 
     view_model = ViewModel(screen)
 
-    obj = Square(
-        mass=1,
-        color=RED,
-        position=TwoDimensionalVector(1000, 1000),
-        width=100,
-        height=100,
+    obj = Circle(
+        mass=1, color=RED, position=TwoDimensionalVector(1000, 1000), radius=100
     )
 
     world.add_object(obj)

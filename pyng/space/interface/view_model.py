@@ -28,3 +28,13 @@ class ViewModel:
         pygame.draw.polygon(
             surface=self.screen, color=polygon.color, points=converted_points
         )
+
+    def render_circle(self, circle):
+        pygame.draw.circle(
+            surface=self.screen,
+            color=circle.color,
+            center=convert_coordinates(
+                circle.position.x, circle.position.y, self.screen
+            ),
+            radius=circle.radius,
+        )

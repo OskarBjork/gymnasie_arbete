@@ -80,3 +80,20 @@ class Square(PhysObj):
             (self.position.x + self.width // 2, self.position.y + self.height // 2),
             (self.position.x - self.width // 2, self.position.y + self.height // 2),
         ]
+
+
+class Circle(PhysObj):
+    def __init__(
+        self,
+        mass: float,
+        color: (int, int, int),
+        position: TwoDimensionalVector,
+        velocity=TwoDimensionalVector(0, 0),
+        force=TwoDimensionalVector(0, 0),
+        radius=1,
+    ):
+        super().__init__(mass, color, position, velocity, force)
+        self.radius = radius
+
+    def render(self, view_model):
+        view_model.render_circle(self)
