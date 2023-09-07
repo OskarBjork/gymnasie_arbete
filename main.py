@@ -43,12 +43,15 @@ def main():
         dt = now - prev_time
         prev_time = now
 
-        screen.fill(BLACK)
+        view_model.clear()
+
         event_handler.handle_events(pygame.event.get())
 
         world.step(dt)
+
         view_model.render_objects(world.objects)
-        pygame.display.update()
+
+        view_model.update()
 
     pygame.quit()
 
