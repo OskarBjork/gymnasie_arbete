@@ -1,6 +1,6 @@
 from pyng.space.vectors import TwoDimensionalVector
 from pyng.config import RED
-from pyng.space.interface.view_model import convert_coordinates
+from pyng.space.interface.view_model import ViewModel
 
 
 class PhysObj:

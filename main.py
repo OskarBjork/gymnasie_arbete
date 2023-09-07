@@ -1,4 +1,6 @@
 # TODO: Ta bort all third-part dependencies
+# TODO: Gör så att mindre upplösning ger samma information
+# TODO Ta bort allt klotter härifrån och sätt det in i andra klasser
 
 import time
 
@@ -7,7 +9,7 @@ import pygame
 from pyng.space.phys_world import PhysWorld
 from pyng.space.phys_obj import PhysObj, Point, Square, Circle
 from pyng.space.vectors import TwoDimensionalVector
-from pyng.space.interface.view_model import ViewModel, convert_coordinates
+from pyng.space.interface.view_model import ViewModel
 from pyng.config import FPS, RED, BLACK, TEST_COORDINATE
 from pyng.time.events.event_handler import EventHandler
 
@@ -39,6 +41,7 @@ def main():
     screen.fill(BLACK)
     running = True
     prev_time = time.time()
+
     while running:
         clock.tick(FPS)
         now = time.time()
