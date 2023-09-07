@@ -28,6 +28,8 @@ def main():
 
     view_model = ViewModel(screen)
 
+    view_model.set_caption("Pyng")
+
     obj = Circle(
         mass=10, color=RED, position=TwoDimensionalVector(*TEST_COORDINATE), radius=100
     )

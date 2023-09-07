@@ -14,6 +14,7 @@ class ViewModel:
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
+        self.font = pygame.font.Font(None, 36)
 
     def clear(self):
         self.screen.fill(WHITE)
@@ -32,6 +33,7 @@ class ViewModel:
         num_of_lines_vertical = ceil(self.width / PIXELS_PER_METER)
         num_of_lines_horizontal = ceil(self.height / PIXELS_PER_METER)
 
+        # Skapar rutorna
         for i in range(num_of_lines_vertical):
             x_offset = i * PIXELS_PER_METER
 
@@ -45,7 +47,14 @@ class ViewModel:
                     origo[0] + x_offset, self.height, self.screen
                 ),
             )
+            # Ritar siffrorna
+            self.render_text(
+                f"{i * 100}",
+                BLACK,
+                convert_coordinates(origo[0] + x_offset, origo[1], self.screen),
+            )
 
+        # Samma ordning som ovan
         for i in range(num_of_lines_horizontal):
             y_offset = i * PIXELS_PER_METER
 
@@ -59,6 +68,24 @@ class ViewModel:
                     self.width, origo[1] + y_offset, self.screen
                 ),
             )
+
+            if i == 0:
+                continue
+            self.render_text(
+                f"{i * 100}",
+                BLACK,
+                convert_coordinates(origo[0] - 50, origo[1] + y_offset, self.screen),
+            )
+
+    def set_caption(self, caption: str) -> None:
+        pygame.display.set_caption(caption)
+
+    def create_text(self, text: str, color: tuple, position: tuple) -> None:
+        return self.font.render(text, True, color)
+
+    def render_text(self, text: str, color: tuple, position: tuple) -> None:
+        text_surface = self.create_text(text, color, position)
+        self.screen.blit(text_surface, position)
 
     def render_objects(self, objects: list) -> None:
         for obj in objects:
