@@ -1,6 +1,6 @@
 import pygame
 
-from pyng.config import RED, BLACK, WHITE
+from pyng.config import RED, BLACK, WHITE, GRID_SCALE
 
 
 # TODO: Flytta
@@ -11,6 +11,8 @@ def convert_coordinates(x, y, screen) -> (float, float):
 class ViewModel:
     def __init__(self, screen) -> None:
         self.screen = screen
+        self.width = screen.get_width()
+        self.height = screen.get_height()
 
     def clear(self):
         self.screen.fill(WHITE)
@@ -23,6 +25,19 @@ class ViewModel:
         pygame.draw.rect(self.screen, color, (converted_x, converted_y, 1, 1))
 
     def show_grid(self):
+        origo = self.width // GRID_SCALE, self.height // GRID_SCALE
+        pygame.draw.line(
+            surface=self.screen,
+            color=BLACK,
+            start_pos=convert_coordinates(*origo, self.screen),
+            end_pos=(convert_coordinates(origo[0], self.height, self.screen)),
+        )
+        pygame.draw.line(
+            surface=self.screen,
+            color=BLACK,
+            start_pos=convert_coordinates(*origo, self.screen),
+            end_pos=(convert_coordinates(self.width, origo[1], self.screen)),
+        )
         pass
 
     def render_objects(self, objects: list) -> None:

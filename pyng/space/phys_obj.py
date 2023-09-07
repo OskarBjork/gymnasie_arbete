@@ -18,7 +18,7 @@ class PhysObj:
         self.force = force
         self.color = color
         self.stop = False
-        self.gravitational_force = TwoDimensionalVector(0, mass * -9.82)
+        self.gravitational_force = TwoDimensionalVector(0, self.mass * -9.82)
         self.force.y += self.gravitational_force.y
 
     def is_inside_of_other_object(self, other_object) -> bool:

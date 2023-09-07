@@ -29,7 +29,7 @@ def main():
     view_model = ViewModel(screen)
 
     obj = Circle(
-        mass=1, color=RED, position=TwoDimensionalVector(1000, 1000), radius=100
+        mass=10, color=RED, position=TwoDimensionalVector(1000, 1000), radius=100
     )
 
     world.add_object(obj)
@@ -50,6 +50,8 @@ def main():
         world.step(dt)
 
         view_model.render_objects(world.objects)
+
+        view_model.show_grid()
 
         view_model.update()
 
