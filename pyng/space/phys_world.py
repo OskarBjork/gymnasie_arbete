@@ -9,7 +9,7 @@ class PhysWorld:
         width,
         height,
         gravity=TwoDimensionalVector(0, -9.82),
-        objects: [PhysObj] =[],
+        objects: [PhysObj] = [],
     ):
         self.objects = objects
         self.gravity = gravity
@@ -21,11 +21,8 @@ class PhysWorld:
         for obj in self.objects:
             # TODO: Fixa +=
             # Lägger till gravitationskraften
-            obj.force = obj.force + (self.gravity * obj.mass)
-            # TODO: Kommentera
-            obj.velocity = obj.velocity + (obj.force / obj.mass) * delta_time
-            obj.position = obj.position + (obj.velocity * delta_time)
-            obj.force = TwoDimensionalVector(0, 0)
+            obj.update_velocity(delta_time)
+            obj.update_position(delta_time)
 
     def resolve_collision(self):
         pass

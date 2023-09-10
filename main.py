@@ -1,14 +1,16 @@
 # TODO: Ta bort all third-part dependencies förutom pygame
+# TODO: Gör så att mindre upplösning ger samma information
+# TODO Ta bort allt klotter härifrån och sätt det in i andra klasser
 
 import time
 
 import pygame
 
 from pyng.space.phys_world import PhysWorld
-from pyng.space.phys_obj import PhysObj
+from pyng.space.phys_obj import PhysObj, Point, Square, Circle
 from pyng.space.vectors import TwoDimensionalVector
 from pyng.space.interface.view_model import ViewModel
-from pyng.config import FPS, RED, BLACK
+from pyng.config import FPS, RED, BLACK, TEST_COORDINATE
 from pyng.time.events.event_handler import EventHandler
 
 
@@ -28,12 +30,18 @@ def main():
 
     view_model = ViewModel(screen)
 
-    obj1 = PhysObj(1, (255, 0, 0), TwoDimensionalVector(500, 550))
-    world.add_object(obj1)
+    view_model.set_caption("Pyng")
 
-    screen.fill((0, 0, 0))
+    obj = Circle(
+        mass=10, color=RED, position=TwoDimensionalVector(*TEST_COORDINATE), radius=100
+    )
+
+    world.add_object(obj)
+
+    screen.fill(BLACK)
     running = True
     prev_time = time.time()
+
     while running:
         clock.tick(FPS)
         # TODO: Omstrukturera tid in i egen funktion/klass
@@ -41,12 +49,17 @@ def main():
         dt = now - prev_time
         prev_time = now
 
-        screen.fill(BLACK)
+        view_model.clear()
+
         event_handler.handle_events(pygame.event.get())
 
         world.step(dt)
+
         view_model.render_objects(world.objects)
-        pygame.display.update()
+
+        view_model.show_grid()
+
+        view_model.update()
 
     pygame.quit()
 
