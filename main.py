@@ -11,6 +11,7 @@ from pyng.state.phys_world import PhysWorld
 from pyng.space.phys_obj import Circle
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
+from pyng.state.analyzer import check_collisions
 from pyng.config import FPS, RED, BLACK, TEST_COORDINATE
 from simulation.event_handler import handle_events
 
@@ -42,7 +43,7 @@ def main():
     obj2 = Circle(
         mass=10,
         color=RED,
-        position=Vector2D(1000, 800),
+        position=Vector2D(1000, 500),
         radius=100,
     )
 
@@ -63,6 +64,8 @@ def main():
         view_model.clear()
 
         handle_events(pygame.event.get())
+
+        check_collisions(world.objects)
 
         world.step(dt)
 
