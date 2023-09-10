@@ -1,5 +1,5 @@
 from pyng.space.vectors import TwoDimensionalVector
-from pyng.config import RED
+from pyng.config import RED, GRAVITY_CONSTANT
 from pyng.space.interface.view_model import ViewModel
 
 
@@ -18,19 +18,17 @@ class PhysObj:
         self.force = force
         self.color = color
         self.stop = False
-        self.gravitational_force = TwoDimensionalVector(0, self.mass * -982)
+        self.gravitational_force = TwoDimensionalVector(0, self.mass * GRAVITY_CONSTANT)
         self.force.y += self.gravitational_force.y
 
     def add_force(self, force: TwoDimensionalVector):
         self.force += force
 
     def update_velocity(self, delta_time: float):
-        self.velocity.x = self.velocity.x + (self.force.x / self.mass) * delta_time
-        self.velocity.y = self.velocity.y + (self.force.y / self.mass) * delta_time
+        self.velocity = self.velocity + (self.force / self.mass) * delta_time
 
     def update_position(self, delta_time: float):
-        self.position.x = self.position.x + self.velocity.x * delta_time
-        self.position.y = self.position.y + self.velocity.y * delta_time
+        self.position = self.position + self.velocity * delta_time
 
     def render(self, view_model):
         view_model.render_polygon(self)
