@@ -35,15 +35,15 @@ def main():
     obj1 = Circle(
         mass=10,
         color=RED,
-        position=Vector2D(*TEST_COORDINATE),
+        position=Vector2D(1000, 900),
         radius=100,
-        force=Vector2D(0, -982 * 10),
     )
 
     obj2 = Circle(
         mass=10,
         color=RED,
-        position=Vector2D(1000, 500),
+        position=Vector2D(100, 900),
+        force=Vector2D(100, 0),
         radius=100,
     )
 
