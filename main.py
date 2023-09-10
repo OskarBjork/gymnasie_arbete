@@ -12,7 +12,7 @@ from pyng.space.phys_obj import Circle
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.config import FPS, RED, BLACK, TEST_COORDINATE
-from event_handler import handle_events
+from simulation.event_handler import handle_events
 
 
 def main():
