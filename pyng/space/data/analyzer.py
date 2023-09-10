@@ -7,7 +7,6 @@ class Analyzer:
 
                 if obj.is_inside_of_other_object(other_obj):
                     self.resolve_collision(obj, other_obj)
-                    pass
 
     def resolve_collision(self, obj, other_obj):
         pass

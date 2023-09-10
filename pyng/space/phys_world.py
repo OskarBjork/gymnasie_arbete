@@ -19,7 +19,6 @@ class PhysWorld:
     def step(self, delta_time: float):
         for obj in self.objects:
             # TODO: Fixa +=
-            # Lägger till gravitationskraften
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
 

@@ -17,9 +17,6 @@ class PhysObj:
         self.velocity = velocity
         self.force = force
         self.color = color
-        self.stop = False
-        self.gravitational_force = TwoDimensionalVector(0, self.mass * GRAVITY_CONSTANT)
-        self.force.y += self.gravitational_force.y
 
     def add_force(self, force: TwoDimensionalVector):
         self.force += force
