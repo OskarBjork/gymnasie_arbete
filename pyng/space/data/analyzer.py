@@ -1,4 +1,4 @@
-class analyzer:
+class Analyzer:
     def check_if_any_objects_are_inside_of_each_other(self, objects):
         for obj in objects:
             for other_obj in objects:
