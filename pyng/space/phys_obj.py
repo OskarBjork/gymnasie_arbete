@@ -1,4 +1,4 @@
-from pyng.space.vectors import TwoDimensionalVector
+from pyng.space.vectors import Vector2D
 from pyng.config import RED
 from pyng.space.interface.view_model import ViewModel
 
