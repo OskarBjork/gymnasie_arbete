@@ -10,7 +10,7 @@ class PhysObj:
         color: (int, int, int),
         position: Vector2D,  # Centrumet av formen
         velocity=Vector2D(0, 0),
-        force=Vector2D(0, 0)
+        force=Vector2D(0, 0),
     ):
         self.mass = mass
         self.position = position
@@ -41,7 +41,7 @@ class Point(PhysObj):
         color: (int, int, int),
         position: Vector2D,
         velocity=Vector2D(0, 0),
-        force=Vector2D(0, 0)
+        force=Vector2D(0, 0),
     ):
         super().__init__(mass, color, position, velocity, force)
 
@@ -64,7 +64,7 @@ class Square(PhysObj):
         height: int,
         position: Vector2D,
         velocity=Vector2D(0, 0),
-        force=Vector2D(0, 0)
+        force=Vector2D(0, 0),
     ):
         super().__init__(mass, color, position, velocity, force)
         self.width = width
@@ -81,8 +81,8 @@ class Square(PhysObj):
 
     def is_inside_of(self, other_object) -> bool:
         return (
-                self.position.x == other_object.position.x
-                and self.position.y == other_object.position.y
+            self.position.x == other_object.position.x
+            and self.position.y == other_object.position.y
         )
 
 
@@ -94,7 +94,7 @@ class Circle(PhysObj):
         position: Vector2D,
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
-        radius=1
+        radius=1,
     ):
         super().__init__(mass, color, position, velocity, force)
         self.radius = radius
@@ -103,5 +103,4 @@ class Circle(PhysObj):
         view_model.render_circle(self)
 
     def is_inside_of(self, other) -> bool:
-        return (self.radius + other.radius
-                < self.position.distance_to(other.position))
+        return self.position.distance_to(other.position) < self.radius + other.radius

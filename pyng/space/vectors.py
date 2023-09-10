@@ -2,7 +2,7 @@ import math
 
 
 def vector_magnitude(vec):
-    return math.sqrt(vec.x ** 2 + vec.y ** 2)
+    return math.sqrt(vec.x**2 + vec.y**2)
 
 
 class Vector2D:
