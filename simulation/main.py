@@ -31,11 +31,23 @@ def main():
 
     view_model.set_caption("Pyng")
 
-    obj = Circle(
-        mass=10, color=RED, position=Vector2D(*TEST_COORDINATE), radius=100
+    obj1 = Circle(
+        mass=10,
+        color=RED,
+        position=TwoDimensionalVector(*TEST_COORDINATE),
+        radius=100,
+        force=TwoDimensionalVector(0, -982 * 10),
     )
 
-    world.add_object(obj)
+    obj2 = Circle(
+        mass=10,
+        color=RED,
+        position=TwoDimensionalVector(1000, 800),
+        radius=100,
+    )
+
+    world.add_object(obj1)
+    world.add_object(obj2)
 
     screen.fill(BLACK)
     running = True

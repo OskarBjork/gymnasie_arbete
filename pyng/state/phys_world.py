@@ -20,7 +20,6 @@ class PhysWorld:
         self.resolve_collision()
         for obj in self.objects:
             # TODO: Fixa +=
-            # Lägger till gravitationskraften
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
 

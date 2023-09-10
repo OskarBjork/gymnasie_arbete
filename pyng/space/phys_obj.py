@@ -1,4 +1,4 @@
-from pyng.space.vectors import Vector2D
+from pyng.space.vectors import TwoDimensionalVector
 from pyng.config import RED
 from pyng.space.interface.view_model import ViewModel
 
@@ -17,9 +17,6 @@ class PhysObj:
         self.velocity = velocity
         self.force = force
         self.color = color
-        self.stop = False
-        self.gravitational_force = Vector2D(0, self.mass * -982)
-        self.force.y += self.gravitational_force.y
 
     def is_inside_of(self, other_object) -> bool:
         pass
@@ -50,6 +47,12 @@ class Point(PhysObj):
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
+
+    def is_inside_of_other_object(self, other_object) -> bool:
+        return (
+            self.position.x == other_object.position.x
+            and self.position.y == other_object.position.y
+        )
 
 
 class Square(PhysObj):

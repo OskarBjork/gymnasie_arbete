@@ -70,3 +70,6 @@ class Vector2D:
     def __itruediv__(self, scalar):
         self.x /= scalar
         self.y /= scalar
+
+    def get_distance_to(self, other) -> float:
+        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
