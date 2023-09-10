@@ -45,7 +45,6 @@ def main():
         color=RED,
         position=TwoDimensionalVector(1000, 800),
         radius=100,
-        no_gravity=True,
     )
 
     world.add_object(obj1)
