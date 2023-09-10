@@ -1,4 +1,4 @@
-# TODO: Ta bort all third-part dependencies
+# TODO: Ta bort all third-part dependencies förutom pygame
 
 import time
 
@@ -10,6 +10,7 @@ from pyng.space.vectors import TwoDimensionalVector
 from pyng.space.interface.view_model import ViewModel
 from pyng.config import FPS, RED, BLACK
 from pyng.time.events.event_handler import EventHandler
+
 
 def main():
     pygame.init()
@@ -27,14 +28,15 @@ def main():
 
     view_model = ViewModel(screen)
 
-    obj = PhysObj(10, (255, 0, 0), TwoDimensionalVector(500, 250))
-    world.add_object(obj)
+    obj1 = PhysObj(1, (255, 0, 0), TwoDimensionalVector(500, 550))
+    world.add_object(obj1)
 
     screen.fill((0, 0, 0))
     running = True
     prev_time = time.time()
     while running:
         clock.tick(FPS)
+        # TODO: Omstrukturera tid in i egen funktion/klass
         now = time.time()
         dt = now - prev_time
         prev_time = now

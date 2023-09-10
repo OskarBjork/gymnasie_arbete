@@ -1,7 +1,7 @@
 import pygame
 
 
-# TODO: Flytta
+# TODO: Flytta till annat bättre ställe
 def convert_coordinates(x, y, screen) -> (float, float):
     return x, screen.get_height() - y
 

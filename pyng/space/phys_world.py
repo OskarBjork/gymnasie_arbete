@@ -17,6 +17,7 @@ class PhysWorld:
         self.height = height
 
     def step(self, delta_time: float):
+        self.resolve_collision()
         for obj in self.objects:
             # TODO: Fixa +=
             # Lägger till gravitationskraften
@@ -25,6 +26,9 @@ class PhysWorld:
             obj.velocity = obj.velocity + (obj.force / obj.mass) * delta_time
             obj.position = obj.position + (obj.velocity * delta_time)
             obj.force = TwoDimensionalVector(0, 0)
+
+    def resolve_collision(self):
+        pass
 
     def add_object(self, obj: PhysObj):
         self.objects.append(obj)
