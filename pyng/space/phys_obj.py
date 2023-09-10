@@ -1,4 +1,4 @@
-from pyng.space.vectors import TwoDimensionalVector
+from pyng.space.vectors import Vector2D
 from pyng.config import RED
 from pyng.space.interface.view_model import ViewModel
 
@@ -8,9 +8,9 @@ class PhysObj:
         self,
         mass: float,
         color: (int, int, int),
-        position: TwoDimensionalVector,  # Centrumet av formen
-        velocity=TwoDimensionalVector(0, 0),
-        force=TwoDimensionalVector(0, 0)
+        position: Vector2D,  # Centrumet av formen
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0)
     ):
         self.mass = mass
         self.position = position
@@ -18,25 +18,20 @@ class PhysObj:
         self.force = force
         self.color = color
         self.stop = False
-        self.gravitational_force = TwoDimensionalVector(0, self.mass * -982)
+        self.gravitational_force = Vector2D(0, self.mass * -982)
         self.force.y += self.gravitational_force.y
 
-    def is_inside_of_other_object(self, other_object) -> bool:
-        return (
-            self.position.x == other_object.position.x
-            and self.position.y == other_object.position.y
-        )
+    def is_inside_of(self, other_object) -> bool:
+        pass
 
-    def add_force(self, force: TwoDimensionalVector):
+    def add_force(self, force: Vector2D):
         self.force += force
 
     def update_velocity(self, delta_time: float):
-        self.velocity.x = self.velocity.x + (self.force.x / self.mass) * delta_time
-        self.velocity.y = self.velocity.y + (self.force.y / self.mass) * delta_time
+        self.velocity = self.velocity + (self.force / self.mass) * delta_time
 
     def update_position(self, delta_time: float):
-        self.position.x = self.position.x + self.velocity.x * delta_time
-        self.position.y = self.position.y + self.velocity.y * delta_time
+        self.position = self.position + self.velocity * delta_time
 
     def render(self, view_model):
         view_model.render_polygon(self)
@@ -47,9 +42,9 @@ class Point(PhysObj):
         self,
         mass: float,
         color: (int, int, int),
-        position: TwoDimensionalVector,
-        velocity=TwoDimensionalVector(0, 0),
-        force=TwoDimensionalVector(0, 0)
+        position: Vector2D,
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0)
     ):
         super().__init__(mass, color, position, velocity, force)
 
@@ -64,9 +59,9 @@ class Square(PhysObj):
         color: (int, int, int),
         width: int,
         height: int,
-        position: TwoDimensionalVector,
-        velocity=TwoDimensionalVector(0, 0),
-        force=TwoDimensionalVector(0, 0)
+        position: Vector2D,
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0)
     ):
         super().__init__(mass, color, position, velocity, force)
         self.width = width
@@ -81,15 +76,21 @@ class Square(PhysObj):
             (self.position.x - self.width // 2, self.position.y + self.height // 2),
         ]
 
+    def is_inside_of(self, other_object) -> bool:
+        return (
+                self.position.x == other_object.position.x
+                and self.position.y == other_object.position.y
+        )
+
 
 class Circle(PhysObj):
     def __init__(
         self,
         mass: float,
         color: (int, int, int),
-        position: TwoDimensionalVector,
-        velocity=TwoDimensionalVector(0, 0),
-        force=TwoDimensionalVector(0, 0),
+        position: Vector2D,
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
         radius=1
     ):
         super().__init__(mass, color, position, velocity, force)
@@ -97,3 +98,7 @@ class Circle(PhysObj):
 
     def render(self, view_model):
         view_model.render_circle(self)
+
+    def is_inside_of(self, other) -> bool:
+        return (self.radius + other.radius
+                < self.position.distance_to(other.position))

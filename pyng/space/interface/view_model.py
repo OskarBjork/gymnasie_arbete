@@ -1,5 +1,7 @@
-import pygame
 from math import ceil
+
+import pygame
+from pygame import Surface
 
 from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER
 
@@ -8,7 +10,7 @@ from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER
 
 
 class ViewModel:
-    def __init__(self, screen) -> None:
+    def __init__(self, screen: Surface) -> None:
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
@@ -28,8 +30,7 @@ class ViewModel:
         pygame.draw.rect(self.screen, color, (converted_x, converted_y, 1, 1))
 
     def show_grid(self):
-        """Till för att visa rutnätet."""
-        origo = self.width // GRID_SCALE, self.height // GRID_SCALE
+        origin = self.width // GRID_SCALE, self.height // GRID_SCALE
 
         num_of_lines_vertical = ceil(self.width / PIXELS_PER_METER)
         num_of_lines_horizontal = ceil(self.height / PIXELS_PER_METER)
@@ -41,14 +42,14 @@ class ViewModel:
             pygame.draw.line(
                 surface=self.screen,
                 color=BLACK,
-                start_pos=self.convert_coordinates(origo[0] + x_offset, origo[1]),
-                end_pos=self.convert_coordinates(origo[0] + x_offset, self.height),
+                start_pos=self.convert_coordinates(origin[0] + x_offset, origin[1]),
+                end_pos=self.convert_coordinates(origin[0] + x_offset, self.height),
             )
             # Ritar siffrorna
             self.render_text(
                 f"{i * 100}",
                 BLACK,
-                self.convert_coordinates(origo[0] + x_offset, origo[1]),
+                self.convert_coordinates(origin[0] + x_offset, origin[1]),
             )
 
         # Samma ordning som ovan
@@ -58,8 +59,8 @@ class ViewModel:
             pygame.draw.line(
                 surface=self.screen,
                 color=BLACK,
-                start_pos=self.convert_coordinates(origo[0], origo[1] + y_offset),
-                end_pos=self.convert_coordinates(self.width, origo[1] + y_offset),
+                start_pos=self.convert_coordinates(origin[0], origin[1] + y_offset),
+                end_pos=self.convert_coordinates(self.width, origin[1] + y_offset),
             )
 
             if i == 0:
@@ -67,7 +68,7 @@ class ViewModel:
             self.render_text(
                 f"{i * 100}",
                 BLACK,
-                self.convert_coordinates(origo[0] - 50, origo[1] + y_offset),
+                self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
             )
 
     def set_caption(self, caption: str) -> None:
@@ -89,6 +90,7 @@ class ViewModel:
         converted_points = []
         for point in polygon.points:
             converted_points.append(self.convert_coordinates(point[0], point[1]))
+
         pygame.draw.polygon(
             surface=self.screen, color=polygon.color, points=converted_points
         )

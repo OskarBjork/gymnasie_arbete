@@ -1,5 +1,5 @@
 from pyng.space.phys_obj import PhysObj, Point
-from pyng.space.vectors import TwoDimensionalVector
+from pyng.space.vectors import Vector2D
 from pyng.space.grid import Grid
 
 
@@ -8,7 +8,7 @@ class PhysWorld:
         self,
         width,
         height,
-        gravity=TwoDimensionalVector(0, -9.82),
+        gravity=Vector2D(0, -9.82),
         objects: [PhysObj] = [],
     ):
         self.objects = objects
