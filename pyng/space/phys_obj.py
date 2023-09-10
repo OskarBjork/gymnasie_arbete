@@ -21,12 +21,6 @@ class PhysObj:
         self.gravitational_force = TwoDimensionalVector(0, self.mass * -982)
         self.force.y += self.gravitational_force.y
 
-    def is_inside_of_other_object(self, other_object) -> bool:
-        return (
-            self.position.x == other_object.position.x
-            and self.position.y == other_object.position.y
-        )
-
     def add_force(self, force: TwoDimensionalVector):
         self.force += force
 
@@ -55,6 +49,12 @@ class Point(PhysObj):
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
+
+    def is_inside_of_other_object(self, other_object) -> bool:
+        return (
+            self.position.x == other_object.position.x
+            and self.position.y == other_object.position.y
+        )
 
 
 class Square(PhysObj):
@@ -97,3 +97,7 @@ class Circle(PhysObj):
 
     def render(self, view_model):
         view_model.render_circle(self)
+
+    def is_inside_of_other_object(self, other_object) -> bool:
+        d = self.position.get_distance_to(other_object.position)
+        return d < self.radius + other_object.radius
