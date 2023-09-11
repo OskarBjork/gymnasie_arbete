@@ -36,6 +36,7 @@ def main():
         mass=10,
         color=RED,
         position=Vector2D(1000, 900),
+        force=Vector2D(-1000, 0),
         radius=100,
     )
 
@@ -43,12 +44,21 @@ def main():
         mass=10,
         color=RED,
         position=Vector2D(100, 900),
-        force=Vector2D(100, 0),
+        force=Vector2D(1000, 0),
         radius=100,
     )
 
+    # obj3 = Circle(
+    #     mass=10,
+    #     color=RED,
+    #     position=Vector2D(500, 450),
+    #     force=Vector2D(0, 1000),
+    #     radius=100,
+    # )
+
     world.add_object(obj1)
     world.add_object(obj2)
+    # world.add_object(obj3)
 
     screen.fill(BLACK)
     running = True

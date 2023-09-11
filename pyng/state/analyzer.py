@@ -26,3 +26,14 @@ def resolve_collision(obj: PhysObj, other_obj: PhysObj):
     obj.position = obj.position + direction
 
     other_obj.position = other_obj.position - direction
+
+    resolve_momentum(obj, other_obj)
+
+
+def resolve_momentum(obj1, obj2):
+    obj1_momentum = obj1.velocity * obj1.mass
+    obj2_momentum = obj2.velocity * obj2.mass
+
+    obj1.velocity = obj2_momentum / obj1.mass
+
+    obj2.velocity = obj1_momentum / obj2.mass
