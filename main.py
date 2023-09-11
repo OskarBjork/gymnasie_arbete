@@ -12,7 +12,7 @@ from pyng.space.phys_obj import Circle
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.analyzer import check_collisions
-from pyng.config import FPS, RED, BLACK, TEST_COORDINATE
+from pyng.config import FPS, RED, BLACK, TEST_COORDINATE, BLUE
 from simulation.event_handler import handle_events
 
 
@@ -36,29 +36,40 @@ def main():
         mass=10,
         color=RED,
         position=Vector2D(1000, 900),
-        force=Vector2D(-1000, 0),
+        velocity=Vector2D(0, 0),
+        # force=Vector2D(-500, 0),
         radius=100,
     )
 
     obj2 = Circle(
         mass=10,
-        color=RED,
+        color=BLUE,
         position=Vector2D(100, 900),
-        force=Vector2D(1000, 0),
+        velocity=Vector2D(100, 0),
+        # force=Vector2D(100, 0),
         radius=100,
     )
 
-    # obj3 = Circle(
-    #     mass=10,
-    #     color=RED,
-    #     position=Vector2D(500, 450),
-    #     force=Vector2D(0, 1000),
-    #     radius=100,
-    # )
+    obj3 = Circle(
+        mass=10,
+        color=RED,
+        position=Vector2D(1200, 900),
+        # force=Vector2D(0, 1000),
+        radius=100,
+    )
+
+    obj4 = Circle(
+        mass=10,
+        color=RED,
+        position=Vector2D(1400, 900),
+        # force=Vector2D(0, 1000),
+        radius=100,
+    )
 
     world.add_object(obj1)
     world.add_object(obj2)
-    # world.add_object(obj3)
+    world.add_object(obj3)
+    world.add_object(obj4)
 
     screen.fill(BLACK)
     running = True
