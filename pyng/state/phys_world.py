@@ -1,6 +1,7 @@
 from pyng.space.phys_obj import PhysObj, Point
 from pyng.space.vectors import Vector2D
 from pyng.space.grid import Grid
+from pyng.config import ORIGIN, PIXELS_PER_METER, BLACK, RED, BLUE
 
 
 class PhysWorld:
@@ -27,6 +28,10 @@ class PhysWorld:
         pass
 
     def add_object(self, obj: PhysObj):
+        self.objects.append(obj)
+
+    def create_object(self, obj: PhysObj, position: Vector2D):
+        obj.position = position + Vector2D(*ORIGIN)
         self.objects.append(obj)
 
     def del_object(self, obj: PhysObj):

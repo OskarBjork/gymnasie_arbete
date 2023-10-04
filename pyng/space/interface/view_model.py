@@ -3,7 +3,7 @@ from math import ceil
 import pygame
 from pygame import Surface
 
-from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER
+from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER, ORIGIN
 
 
 # TODO: Flytta
@@ -30,7 +30,7 @@ class ViewModel:
         pygame.draw.rect(self.screen, color, (converted_x, converted_y, 1, 1))
 
     def show_grid(self):
-        origin = self.width // GRID_SCALE, self.height // GRID_SCALE
+        origin = ORIGIN
 
         num_of_lines_vertical = ceil(self.width / PIXELS_PER_METER)
         num_of_lines_horizontal = ceil(self.height / PIXELS_PER_METER)

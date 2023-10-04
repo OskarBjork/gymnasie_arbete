@@ -1,5 +1,5 @@
 from pyng.space.vectors import Vector2D
-from pyng.config import RED
+from pyng.config import RED, ORIGIN
 from pyng.space.interface.view_model import ViewModel
 
 
@@ -8,7 +8,7 @@ class PhysObj:
         self,
         mass: float,
         color: (int, int, int),
-        position: Vector2D,  # Centrumet av formen
+        position=Vector2D(*ORIGIN),  # Centrumet av formen
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
     ):
@@ -39,7 +39,7 @@ class Point(PhysObj):
         self,
         mass: float,
         color: (int, int, int),
-        position: Vector2D,
+        position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
     ):
@@ -62,7 +62,7 @@ class Square(PhysObj):
         color: (int, int, int),
         width: int,
         height: int,
-        position: Vector2D,
+        position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
     ):
@@ -91,7 +91,7 @@ class Circle(PhysObj):
         self,
         mass: float,
         color: (int, int, int),
-        position: Vector2D,
+        position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         radius=1,
