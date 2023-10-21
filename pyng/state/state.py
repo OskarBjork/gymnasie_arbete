@@ -20,6 +20,10 @@ class State:
         self.player_chosen_color = RED
         pass
 
+    def parse_mouse_click(self, mouse_pos: Vector2D):
+        if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
+            self.create_object(mouse_pos)
+
     def step(self, delta_time: float):
         for obj in self.objects:
             # TODO: Fixa +=
@@ -37,13 +41,12 @@ class State:
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
         if obj is None:
-            obj = self.default_object
-        obj = Circle(
-            mass=self.player_chosen_mass,
-            radius=self.player_chosen_radius,
-            color=self.player_chosen_color,
-            position=position,
-        )
+            obj = Circle(
+                mass=self.player_chosen_mass,
+                radius=self.player_chosen_radius,
+                color=self.player_chosen_color,
+                position=position,
+            )
         self.add_object(obj)
         self.time_since_last_object_creation = time.time()
         if with_gravity:
