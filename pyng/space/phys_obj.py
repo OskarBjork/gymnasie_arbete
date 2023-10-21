@@ -22,7 +22,7 @@ class PhysObj:
         pass
 
     def add_force(self, force: Vector2D):
-        self.force += force
+        self.force = self.force + force
 
     def update_velocity(self, delta_time: float):
         self.velocity = self.velocity + (self.force / self.mass) * delta_time
@@ -32,6 +32,9 @@ class PhysObj:
 
     def render(self, view_model):
         view_model.render_polygon(self)
+
+    def __repr__(self) -> str:
+        return f"PhysObj(mass={self.mass}, color={self.color}, position={self.position}, velocity={self.velocity}, force={self.force})"
 
 
 class Point(PhysObj):

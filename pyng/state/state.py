@@ -1,6 +1,6 @@
 from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import Vector2D
-from pyng.config import ORIGIN, RED
+from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT
 from pyng.space.phys_obj import PhysObj, Circle
 import time
 
@@ -29,7 +29,9 @@ class State:
     def add_object(self, obj: PhysObj):
         self.objects.append(obj)
 
-    def create_object(self, position: Vector2D, obj: PhysObj = None):
+    def create_object(
+        self, position: Vector2D, obj: PhysObj = None, with_gravity=False
+    ):
         if not (
             time.time() - self.time_since_last_object_creation > 0.1
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
@@ -44,9 +46,16 @@ class State:
         )
         self.add_object(obj)
         self.time_since_last_object_creation = time.time()
+        if with_gravity:
+            self.impose_gravity(obj)
 
     def del_object(self, obj: PhysObj):
         self.objects.remove(obj)
+
+    # TODO Möjligtvis flytta fysikfunktioner till egen klass
+
+    def impose_gravity(self, obj: PhysObj):
+        obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
     def check_collisions(self):
         for obj in self.objects:
@@ -75,7 +84,7 @@ class State:
 
         self.resolve_momentum(obj, other_obj)
 
-    def resolve_momentum(obj1, obj2):
+    def resolve_momentum(self, obj1, obj2):
         obj1_momentum = obj1.velocity * obj1.mass
         obj2_momentum = obj2.velocity * obj2.mass
 

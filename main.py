@@ -48,7 +48,8 @@ def main():
 
         if handle_events(pygame.event.get()) == "mouse 1":
             state.create_object(
-                Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos())))
+                Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos()))),
+                with_gravity=False,
             )
 
         state.check_collisions()
