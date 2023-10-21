@@ -71,5 +71,8 @@ class Vector2D:
         self.x /= scalar
         self.y /= scalar
 
+    def __repr__(self) -> str:
+        return f"Vector2D({self.x}, {self.y})"
+
     def get_distance_to(self, other) -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5

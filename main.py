@@ -7,11 +7,10 @@ import time
 
 import pygame
 
-from pyng.state.phys_world import PhysWorld
 from pyng.space.phys_obj import Circle
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
-from pyng.state.analyzer import check_collisions
+from pyng.state.state import State
 from pyng.config import FPS, RED, BLACK, TEST_COORDINATE, BLUE, ORIGIN, GREEN
 from simulation.event_handler import handle_events
 
@@ -26,7 +25,7 @@ def main():
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
 
-    world = PhysWorld(screen_width, screen_height)
+    state = State()
 
     view_model = ViewModel(screen)
 
@@ -45,13 +44,16 @@ def main():
 
         view_model.clear()
 
-        handle_events(pygame.event.get())
+        if handle_events(pygame.event.get()) == "mouse 1":
+            state.create_object(
+                Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos())))
+            )
 
-        check_collisions(world.objects)
+        state.check_collisions()
 
-        world.step(dt)
+        state.step(dt)
 
-        view_model.render_objects(world.objects)
+        view_model.render_objects(state.objects)
 
         view_model.show_grid()
 
