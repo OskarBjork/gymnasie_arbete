@@ -4,8 +4,10 @@
 # TODO: TYPE ANNOTATIONS!
 
 import time
+import sys
 
 import pygame
+import pygame_gui
 
 from pyng.space.phys_obj import Circle, Point
 from pyng.space.vectors import Vector2D
@@ -27,7 +29,8 @@ def main():
 
     state = State()
 
-    view_model = ViewModel(screen)
+    UI_manager = pygame_gui.UIManager((screen_width, screen_height))
+    view_model = ViewModel(screen, UI_manager)
 
     view_model.set_caption("Pyng")
 
@@ -37,8 +40,10 @@ def main():
 
     obj1 = Circle(mass=10, radius=10, color=BLUE)
 
+    view_model.show_editor()
+
     while running:
-        clock.tick(FPS)
+        UI_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass
         now = time.time()
         dt = now - prev_time
@@ -46,7 +51,7 @@ def main():
 
         view_model.clear()
 
-        if handle_events(pygame.event.get()) == "mouse 1":
+        if handle_events(pygame.event.get(), UI_manager) == "mouse 1":
             state.parse_mouse_click(
                 Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos())))
             )
@@ -57,9 +62,9 @@ def main():
 
         view_model.render_objects(state.objects)
 
-        view_model.show_grid()
+        view_model.render_UI(UI_manager)
 
-        view_model.update()
+        view_model.update(UI_refresh_rate)
 
     pygame.quit()
 

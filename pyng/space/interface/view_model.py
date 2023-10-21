@@ -1,6 +1,7 @@
 from math import ceil
 
 import pygame
+import pygame_gui
 from pygame import Surface
 
 from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER, ORIGIN
@@ -10,10 +11,11 @@ from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER, ORIGIN
 
 
 class ViewModel:
-    def __init__(self, screen: Surface) -> None:
+    def __init__(self, screen: Surface, UI_manager) -> None:
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
+        self.UI_manager = UI_manager
         self.font = pygame.font.Font(None, 36)
 
     def convert_coordinates(self, x, y) -> (float, float):
@@ -22,8 +24,9 @@ class ViewModel:
     def clear(self):
         self.screen.fill(WHITE)
 
-    def update(self):
+    def update(self, UI_refresh_rate: float):
         pygame.display.update()
+        self.UI_manager.update(UI_refresh_rate)
 
     def place_pixel(self, x: int, y: int, color: tuple) -> None:
         converted_x, converted_y = self.convert_coordinates(x, y)
@@ -70,6 +73,17 @@ class ViewModel:
                 BLACK,
                 self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
             )
+
+    def render_UI(self, UI_manager):
+        self.show_grid()
+        UI_manager.draw_ui(self.screen)
+
+    def show_editor(self):
+        text_input = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((0, 500), (540, 50)),
+            manager=self.UI_manager,
+        )
+        pass
 
     def set_caption(self, caption: str) -> None:
         pygame.display.set_caption(caption)
