@@ -73,6 +73,11 @@ class ViewModel:
                 BLACK,
                 self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
             )
+        self.render_text(
+            "Radius:",
+            BLACK,
+            (0, 80),
+        )
 
     def render_UI(self, UI_manager):
         self.show_grid()
@@ -84,6 +89,7 @@ class ViewModel:
             manager=self.UI_manager,
             object_id="#radius_input",
         )
+
         pass
 
     def set_caption(self, caption: str) -> None:
