@@ -2,6 +2,7 @@ from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import Vector2D
 from pyng.config import ORIGIN, RED
 from pyng.space.phys_obj import PhysObj, Circle
+import time
 
 
 class State:
@@ -10,6 +11,7 @@ class State:
         objects: [PhysObj] = [],
     ) -> None:
         self.objects = objects
+        self.time_since_last_object_creation = time.time()
 
         self.default_object = Circle(color=RED, mass=10, radius=10)
         self.player_chosen_mass = 10
@@ -28,10 +30,20 @@ class State:
         self.objects.append(obj)
 
     def create_object(self, position: Vector2D, obj: PhysObj = None):
+        if not (
+            time.time() - self.time_since_last_object_creation > 0.1
+        ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
+            return
         if obj is None:
             obj = self.default_object
-        obj.position = position
-        self.objects.append(obj)
+        obj = Circle(
+            mass=self.player_chosen_mass,
+            radius=self.player_chosen_radius,
+            color=self.player_chosen_color,
+            position=position,
+        )
+        self.add_object(obj)
+        self.time_since_last_object_creation = time.time()
 
     def del_object(self, obj: PhysObj):
         self.objects.remove(obj)

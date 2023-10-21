@@ -7,7 +7,7 @@ import time
 
 import pygame
 
-from pyng.space.phys_obj import Circle
+from pyng.space.phys_obj import Circle, Point
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.state import State
@@ -34,6 +34,8 @@ def main():
     screen.fill(BLACK)
     running = True
     prev_time = time.time()
+
+    obj1 = Circle(mass=10, radius=10, color=BLUE)
 
     while running:
         clock.tick(FPS)
