@@ -12,7 +12,7 @@ from pyng.space.phys_obj import Circle
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.analyzer import check_collisions
-from pyng.config import FPS, RED, BLACK, TEST_COORDINATE, BLUE, ORIGIN
+from pyng.config import FPS, RED, BLACK, TEST_COORDINATE, BLUE, ORIGIN, GREEN
 from simulation.event_handler import handle_events
 
 
@@ -31,21 +31,6 @@ def main():
     view_model = ViewModel(screen)
 
     view_model.set_caption("Pyng")
-
-    obj1 = Circle(
-        mass=1,
-        radius=50,
-        color=RED,
-    )
-
-    ob2 = Circle(
-        mass=1,
-        radius=50,
-        color=BLUE,
-    )
-
-    world.create_object(obj1, position=Vector2D(100, 100))
-    world.create_object(ob2, position=Vector2D(200, 200))
 
     screen.fill(BLACK)
     running = True
