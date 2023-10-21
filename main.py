@@ -14,7 +14,7 @@ from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.state import State
 from pyng.config import FPS, RED, BLACK, TEST_COORDINATE, BLUE, ORIGIN, GREEN
-from simulation.event_handler import handle_events
+from simulation.event_handler import handle_events, delegate_event
 
 
 def main():
@@ -51,10 +51,9 @@ def main():
 
         view_model.clear()
 
-        if handle_events(pygame.event.get(), UI_manager) == "mouse 1":
-            state.parse_mouse_click(
-                Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos())))
-            )
+        event = handle_events(pygame.event.get(), UI_manager)
+
+        delegate_event(event, state, view_model, UI_manager)
 
         state.check_collisions()
 

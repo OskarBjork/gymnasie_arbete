@@ -80,8 +80,9 @@ class ViewModel:
 
     def show_editor(self):
         text_input = pygame_gui.elements.UITextEntryLine(
-            relative_rect=pygame.Rect((0, 500), (540, 50)),
+            relative_rect=pygame.Rect((0, 100), (0.7 * ORIGIN[0], 50)),
             manager=self.UI_manager,
+            object_id="#radius_input",
         )
         pass
 
