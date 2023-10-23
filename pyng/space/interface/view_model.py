@@ -53,6 +53,7 @@ class ViewModel:
                 f"{i * 100}",
                 BLACK,
                 self.convert_coordinates(origin[0] + x_offset, origin[1]),
+                20,
             )
 
         # Samma ordning som ovan
@@ -72,11 +73,19 @@ class ViewModel:
                 f"{i * 100}",
                 BLACK,
                 self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
+                20,
             )
         self.render_text(
             "Radius:",
             BLACK,
             (0, 80),
+            20,
+        )
+        self.render_text(
+            "dU ÄR EN NÖRRRRRD",
+            RED,
+            (300, 80),
+            40,
         )
 
     def render_UI(self, UI_manager):
@@ -94,12 +103,13 @@ class ViewModel:
 
     def set_caption(self, caption: str) -> None:
         pygame.display.set_caption(caption)
-
-    def create_text(self, text: str, color: tuple, position: tuple) -> None:
+    
+    def create_text(self, text: str, color: tuple, position: tuple, size: int) -> None:
+        self.font.set_point_size(size)
         return self.font.render(text, True, color)
 
-    def render_text(self, text: str, color: tuple, position: tuple) -> None:
-        text_surface = self.create_text(text, color, position)
+    def render_text(self, text: str, color: tuple, position: tuple, size: int) -> None:
+        text_surface = self.create_text(text, color, position, size)
         self.screen.blit(text_surface, position)
 
     def render_objects(self, objects: list) -> None:
