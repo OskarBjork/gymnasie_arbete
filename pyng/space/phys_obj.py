@@ -58,35 +58,42 @@ class Point(PhysObj):
         )
 
 
-class Square(PhysObj):
+class Rectangle(PhysObj):
     def __init__(
         self,
         mass: float,
         color: (int, int, int),
-        width: int,
         height: int,
+        width: int,
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
     ):
-        super().__init__(mass, color, position, velocity, force)
-        self.width = width
+        super().__init__(mass, color, velocity, force)
+        self.middle_point = position
         self.height = height
-        self.update_points()
+        self.width = width
 
-    def update_points(self):
-        self.points = [
-            (self.position.x - self.width // 2, self.position.y - self.height // 2),
-            (self.position.x + self.width // 2, self.position.y - self.height // 2),
-            (self.position.x + self.width // 2, self.position.y + self.height // 2),
-            (self.position.x - self.width // 2, self.position.y + self.height // 2),
-        ]
-
-    def is_inside_of(self, other_object) -> bool:
-        return (
-            self.position.x == other_object.position.x
-            and self.position.y == other_object.position.y
+    def is_inside_of(self, other_rect):
+        a1 = Vector2D(
+            self.middle_point.x - self.width / 2, self.middle_point.y + self.height / 2
         )
+        a2 = Vector2D(
+            self.middle_point.x + self.width / 2, self.middle_point.y - self.height / 2
+        )
+        b1 = Vector2D(
+            other_rect.middle_point.x - other_rect.width / 2,
+            other_rect.middle_point.y + other_rect.height / 2,
+        )
+        b2 = Vector2D(
+            Vector2D(
+                other_rect.middle_point.x - other_rect.width / 2,
+                other_rect.middle_point.y + other_rect.height / 2,
+            )
+        )
+        if b2.y > a1.y or a2.y > b1.y or a1.x > b2.x or b1.x > a2.x:
+            return False
+        return True
 
 
 class Circle(PhysObj):
