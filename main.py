@@ -29,8 +29,8 @@ def main():
 
     state = State()
 
-    UI_manager = pygame_gui.UIManager((screen_width, screen_height))
-    view_model = ViewModel(screen, UI_manager)
+    ui_manager = pygame_gui.UIManager((screen_width, screen_height))
+    view_model = ViewModel(screen, ui_manager)
 
     view_model.set_caption("Pyng")
 
@@ -43,7 +43,7 @@ def main():
     view_model.show_editor()
 
     while running:
-        UI_refresh_rate = clock.tick(FPS) / 1000
+        ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass
         now = time.time()
         dt = now - prev_time
@@ -51,9 +51,9 @@ def main():
 
         view_model.clear()
 
-        event = handle_events(pygame.event.get(), UI_manager)
+        event = handle_events(pygame.event.get(), ui_manager)
 
-        delegate_event(event, state, view_model, UI_manager)
+        delegate_event(event, state, view_model, ui_manager)
 
         state.check_collisions()
 
@@ -61,9 +61,9 @@ def main():
 
         view_model.render_objects(state.objects)
 
-        view_model.render_UI(UI_manager)
+        view_model.render_ui(ui_manager)
 
-        view_model.update(UI_refresh_rate)
+        view_model.update(ui_refresh_rate)
 
     pygame.quit()
 

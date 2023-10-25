@@ -11,11 +11,11 @@ from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER, ORIGIN
 
 
 class ViewModel:
-    def __init__(self, screen: Surface, UI_manager) -> None:
+    def __init__(self, screen: Surface, ui_manager) -> None:
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
-        self.UI_manager = UI_manager
+        self.ui_manager = ui_manager
         self.font = pygame.font.Font(None, 36)
 
     def convert_coordinates(self, x, y) -> (float, float):
@@ -24,9 +24,9 @@ class ViewModel:
     def clear(self):
         self.screen.fill(WHITE)
 
-    def update(self, UI_refresh_rate: float):
+    def update(self, ui_refresh_rate: float):
         pygame.display.update()
-        self.UI_manager.update(UI_refresh_rate)
+        self.ui_manager.update(ui_refresh_rate)
 
     def place_pixel(self, x: int, y: int, color: tuple) -> None:
         converted_x, converted_y = self.convert_coordinates(x, y)
@@ -81,21 +81,15 @@ class ViewModel:
             (0, 80),
             20,
         )
-        self.render_text(
-            "dU ÄR EN NÖRRRRRD",
-            RED,
-            (300, 80),
-            40,
-        )
 
-    def render_UI(self, UI_manager):
+    def render_ui(self, ui_manager):
         self.show_grid()
-        UI_manager.draw_ui(self.screen)
+        ui_manager.draw_ui(self.screen)
 
     def show_editor(self):
         text_input = pygame_gui.elements.UITextEntryLine(
             relative_rect=pygame.Rect((0, 100), (0.7 * ORIGIN[0], 50)),
-            manager=self.UI_manager,
+            manager=self.ui_manager,
             object_id="#radius_input",
         )
 
