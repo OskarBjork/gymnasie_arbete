@@ -26,8 +26,8 @@ def handle_events(events: list[Event], UI_manager):
             pygame.quit()
             sys.exit()
 
-    if pygame.mouse.get_pressed()[0] == True:  # Kollar ifall mouse1 är nedtryckt
-        return "mouse 1"
+    # if pygame.mouse.get_pressed()[0] == True:  # Kollar ifall mouse1 är nedtryckt
+    #     return "mouse 1"
 
 
 def delegate_event(event, state, view_model, UI_manager):

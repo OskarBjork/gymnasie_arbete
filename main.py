@@ -9,7 +9,7 @@ import sys
 import pygame
 import pygame_gui
 
-from pyng.space.phys_obj import Circle, Point
+from pyng.space.phys_obj import Circle, Point, Rectangle
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.state import State
@@ -38,9 +38,28 @@ def main():
     running = True
     prev_time = time.time()
 
-    obj1 = Circle(mass=10, radius=10, color=BLUE)
-
     view_model.show_editor()
+
+    obj1 = Rectangle(
+        mass=30,
+        width=20,
+        height=10,
+        color=GREEN,
+        position=Vector2D(700, 670),
+        velocity=Vector2D(-100, 0),
+    )
+
+    obj2 = Rectangle(
+        mass=30,
+        width=10,
+        height=10,
+        color=RED,
+        position=Vector2D(300, 670),
+        velocity=Vector2D(100, 0),
+    )
+
+    state.add_object(obj1)
+    state.add_object(obj2)
 
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000

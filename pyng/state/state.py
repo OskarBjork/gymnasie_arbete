@@ -1,7 +1,7 @@
 from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import Vector2D
 from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT
-from pyng.space.phys_obj import PhysObj, Circle
+from pyng.space.phys_obj import PhysObj, Circle, Rectangle
 import time
 
 
@@ -69,21 +69,28 @@ class State:
                     self.resolve_collision(obj, other_obj)
 
     def resolve_collision(self, obj: PhysObj, other_obj: PhysObj):
-        d = obj.position.distance_to(other_obj.position)
+        if obj.isinstance(Circle) and other_obj.isinstance(Circle):
+            d = obj.position.distance_to(other_obj.position)
 
-        overlap_length = obj.radius + other_obj.radius - d
+            overlap_length = obj.radius + other_obj.radius - d
 
-        direction = obj.position - other_obj.position
+            direction = obj.position - other_obj.position
 
-        direction = direction.normalize()
+            direction = direction.normalize()
 
-        magnitude = overlap_length / 2
+            magnitude = overlap_length / 2
 
-        direction = direction * magnitude
+            direction = direction * magnitude
 
-        obj.position = obj.position + direction
+            obj.position = obj.position + direction
 
-        other_obj.position = other_obj.position - direction
+            other_obj.position = other_obj.position - direction
+
+        elif obj.isinstance(Circle) and other_obj.isinstance(Rectangle):
+            obj.position.x = obj.position.x - obj.velocity.x
+            obj.position.y = obj.position.y - obj.velocity.y
+            other_obj.position.x = other_obj.position.x - other_obj.velocity.x
+            other_obj.position.y = other_obj.position.y - other_obj.velocity.y
 
         self.resolve_momentum(obj, other_obj)
 

@@ -55,6 +55,10 @@ class Vector2D:
     def __truediv__(self, scalar):
         return Vector2D(self.x / scalar, self.y / scalar)
 
+    # Dividerar elementvis
+    def element_division(self, vector):
+        return Vector2D(self.x / vector.x, self.y / vector.y)
+
     def __iadd__(self, other):
         self.x += other.x
         self.y += other.y

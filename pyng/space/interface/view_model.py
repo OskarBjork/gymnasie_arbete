@@ -87,17 +87,22 @@ class ViewModel:
         ui_manager.draw_ui(self.screen)
 
     def show_editor(self):
-        text_input = pygame_gui.elements.UITextEntryLine(
+        pygame_gui.elements.UITextEntryLine(
             relative_rect=pygame.Rect((0, 100), (0.7 * ORIGIN[0], 50)),
             manager=self.ui_manager,
             object_id="#radius_input",
+        )
+        pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((0, 300), (0.7 * ORIGIN[0], 50)),
+            manager=self.ui_manager,
+            object_id="#lol_input",
         )
 
         pass
 
     def set_caption(self, caption: str) -> None:
         pygame.display.set_caption(caption)
-    
+
     def create_text(self, text: str, color: tuple, position: tuple, size: int) -> None:
         self.font.set_point_size(size)
         return self.font.render(text, True, color)
@@ -110,14 +115,17 @@ class ViewModel:
         for obj in objects:
             obj.render(self)
 
-    def render_polygon(self, polygon):
-        polygon.update_points()
-        converted_points = []
-        for point in polygon.points:
-            converted_points.append(self.convert_coordinates(point[0], point[1]))
-
-        pygame.draw.polygon(
-            surface=self.screen, color=polygon.color, points=converted_points
+    def render_rectangle(self, rectangle):
+        pygame.draw.rect(
+            surface=self.screen,
+            color=rectangle.color,
+            rect=pygame.Rect(
+                self.convert_coordinates(rectangle.position.x, rectangle.position.y),
+                (
+                    rectangle.width * GRID_SCALE,
+                    rectangle.height * GRID_SCALE,
+                ),
+            ),
         )
 
     def render_circle(self, circle):

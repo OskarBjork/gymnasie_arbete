@@ -5,12 +5,12 @@ from pyng.space.interface.view_model import ViewModel
 
 class PhysObj:
     def __init__(
-            self,
-            mass: float,
-            color: (int, int, int),
-            position=Vector2D(*ORIGIN),  # Centrumet av formen
-            velocity=Vector2D(0, 0),
-            force=Vector2D(0, 0),
+        self,
+        mass: float,
+        color: (int, int, int),
+        position=Vector2D(*ORIGIN),  # Centrumet av formen
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
     ):
         self.mass = mass
         self.position = position
@@ -39,12 +39,12 @@ class PhysObj:
 
 class Point(PhysObj):
     def __init__(
-            self,
-            mass: float,
-            color: (int, int, int),
-            position=Vector2D(*ORIGIN),
-            velocity=Vector2D(0, 0),
-            force=Vector2D(0, 0),
+        self,
+        mass: float,
+        color: (int, int, int),
+        position=Vector2D(*ORIGIN),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
     ):
         super().__init__(mass, color, position, velocity, force)
 
@@ -53,59 +53,55 @@ class Point(PhysObj):
 
     def is_inside_of_other_object(self, other_object) -> bool:
         return (
-                self.position.x == other_object.position.x
-                and self.position.y == other_object.position.y
+            self.position.x == other_object.position.x
+            and self.position.y == other_object.position.y
         )
 
 
 class Rectangle(PhysObj):
     def __init__(
-            self,
-            mass: float,
-            color: (int, int, int),
-            height: int,
-            width: int,
-            position=Vector2D(*ORIGIN),
-            velocity=Vector2D(0, 0),
-            force=Vector2D(0, 0),
+        self,
+        mass: float,
+        color: (int, int, int),
+        height: int,
+        width: int,
+        position=Vector2D(*ORIGIN),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
     ):
-        super().__init__(mass, color, velocity, force)
-        self.middle_point = Vector2D(position.x + (width / 2),
-                                     position.y + (height / 2))
+        self.mass = mass
+        self.color = color
+        self.velocity = velocity
+        self.force = force
+        self.position = position
         self.height = height
         self.width = width
 
     def is_inside_of(self, other_rect):
-        a1 = Vector2D(
-            self.middle_point.x - self.width / 2, self.middle_point.y + self.height / 2
-        )
-        a2 = Vector2D(
-            self.middle_point.x + self.width / 2, self.middle_point.y - self.height / 2
-        )
-        b1 = Vector2D(
-            other_rect.middle_point.x - other_rect.width / 2,
-            other_rect.middle_point.y + other_rect.height / 2,
-        )
+        a1 = self.position
+        a2 = Vector2D(self.position.x + self.width, self.position.y + self.height)
+        b1 = other_rect.position
         b2 = Vector2D(
-            Vector2D(
-                other_rect.middle_point.x - other_rect.width / 2,
-                other_rect.middle_point.y + other_rect.height / 2,
-            )
+            other_rect.position.x + other_rect.width,
+            other_rect.position.y + other_rect.height,
         )
         if b2.y > a1.y or a2.y > b1.y or a1.x > b2.x or b1.x > a2.x:
             return False
         return True
 
+    def render(self, view_model):
+        view_model.render_rectangle(self)
+
 
 class Circle(PhysObj):
     def __init__(
-            self,
-            mass: float,
-            color: (int, int, int),
-            position=Vector2D(*ORIGIN),
-            velocity=Vector2D(0, 0),
-            force=Vector2D(0, 0),
-            radius=1,
+        self,
+        mass: float,
+        color: (int, int, int),
+        position=Vector2D(*ORIGIN),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
+        radius=1,
     ):
         super().__init__(mass, color, position, velocity, force)
         self.radius = radius
@@ -117,10 +113,17 @@ class Circle(PhysObj):
         return self.position.distance_to(other.position) < self.radius + other.radius
 
 
-def RayvsRect(ray_origin: Vector2D, ray_direction: Vector2D, target: Rectangle) -> bool:
-    t_near = (target.position - ray_origin) / ray_direction
-    t_far = (target.position + Vector2D(target.width, target.height)
-             - ray_origin) / ray_direction
+class CollisionResult:
+    def __init__(self, contact_point: Vector2D, normal: Vector2D):
+        self.contact_point = contact_point
+        self.normal = normal
+
+
+def RayVsRect(ray_origin: Vector2D, ray_direction: Vector2D, target: Rectangle) -> bool:
+    t_near = (target.position - ray_origin).element_division(ray_direction)
+    t_far = (
+        target.position + Vector2D(target.width, target.height) - ray_origin
+    ).element_division(ray_direction)
     if t_near.x > t_far.x:
         t_near.x, t_far.x = t_far.x, t_near.x
 
@@ -138,4 +141,24 @@ def RayvsRect(ray_origin: Vector2D, ray_direction: Vector2D, target: Rectangle) 
         return False
 
     contact_point = ray_origin + (t_hit_near * ray_direction)
+
+    # Hitta vilken sida som träffas
+
+    if t_near.x > t_near.y:
+        if ray_direction.x < 0:
+            normal = Vector2D(1, 0)
+        else:
+            normal = Vector2D(-1, 0)
+
+    elif t_near.x < t_near.y:
+        if ray_direction.y < 0:
+            normal = Vector2D(0, 1)
+        else:
+            normal = Vector2D(0, -1)
+
+    return True, CollisionResult(contact_point, normal)
+
     # TODO: FINISH ME
+
+
+RayVsRect(Vector2D(0, 0), Vector2D(1, 1), Rectangle(1, RED, 1, 1))
