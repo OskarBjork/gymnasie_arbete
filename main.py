@@ -29,7 +29,7 @@ def main():
 
     state = State()
 
-    ui_manager = pygame_gui.UIManager((screen_width, screen_height))
+    ui_manager = pygame_gui.UIManager((screen_width, screen_height), "theme.json")
     view_model = ViewModel(screen, ui_manager)
 
     view_model.set_caption("Pyng")

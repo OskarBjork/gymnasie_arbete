@@ -98,6 +98,13 @@ class ViewModel:
             object_id="#lol_input",
         )
 
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((0, 500), (0.3 * ORIGIN[0], 45)),
+            text="Manipulate",
+            manager=self.ui_manager,
+            object_id="#manipulate_view_changer_button"
+        )
+
         pass
 
     def set_caption(self, caption: str) -> None:
