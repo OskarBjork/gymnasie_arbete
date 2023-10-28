@@ -3,6 +3,7 @@ from pyng.space.vectors import Vector2D
 from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT
 from pyng.space.phys_obj import PhysObj, Circle, Rectangle
 import time
+import math
 
 
 class State:
@@ -60,6 +61,90 @@ class State:
     def impose_gravity(self, obj: PhysObj):
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
+    def find_collisions(self):
+        points = [
+            (obj.position.x, obj.position.y)
+            if isinstance(obj, Circle)
+            else (obj.position.x + obj.width / 2, obj.position.y + obj.height / 2)
+            for obj in self.objects
+        ]
+        kd_tree = self.build_kd_tree(points)
+        collisions = self.find_all_leaves_with_two_points(kd_tree)
+        print(len(collisions))
+
+    def build_kd_tree(self, points, depth=0, k=2):
+        n = len(points)
+        if n <= 0:
+            return None
+        axis = depth % k
+        sorted_points = sorted(points, key=lambda point: point[axis])
+        median = n // 2
+
+        return {
+            "point": sorted_points[median],
+            "left": self.build_kd_tree(points=sorted_points[:median], depth=depth + 1),
+            "right": self.build_kd_tree(
+                points=sorted_points[median + 1 :], depth=depth + 1
+            ),
+        }
+
+    def find_all_leaves_with_two_points(self, root):
+        if root is None:
+            return []
+        elif root["left"] is None and root["right"] is None:
+            return [root]
+        else:
+            return self.find_all_leaves_with_two_points(
+                root["left"]
+            ) + self.find_all_leaves_with_two_points(root["right"])
+
+    def distance(self, p1, p2):
+        return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
+
+    def closer_distance(self, pivot, p1, p2):
+        if p1 is None:
+            return p2
+        if p2 is None:
+            return p1
+
+        d1 = self.distance(pivot, p1)
+        d2 = self.distance(pivot, p2)
+
+        if d1 < d2:
+            return p1
+        else:
+            return p2
+
+    def kd_tree_closest_point(self, root, point, depth=0, k=2):
+        if root is None:
+            return None
+
+        axis = depth % k
+        next_branch = None
+        opposite_branch = None
+
+        if point[axis] < root["point"][axis]:
+            next_branch = root["left"]
+            opposite_branch = root["right"]
+        else:
+            next_branch = root["right"]
+            opposite_branch = root["left"]
+
+        best = self.closer_distance(
+            point,
+            self.kd_tree_closest_point(next_branch, point, depth + 1),
+            root["point"],
+        )
+
+        if self.distance(point, best) > abs(point[axis] - root["point"][axis]):
+            best = self.closer_distance(
+                point,
+                self.kd_tree_closest_point(opposite_branch, point, depth + 1),
+                best,
+            )
+
+        return best
+
     def check_collisions(self):
         for obj in self.objects:
             for other_obj in self.objects:
@@ -69,7 +154,7 @@ class State:
                     self.resolve_collision(obj, other_obj)
 
     def resolve_collision(self, obj: PhysObj, other_obj: PhysObj):
-        if obj.isinstance(Circle) and other_obj.isinstance(Circle):
+        if isinstance(obj, Circle) and isinstance(obj, Circle):
             d = obj.position.distance_to(other_obj.position)
 
             overlap_length = obj.radius + other_obj.radius - d

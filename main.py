@@ -3,6 +3,10 @@
 # TODO: Ta bort allt klotter härifrån och sätt det in i andra klasser
 # TODO: TYPE ANNOTATIONS!
 
+# TODO: Collision detection
+# Broad phase: kd-tree
+# Narrow phase: ?
+
 import time
 import sys
 
@@ -58,8 +62,8 @@ def main():
         velocity=Vector2D(100, 0),
     )
 
-    state.add_object(obj1)
-    state.add_object(obj2)
+    # state.add_object(obj1)
+    # state.add_object(obj2)
 
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
@@ -79,6 +83,8 @@ def main():
         state.step(dt)
 
         view_model.render_objects(state.objects)
+
+        state.find_collisions()
 
         view_model.render_ui(ui_manager)
 
