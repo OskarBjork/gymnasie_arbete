@@ -66,50 +66,55 @@ def main():
         mass=30,
         color=GREEN,
         position=Vector2D(1000, 670),
-        velocity=Vector2D(-100, 0),
+        # velocity=Vector2D(-100, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
+        id="green",
     )
 
     obj2 = ConvexPolygon(
         mass=30,
         color=RED,
         position=Vector2D(100, 670),
-        velocity=Vector2D(100, 0),
+        # velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
+        id="red",
     )
 
     obj3 = ConvexPolygon(
         mass=30,
         color=BLUE,
         position=Vector2D(500, 500),
-        velocity=Vector2D(0, 10),
+        # velocity=Vector2D(0, 10),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
+        id="blue",
     )
 
     obj4 = ConvexPolygon(
         mass=30,
         color=ORANGE,
-        position=Vector2D(1500, 500),
+        position=Vector2D(700, 500),
         velocity=Vector2D(0, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
+        id="orange",
     )
 
     obj5 = ConvexPolygon(
         mass=30,
         color=PINK,
-        position=Vector2D(1500, 500),
+        position=Vector2D(1000, 500),
         velocity=Vector2D(0, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
+        id="pink",
     )
 
     obj6 = ConvexPolygon(
@@ -120,6 +125,7 @@ def main():
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
+        id="purple",
     )
 
     state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])

@@ -106,12 +106,15 @@ class State:
 
     def find_collisions(self):
         root_node = self.build_bvh(self.objects)
-        # print("NEW NODE: ")
+        print("NEW NODE: ")
         # pp.pprint(root_node)
         potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
-        print(len(potential_collision_nodes))
+        # print(len(potential_collision_nodes))
+        for node in potential_collision_nodes:
+            pp.pprint([obj.id for obj in node["objects"]])
+            pass
 
-    def build_bvh(self, objects, depth=0, max_depth=20):
+    def build_bvh(self, objects, depth=0, max_depth=20, k=2):
         if len(objects) == 0:
             return None
 
@@ -145,10 +148,17 @@ class State:
             left_objects = [objects[0]]
             right_objects = [objects[1]]
         else:
-            left_objects, right_objects = self.partition_objects(objects, bounding_box)
+            left_objects, right_objects, k = self.partition_objects(
+                objects, bounding_box, k=k
+            )
 
-        left_child = self.build_bvh(left_objects, depth + 1, max_depth)
-        right_child = self.build_bvh(right_objects, depth + 1, max_depth)
+        left_child = self.build_bvh(left_objects, depth + 1, max_depth, k=k)
+        right_child = self.build_bvh(right_objects, depth + 1, max_depth, k=k)
+
+        # print("LEFT CHILD: ")
+        # pp.pprint(left_child)
+        # print("RIGHT CHILD: ")
+        # pp.pprint(right_child)
 
         return {
             "objects": objects,
@@ -183,20 +193,38 @@ class State:
 
         return bounding_box
 
-    def partition_objects(self, objects, bounding_box):
+    def partition_objects(self, objects, bounding_box, k=2):
+        # print("new objects: ")
         axis = self.longest_axis(bounding_box)
-        midpoint = (bounding_box[axis][0] + bounding_box[axis][1]) / 2
+        objects_sorted_along_axis = sorted(
+            objects, key=lambda obj: obj.position.x if axis == 0 else obj.position.y
+        )
+        print([obj.id for obj in objects_sorted_along_axis])
+        print(
+            [
+                obj.position.x if axis == 0 else obj.position.y
+                for obj in objects_sorted_along_axis
+            ]
+        )
+        median = objects_sorted_along_axis[len(objects_sorted_along_axis) // 2]
+        median_position_in_axis = median.position.x if axis == 0 else median.position.y
+        # print(f"median: {median.id}")
+        # print("axis: ", axis)
 
         left_objects = []
         right_objects = []
 
         for obj in objects:
             obj.bounding_box = obj.calculate_polygon_bounding_box()
-            if obj.bounding_box[axis][1] < midpoint:
+            obj_position_in_axis = obj.position.x if axis == 0 else obj.position.y
+            if obj_position_in_axis < median_position_in_axis:
+                # print(f"obj: {obj.id} is left of median")
                 left_objects.append(obj)
-            elif obj.bounding_box[axis][0] > midpoint:
+            elif obj_position_in_axis > median_position_in_axis:
+                # print(f"obj: {obj.id} is right of median")
                 right_objects.append(obj)
             else:
+                # print(f"obj: {obj.id} is on median")
                 left_objects.append(obj)
 
         # print(f"Right objects: {len(right_objects)}")
@@ -209,7 +237,9 @@ class State:
             right_objects = left_objects[: len(left_objects) // 2]
             left_objects = left_objects[len(left_objects) // 2 :]
 
-        return left_objects, right_objects
+        k += 1
+
+        return left_objects, right_objects, k
 
     def longest_axis(self, bounding_box):
         x_length = bounding_box[0][1] - bounding_box[0][0]

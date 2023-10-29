@@ -35,7 +35,7 @@ class PhysObj:
         view_model.render_polygon(self)
 
     def __repr__(self) -> str:
-        return f"PhysObj(position={self.position})"
+        return f"PhysObj(position={self.position} id = {self.id})"
 
 
 class Point(PhysObj):
@@ -70,6 +70,7 @@ class ConvexPolygon(PhysObj):
         num_of_sides=4,
         side_length=1,
         angle=0,
+        id: str = None,
     ):
         self.mass = mass
         self.color = color
@@ -79,6 +80,7 @@ class ConvexPolygon(PhysObj):
         self.num_of_sides = num_of_sides
         self.side_length = side_length
         self.angle = angle
+        self.id = id
         self.vertices = self.update_vertices()
         self.bounding_box = self.calculate_polygon_bounding_box()
 
