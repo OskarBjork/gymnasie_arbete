@@ -73,8 +73,9 @@ class State:
         for obj in self.objects:
             obj.update_vertices()
 
-    def add_object(self, obj: PhysObj):
-        self.objects.append(obj)
+    def add_objects(self, objs: [PhysObj]):
+        for obj in objs:
+            self.objects.append(obj)
 
     def create_object(
         self, position: Vector2D, obj: PhysObj = None, with_gravity=False
@@ -105,11 +106,10 @@ class State:
 
     def find_collisions(self):
         root_node = self.build_bvh(self.objects)
+        # print("NEW NODE: ")
+        # pp.pprint(root_node)
         potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
-        # print(potential_collision_nodes)
-        for node in potential_collision_nodes:
-            objects = potential_collision_nodes["objects"]
-        pass
+        print(len(potential_collision_nodes))
 
     def build_bvh(self, objects, depth=0, max_depth=20):
         if len(objects) == 0:
@@ -117,7 +117,15 @@ class State:
 
         if len(objects) == 1:
             return {
-                "objects": [objects[0]],
+                "objects": objects,
+                "bounding_box": self.calculate_bounding_box(objects),
+                "left": None,
+                "right": None,
+            }
+
+        if len(objects) == 2:
+            return {
+                "objects": objects,
                 "bounding_box": self.calculate_bounding_box(objects),
                 "left": None,
                 "right": None,
@@ -183,13 +191,16 @@ class State:
         right_objects = []
 
         for obj in objects:
+            obj.bounding_box = obj.calculate_polygon_bounding_box()
             if obj.bounding_box[axis][1] < midpoint:
                 left_objects.append(obj)
             elif obj.bounding_box[axis][0] > midpoint:
                 right_objects.append(obj)
             else:
                 left_objects.append(obj)
-                right_objects.append(obj)
+
+        # print(f"Right objects: {len(right_objects)}")
+        # print(f"Left objects: {len(left_objects)}")
 
         if len(left_objects) == 0:
             left_objects = right_objects[: len(right_objects) // 2]
@@ -200,17 +211,14 @@ class State:
 
         return left_objects, right_objects
 
-    def longest_axis(bounding_box):
+    def longest_axis(self, bounding_box):
         x_length = bounding_box[0][1] - bounding_box[0][0]
         y_length = bounding_box[1][1] - bounding_box[1][0]
-        z_length = bounding_box[2][1] - bounding_box[2][0]
 
-        if x_length > y_length and x_length > z_length:
+        if x_length > y_length:
             return 0
-        elif y_length > z_length:
-            return 1
         else:
-            return 2
+            return 1
 
     def projection(polygon, axis):
         """Går igenom alla vertices i ett objekt och projicerar dem på en axel, och returnerar sedan minsta och största värdena av dessa"""

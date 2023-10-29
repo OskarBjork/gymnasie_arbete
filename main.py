@@ -21,7 +21,21 @@ from pyng.space.phys_obj import Circle, Point, ConvexPolygon
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.state import State
-from pyng.config import FPS, RED, BLACK, TEST_COORDINATE, BLUE, ORIGIN, GREEN
+from pyng.config import (
+    FPS,
+    RED,
+    BLACK,
+    TEST_COORDINATE,
+    BLUE,
+    ORIGIN,
+    GREEN,
+    ORANGE,
+    YELLOW,
+    PINK,
+    PURPLE,
+    GRAY,
+    LIGHT_BLUE,
+)
 from simulation.event_handler import handle_events, delegate_event
 
 
@@ -51,7 +65,7 @@ def main():
     obj1 = ConvexPolygon(
         mass=30,
         color=GREEN,
-        position=Vector2D(700, 670),
+        position=Vector2D(1000, 670),
         velocity=Vector2D(-100, 0),
         num_of_sides=4,
         side_length=100,
@@ -68,8 +82,47 @@ def main():
         angle=math.pi / 4,
     )
 
-    state.add_object(obj1)
-    state.add_object(obj2)
+    obj3 = ConvexPolygon(
+        mass=30,
+        color=BLUE,
+        position=Vector2D(500, 500),
+        velocity=Vector2D(0, 10),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+    )
+
+    obj4 = ConvexPolygon(
+        mass=30,
+        color=ORANGE,
+        position=Vector2D(1500, 500),
+        velocity=Vector2D(0, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+    )
+
+    obj5 = ConvexPolygon(
+        mass=30,
+        color=PINK,
+        position=Vector2D(1500, 500),
+        velocity=Vector2D(0, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+    )
+
+    obj6 = ConvexPolygon(
+        mass=30,
+        color=PURPLE,
+        position=Vector2D(1500, 500),
+        velocity=Vector2D(0, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+    )
+
+    state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
 
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000

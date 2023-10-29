@@ -35,7 +35,7 @@ class PhysObj:
         view_model.render_polygon(self)
 
     def __repr__(self) -> str:
-        return f"PhysObj(mass={self.mass}, color={self.color}, position={self.position}, velocity={self.velocity}, force={self.force})"
+        return f"PhysObj(position={self.position})"
 
 
 class Point(PhysObj):
