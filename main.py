@@ -4,7 +4,7 @@
 # TODO: TYPE ANNOTATIONS!
 
 # TODO: Collision detection
-# Broad phase: kd-tree
+# Broad phase: bounding volume hierarchies
 # Narrow phase: ?
 
 import time
