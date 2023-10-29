@@ -225,6 +225,23 @@ class State:
                 right_objects.append(obj)
             else:
                 # print(f"obj: {obj.id} is on median")
+                if len(objects) == 3:
+                    d1 = self.distance(
+                        (objects[0].position.x, objects[0].position.y),
+                        (median.position.x, median.position.y),
+                    )
+                    d2 = self.distance(
+                        (objects[2].position.x, objects[2].position.y),
+                        (median.position.x, median.position.y),
+                    )
+                    if d1 < d2:
+                        left_objects.append(obj)
+                    elif d2 < d1:
+                        right_objects.append(obj)
+                    else:
+                        left_objects.append(obj)
+                        right_objects.append(obj)
+                    pass
                 left_objects.append(obj)
 
         # print(f"Right objects: {len(right_objects)}")
