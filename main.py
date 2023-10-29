@@ -9,6 +9,7 @@
 
 import time
 import sys
+import math
 
 import pygame
 import pygame_gui
@@ -49,22 +50,22 @@ def main():
 
     obj1 = ConvexPolygon(
         mass=30,
-        width=20,
-        height=10,
         color=GREEN,
         position=Vector2D(700, 670),
         velocity=Vector2D(-100, 0),
-        vertices=[Vector2D(0, 0), Vector2D(0, 10), Vector2D(20, 10), Vector2D(20, 0)],
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
     )
 
     obj2 = ConvexPolygon(
         mass=30,
-        width=10,
-        height=10,
         color=RED,
-        position=Vector2D(300, 670),
+        position=Vector2D(100, 670),
         velocity=Vector2D(100, 0),
-        vertices=[Vector2D(0, 0), Vector2D(0, 10), Vector2D(10, 10), Vector2D(10, 0)],
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
     )
 
     state.add_object(obj1)
@@ -89,7 +90,7 @@ def main():
 
         view_model.render_objects(state.objects)
 
-        # state.find_collisions()
+        state.find_collisions()
 
         view_model.render_ui(ui_manager)
 

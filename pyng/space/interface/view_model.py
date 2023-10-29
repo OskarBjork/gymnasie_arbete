@@ -140,6 +140,9 @@ class ViewModel:
         pygame.draw.polygon(
             surface=self.screen,
             color=polygon.color,
-            points=[(point.x, point.y) for point in polygon.vertices],
+            points=[
+                self.convert_coordinates(point.x, point.y)
+                for point in polygon.update_vertices()
+            ],
             width=0,
         )

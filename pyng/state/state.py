@@ -63,10 +63,15 @@ class State:
             self.create_object(mouse_pos)
 
     def step(self, delta_time: float):
+        self.update_all_vertices()
         for obj in self.objects:
             # TODO: Fixa +=
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
+
+    def update_all_vertices(self):
+        for obj in self.objects:
+            obj.update_vertices()
 
     def add_object(self, obj: PhysObj):
         self.objects.append(obj)
@@ -101,7 +106,7 @@ class State:
     def find_collisions(self):
         root_node = self.build_bvh(self.objects)
         potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
-        print(potential_collision_nodes)
+        # print(potential_collision_nodes)
         for node in potential_collision_nodes:
             objects = potential_collision_nodes["objects"]
         pass
@@ -112,7 +117,7 @@ class State:
 
         if len(objects) == 1:
             return {
-                "objects": objects[0],
+                "objects": [objects[0]],
                 "bounding_box": self.calculate_bounding_box(objects),
                 "left": None,
                 "right": None,

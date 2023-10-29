@@ -10,6 +10,9 @@ class Vector2D:
         self.x = x
         self.y = y
 
+    def tuple(self):
+        return (self.x, self.y)
+
     def distance_to(self, other) -> float:
         return vector_magnitude(self - other)
 

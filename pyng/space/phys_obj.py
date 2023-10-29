@@ -1,6 +1,7 @@
 from pyng.space.vectors import Vector2D
 from pyng.config import RED, ORIGIN
 from pyng.space.interface.view_model import ViewModel
+import math
 
 
 class PhysObj:
@@ -63,22 +64,36 @@ class ConvexPolygon(PhysObj):
         self,
         mass: float,
         color: (int, int, int),
-        height: int,
-        width: int,
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
-        vertices=[],
+        num_of_sides=4,
+        side_length=1,
+        angle=0,
     ):
         self.mass = mass
         self.color = color
+        self.position = position
         self.velocity = velocity
         self.force = force
-        self.position = position
-        self.height = height
-        self.width = width
-        self.vertices = vertices
+        self.num_of_sides = num_of_sides
+        self.side_length = side_length
+        self.angle = angle
+        self.vertices = self.update_vertices()
         self.bounding_box = self.calculate_polygon_bounding_box()
+
+    def update_vertices(self):
+        p = self.position
+        k = self.num_of_sides
+        s = self.side_length
+        angle = self.angle
+        vertices = []
+        for i in range(k):
+            rotated_angle = angle + 2 * math.pi * i / k
+            x = p.x + s * math.cos(rotated_angle)
+            y = p.y + s * math.sin(rotated_angle)
+            vertices.append(Vector2D(x, y))
+        return vertices
 
     def calculate_polygon_bounding_box(self):
         min_x = min(v.x for v in self.vertices)
@@ -88,16 +103,7 @@ class ConvexPolygon(PhysObj):
         return [(min_x, min_y), (max_x, max_y)]
 
     def is_inside_of(self, other_rect):
-        a1 = self.position
-        a2 = Vector2D(self.position.x + self.width, self.position.y + self.height)
-        b1 = other_rect.position
-        b2 = Vector2D(
-            other_rect.position.x + other_rect.width,
-            other_rect.position.y + other_rect.height,
-        )
-        if b2.y > a1.y or a2.y > b1.y or a1.x > b2.x or b1.x > a2.x:
-            return False
-        return True
+        pass
 
     def render(self, view_model):
         view_model.render_polygon(self)
