@@ -100,7 +100,7 @@ class ConvexPolygon(PhysObj):
         return True
 
     def render(self, view_model):
-        view_model.render_rectangle(self)
+        view_model.render_polygon(self)
 
 
 class Circle(PhysObj):

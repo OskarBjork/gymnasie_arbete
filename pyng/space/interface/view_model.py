@@ -135,3 +135,11 @@ class ViewModel:
             center=self.convert_coordinates(circle.position.x, circle.position.y),
             radius=circle.radius,
         )
+
+    def render_polygon(self, polygon):
+        pygame.draw.polygon(
+            surface=self.screen,
+            color=polygon.color,
+            points=[(point.x, point.y) for point in polygon.vertices],
+            width=0,
+        )

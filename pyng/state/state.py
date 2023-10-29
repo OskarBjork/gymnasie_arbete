@@ -1,9 +1,12 @@
 from pyng.space.phys_obj import PhysObj
 from pyng.space.vectors import Vector2D
 from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT
-from pyng.space.phys_obj import PhysObj, Circle, Rectangle
+from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 import time
 import math
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class BVHNode:
@@ -96,12 +99,14 @@ class State:
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
     def find_collisions(self):
-        root_node = self.build_bvh()
-        collisions = self.find_leaf_nodes_with_two_objects(root_node)
+        root_node = self.build_bvh(self.objects)
+        potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
+        print(potential_collision_nodes)
+        for node in potential_collision_nodes:
+            objects = potential_collision_nodes["objects"]
         pass
 
-    def build_bvh(self, depth=0, max_depth=20):
-        objects = self.objects
+    def build_bvh(self, objects, depth=0, max_depth=20):
         if len(objects) == 0:
             return None
 
@@ -139,29 +144,28 @@ class State:
             "right": right_child,
         }
 
-    def calculate_bounding_box(self):
-        objects = self.objects
+    def calculate_bounding_box(self, objects):
         if not objects:
             return None
 
         if len(objects) == 1:
             polygon = objects[0]
-            min_x = min(v[0] for v in polygon.vertices)
-            max_x = max(v[0] for v in polygon.vertices)
-            min_y = min(v[1] for v in polygon.vertices)
-            max_y = max(v[1] for v in polygon.vertices)
+            min_x = min(v.x for v in polygon.vertices)
+            max_x = max(v.x for v in polygon.vertices)
+            min_y = min(v.y for v in polygon.vertices)
+            max_y = max(v.y for v in polygon.vertices)
             return [(min_x, min_y), (max_x, max_y)]
 
         bounding_box = [(float("inf"), float("inf")), (float("-inf"), float("-inf"))]
         for polygon in objects:
             for vertex in polygon.vertices:
                 bounding_box[0] = (
-                    min(bounding_box[0][0], vertex[0]),
-                    min(bounding_box[0][1], vertex[1]),
+                    min(bounding_box[0][0], vertex.x),
+                    min(bounding_box[0][1], vertex.y),
                 )
                 bounding_box[1] = (
-                    max(bounding_box[1][0], vertex[0]),
-                    max(bounding_box[1][1], vertex[1]),
+                    max(bounding_box[1][0], vertex.x),
+                    max(bounding_box[1][1], vertex.y),
                 )
 
         return bounding_box
@@ -222,42 +226,15 @@ class State:
 
         if root is None:
             return leaf_nodes
-
-        if root.left is None and root.right is None and len(root.objects) == 2:
+        if root["left"] is None and root["right"] is None and len(root["objects"]) == 2:
             leaf_nodes.append(root)
         else:
-            left_leaf_nodes = self.find_leaf_nodes_with_two_objects(root.left)
-            right_leaf_nodes = self.find_leaf_nodes_with_two_objects(root.right)
+            left_leaf_nodes = self.find_leaf_nodes_with_two_objects(root["left"])
+            right_leaf_nodes = self.find_leaf_nodes_with_two_objects(root["right"])
             leaf_nodes.extend(left_leaf_nodes)
             leaf_nodes.extend(right_leaf_nodes)
 
         return leaf_nodes
-
-    def build_kd_tree(self, points, depth=0, k=2):
-        n = len(points)
-        if n <= 0:
-            return None
-        axis = depth % k
-        sorted_points = sorted(points, key=lambda point: point[axis])
-        median = n // 2
-
-        return {
-            "point": sorted_points[median],
-            "left": self.build_kd_tree(points=sorted_points[:median], depth=depth + 1),
-            "right": self.build_kd_tree(
-                points=sorted_points[median + 1 :], depth=depth + 1
-            ),
-        }
-
-    def find_all_leaves_with_two_points(self, root):
-        if root is None:
-            return []
-        elif root["left"] is None and root["right"] is None:
-            return [root]
-        else:
-            return self.find_all_leaves_with_two_points(
-                root["left"]
-            ) + self.find_all_leaves_with_two_points(root["right"])
 
     def get_normals(polygon):
         # Get the normals of the edges of a convex polygon
@@ -286,6 +263,32 @@ class State:
                 return False  # Separating axis found
 
         return True  # No separating axis found, polygons overlap
+
+    def build_kd_tree(self, points, depth=0, k=2):
+        n = len(points)
+        if n <= 0:
+            return None
+        axis = depth % k
+        sorted_points = sorted(points, key=lambda point: point[axis])
+        median = n // 2
+
+        return {
+            "point": sorted_points[median],
+            "left": self.build_kd_tree(points=sorted_points[:median], depth=depth + 1),
+            "right": self.build_kd_tree(
+                points=sorted_points[median + 1 :], depth=depth + 1
+            ),
+        }
+
+    def find_all_leaves_with_two_points(self, root):
+        if root is None:
+            return []
+        elif root["left"] is None and root["right"] is None:
+            return [root]
+        else:
+            return self.find_all_leaves_with_two_points(
+                root["left"]
+            ) + self.find_all_leaves_with_two_points(root["right"])
 
     def distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
@@ -360,7 +363,7 @@ class State:
 
             other_obj.position = other_obj.position - direction
 
-        elif obj.isinstance(Circle) and other_obj.isinstance(Rectangle):
+        elif obj.isinstance(Circle) and other_obj.isinstance(ConvexPolygon):
             obj.position.x = obj.position.x - obj.velocity.x
             obj.position.y = obj.position.y - obj.velocity.y
             other_obj.position.x = other_obj.position.x - other_obj.velocity.x

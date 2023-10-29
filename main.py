@@ -12,8 +12,11 @@ import sys
 
 import pygame
 import pygame_gui
+from rich.traceback import install
 
-from pyng.space.phys_obj import Circle, Point, Rectangle
+install(show_locals=True)
+
+from pyng.space.phys_obj import Circle, Point, ConvexPolygon
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.state import State
@@ -44,26 +47,28 @@ def main():
 
     view_model.show_editor()
 
-    obj1 = Rectangle(
+    obj1 = ConvexPolygon(
         mass=30,
         width=20,
         height=10,
         color=GREEN,
         position=Vector2D(700, 670),
         velocity=Vector2D(-100, 0),
+        vertices=[Vector2D(0, 0), Vector2D(0, 10), Vector2D(20, 10), Vector2D(20, 0)],
     )
 
-    obj2 = Rectangle(
+    obj2 = ConvexPolygon(
         mass=30,
         width=10,
         height=10,
         color=RED,
         position=Vector2D(300, 670),
         velocity=Vector2D(100, 0),
+        vertices=[Vector2D(0, 0), Vector2D(0, 10), Vector2D(10, 10), Vector2D(10, 0)],
     )
 
-    # state.add_object(obj1)
-    # state.add_object(obj2)
+    state.add_object(obj1)
+    state.add_object(obj2)
 
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
@@ -84,7 +89,7 @@ def main():
 
         view_model.render_objects(state.objects)
 
-        state.find_collisions()
+        # state.find_collisions()
 
         view_model.render_ui(ui_manager)
 
