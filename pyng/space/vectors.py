@@ -10,6 +10,9 @@ class Vector2D:
         self.x = x
         self.y = y
 
+    def tuple(self):
+        return (self.x, self.y)
+
     def distance_to(self, other) -> float:
         return vector_magnitude(self - other)
 
@@ -55,6 +58,10 @@ class Vector2D:
     def __truediv__(self, scalar):
         return Vector2D(self.x / scalar, self.y / scalar)
 
+    # Dividerar elementvis
+    def element_division(self, vector):
+        return Vector2D(self.x / vector.x, self.y / vector.y)
+
     def __iadd__(self, other):
         self.x += other.x
         self.y += other.y
@@ -70,6 +77,9 @@ class Vector2D:
     def __itruediv__(self, scalar):
         self.x /= scalar
         self.y /= scalar
+
+    def __repr__(self) -> str:
+        return f"Vector2D({self.x}, {self.y})"
 
     def get_distance_to(self, other) -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
