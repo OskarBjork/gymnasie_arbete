@@ -87,7 +87,7 @@ def main():
     obj3 = ConvexPolygon(
         mass=30,
         color=BLUE,
-        position=Vector2D(500, 500),
+        position=Vector2D(200, 500),
         # velocity=Vector2D(0, 10),
         num_of_sides=4,
         side_length=100,
@@ -99,7 +99,7 @@ def main():
         mass=30,
         color=ORANGE,
         position=Vector2D(700, 500),
-        velocity=Vector2D(0, 0),
+        velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,

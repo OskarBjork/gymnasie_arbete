@@ -106,13 +106,17 @@ class State:
 
     def find_collisions(self):
         root_node = self.build_bvh(self.objects)
-        print("NEW NODE: ")
         # pp.pprint(root_node)
         potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
         # print(len(potential_collision_nodes))
         for node in potential_collision_nodes:
-            pp.pprint([obj.id for obj in node["objects"]])
-            pass
+            object1 = node["objects"][0]
+            object2 = node["objects"][1]
+            print([obj.id for obj in node["objects"]])
+            # print(f"object1: {object1.id}")
+            # print(f"object2: {object2.id}")
+            if self.check_collision(object1, object2):
+                print("COLLISION")
 
     def build_bvh(self, objects, depth=0, max_depth=20, k=2):
         if len(objects) == 0:
@@ -199,13 +203,12 @@ class State:
         objects_sorted_along_axis = sorted(
             objects, key=lambda obj: obj.position.x if axis == 0 else obj.position.y
         )
-        print([obj.id for obj in objects_sorted_along_axis])
-        print(
-            [
-                obj.position.x if axis == 0 else obj.position.y
-                for obj in objects_sorted_along_axis
-            ]
-        )
+        # print(
+        #     [
+        #         obj.position.x if axis == 0 else obj.position.y
+        #         for obj in objects_sorted_along_axis
+        #     ]
+        # )
         median = objects_sorted_along_axis[len(objects_sorted_along_axis) // 2]
         median_position_in_axis = median.position.x if axis == 0 else median.position.y
         # print(f"median: {median.id}")
@@ -267,17 +270,17 @@ class State:
         else:
             return 1
 
-    def projection(polygon, axis):
+    def projection(self, polygon, axis):
         """Går igenom alla vertices i ett objekt och projicerar dem på en axel, och returnerar sedan minsta och största värdena av dessa"""
         min_proj = float("inf")
         max_proj = float("-inf")
         for vertex in polygon.vertices:
-            dot_product = vertex[0] * axis[0] + vertex[1] * axis[1]
+            dot_product = vertex.x * axis.x + vertex.y * axis.y
             min_proj = min(min_proj, dot_product)
             max_proj = max(max_proj, dot_product)
         return min_proj, max_proj
 
-    def overlaps(projection1, projection2):
+    def overlaps(self, projection1, projection2):
         """Kollar om två projektioner överlappar varandra, utifrån deras minsta och största värden"""
         return projection1[1] >= projection2[0] and projection1[0] <= projection2[1]
 
@@ -296,7 +299,7 @@ class State:
 
         return leaf_nodes
 
-    def get_normals(polygon):
+    def get_normals(self, polygon):
         # Get the normals of the edges of a convex polygon
         normals = []
         for i in range(len(polygon.vertices)):
@@ -304,9 +307,9 @@ class State:
             v2 = polygon.vertices[
                 (i + 1) % len(polygon.vertices)
             ]  # Ser till så att sista och första vertex jämförs
-            edge = (v2[0] - v1[0], v2[1] - v1[1])
-            length = math.sqrt(edge[0] ** 2 + edge[1] ** 2)
-            normal = (edge[1] / length, -edge[0] / length)  # Perpendicular vector
+            edge = Vector2D(v2.x - v1.x, v2.y - v1.y)
+            length = math.sqrt(edge.x**2 + edge.y**2)
+            normal = Vector2D(edge.x / length, -edge.y / length)  # Perpendicular vector
             normals.append(normal)
         return normals
 
