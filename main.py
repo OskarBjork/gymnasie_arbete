@@ -31,7 +31,7 @@ def main():
 
     ui_manager = pygame_gui.UIManager((screen_width, screen_height), "theme.json")
     view_model = ViewModel(screen, ui_manager)
-
+    
     view_model.set_caption("Pyng")
 
     screen.fill(BLACK)
@@ -39,6 +39,7 @@ def main():
     prev_time = time.time()
 
     view_model.show_editor()
+
 
     obj1 = Rectangle(
         mass=30,
@@ -57,6 +58,8 @@ def main():
         position=Vector2D(300, 670),
         velocity=Vector2D(100, 0),
     )
+
+
 
     state.add_object(obj1)
     state.add_object(obj2)

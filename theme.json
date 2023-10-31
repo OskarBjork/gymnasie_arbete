@@ -3,18 +3,18 @@
     {
         "colours":
         {
-            "normal_bg": "#bababa",
-            "hovered_bg": "#35393e",
+            "normal_bg": "#9e9e9e",
+            "hovered_bg": "#999999",
             "disabled_bg": "#25292e",
             "selected_bg": "#25292e",
-            "active_bg": "#e7eb00",
+            "active_bg": "#d4d4d4",
             "normal_text": "#2C3E50",
-            "hovered_text": "#FF0000",
+            "hovered_text": "#2C3E50",
             "selected_text": "#FFFFFF",
             "disabled_text": "#6d736f",
-            "active_text": "#6d736f",
+            "active_text": "#4287f5",
             "normal_border": "#2C3E50",
-            "hovered_border": "#B0B0B0",
+            "hovered_border": "#6a9bcc",
             "disabled_border": "#808080",
             "selected_border": "#8080B0",
             "active_border": "#8080B0",
@@ -39,8 +39,8 @@
             "shape_corner_radius": "7",
             "state_transitions":
             {
-                "normal_hovered": "0.5",
-                "hovered_normal": "0.5"
+                "normal_hovered": "0.1",
+                "hovered_normal": "0.1"
             }
         }
     }

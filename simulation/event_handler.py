@@ -19,6 +19,14 @@ def handle_events(events: list[Event], UI_manager):
         ):
             print("Text entry finished. Text:", event.text)
             return event.text
+        
+        if (event.type == pygame_gui.UI_BUTTON_PRESSED):
+            if(event.ui_object_id == "#manipulate_view_changer_button"):
+                return "manipulate"
+            
+            elif(event.ui_object_id == "#spawner_view_changer_button"):
+                return "spawner"
+        
         if event.type != pygame.KEYDOWN:
             continue
 
@@ -40,5 +48,13 @@ def delegate_event(event, state, view_model, UI_manager):
         )
         return
 
-    elif isinstance(event, str):
-        state.player_chosen_radius = int(event)
+    #elif isinstance(event, str):
+    #    state.player_chosen_radius = int(event)
+    
+    if event == "manipulate":
+        view_model.ui_mode = False
+        
+    
+    elif event == "spawner":
+        view_model.ui_mode = True
+        
