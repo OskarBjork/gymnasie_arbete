@@ -9,40 +9,6 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 
-class BVHNode:
-    def __init__(self, objects):
-        self.left = None
-        self.right = None
-        self.objects = objects
-        self.bounding_box = self.calculate_bounding_box(objects)
-
-    def calculate_bounding_box(self, objects):
-        if not objects:
-            return None
-
-        if len(objects) == 1:
-            polygon = objects[0]
-            min_x = min(v[0] for v in polygon.vertices)
-            max_x = max(v[0] for v in polygon.vertices)
-            min_y = min(v[1] for v in polygon.vertices)
-            max_y = max(v[1] for v in polygon.vertices)
-            return [(min_x, min_y), (max_x, max_y)]
-
-        bounding_box = [(float("inf"), float("inf")), (float("-inf"), float("-inf"))]
-        for polygon in objects:
-            for vertex in polygon.vertices:
-                bounding_box[0] = (
-                    min(bounding_box[0][0], vertex[0]),
-                    min(bounding_box[0][1], vertex[1]),
-                )
-                bounding_box[1] = (
-                    max(bounding_box[1][0], vertex[0]),
-                    max(bounding_box[1][1], vertex[1]),
-                )
-
-        return bounding_box
-
-
 class State:
     def __init__(
         self,
@@ -343,62 +309,8 @@ class State:
             ),
         }
 
-    def find_all_leaves_with_two_points(self, root):
-        if root is None:
-            return []
-        elif root["left"] is None and root["right"] is None:
-            return [root]
-        else:
-            return self.find_all_leaves_with_two_points(
-                root["left"]
-            ) + self.find_all_leaves_with_two_points(root["right"])
-
     def distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
-
-    def closer_distance(self, pivot, p1, p2):
-        if p1 is None:
-            return p2
-        if p2 is None:
-            return p1
-
-        d1 = self.distance(pivot, p1)
-        d2 = self.distance(pivot, p2)
-
-        if d1 < d2:
-            return p1
-        else:
-            return p2
-
-    def kd_tree_closest_point(self, root, point, depth=0, k=2):
-        if root is None:
-            return None
-
-        axis = depth % k
-        next_branch = None
-        opposite_branch = None
-
-        if point[axis] < root["point"][axis]:
-            next_branch = root["left"]
-            opposite_branch = root["right"]
-        else:
-            next_branch = root["right"]
-            opposite_branch = root["left"]
-
-        best = self.closer_distance(
-            point,
-            self.kd_tree_closest_point(next_branch, point, depth + 1),
-            root["point"],
-        )
-
-        if self.distance(point, best) > abs(point[axis] - root["point"][axis]):
-            best = self.closer_distance(
-                point,
-                self.kd_tree_closest_point(opposite_branch, point, depth + 1),
-                best,
-            )
-
-        return best
 
     def check_collisions(self):
         for obj in self.objects:
