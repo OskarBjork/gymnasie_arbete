@@ -6,7 +6,7 @@ import time
 import math
 import pprint
 
-pp = pprint.PrettyPrinter(indent=4)
+pp = pprint.PrettyPrinter(indent=2)
 
 
 class State:
@@ -71,22 +71,33 @@ class State:
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
     def find_collisions(self):
+        print("\nNEW FRAME:\n")
         root_node = self.build_bvh(self.objects)
+        # print("ROOT NODE: ")
         # pp.pprint(root_node)
         potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
         # print(len(potential_collision_nodes))
+        print("POTENTIAL COLLISION NODES: ")
+        pp.pprint(potential_collision_nodes)
+        # pp.pprint(self.objects)
         for node in potential_collision_nodes:
             object1 = node["objects"][0]
             object2 = node["objects"][1]
-            if object1 == object2:
-                continue
-            print([obj.id for obj in node["objects"]])
+            # if object1 == object2:
+            #     continue
+            # print("POSSIBLE COLLISION: ")
+            # print([obj.id for obj in node["objects"]])
             # print(f"object1: {object1.id}")
             # print(f"object2: {object2.id}")
             if self.check_collision(object1, object2):
                 print("COLLISION")
 
     def build_bvh(self, objects, depth=0, max_depth=20, k=2):
+        objects = list(set(objects))
+
+        print("NEW BUILD BVH")
+        print([obj.id for obj in objects])
+
         if len(objects) == 0:
             return None
 
@@ -171,57 +182,82 @@ class State:
         objects_sorted_along_axis = sorted(
             objects, key=lambda obj: obj.position.x if axis == 0 else obj.position.y
         )
-        # print(
-        #     [
-        #         obj.position.x if axis == 0 else obj.position.y
-        #         for obj in objects_sorted_along_axis
-        #     ]
-        # )
+
         median = objects_sorted_along_axis[len(objects_sorted_along_axis) // 2]
         median_position_in_axis = median.position.x if axis == 0 else median.position.y
-        # print(f"median: {median.id}")
-        # print("axis: ", axis)
+        print([obj.id for obj in objects_sorted_along_axis])
+        print(
+            [
+                obj.position.x if axis == 0 else obj.position.y
+                for obj in objects_sorted_along_axis
+            ]
+        )
+        print(f"median: {median.id}")
+        print("axis: ", axis)
 
         left_objects = []
         right_objects = []
 
-        for obj in objects:
+        for index, obj in enumerate(objects_sorted_along_axis):
+            obj.update_vertices()
+            # if obj.id == "orange":
+            #     print(obj.position)
             obj.bounding_box = obj.calculate_polygon_bounding_box()
+            # if obj.id == "orange":
+            #     print(obj.vertices)
+
+            if len(objects) == 3:
+                print("THREE OBJECTS")
+                print(objects_sorted_along_axis[0].id)
+                print(objects_sorted_along_axis[2].id)
+                d1 = self.distance(
+                    (
+                        objects_sorted_along_axis[0].position.x,
+                        objects_sorted_along_axis[0].position.y,
+                    ),
+                    (median.position.x, median.position.y),
+                )
+                d2 = self.distance(
+                    (
+                        objects_sorted_along_axis[2].position.x,
+                        objects_sorted_along_axis[2].position.y,
+                    ),
+                    (median.position.x, median.position.y),
+                )
+                print(f"d1: {d1}")
+                print(f"d2: {d2}")
+                if d1 < d2:
+                    left_objects.append(obj)
+                    left_objects.append(median)
+                elif d1 > d2:
+                    right_objects.append(obj)
+                    right_objects.append(median)
+                else:
+                    left_objects.append(obj)
+                    right_objects.append(obj)
+                break
+
             obj_position_in_axis = obj.position.x if axis == 0 else obj.position.y
             if obj_position_in_axis < median_position_in_axis:
-                # print(f"obj: {obj.id} is left of median")
+                print(f"obj: {obj.id} is left of median")
                 left_objects.append(obj)
             elif obj_position_in_axis > median_position_in_axis:
-                # print(f"obj: {obj.id} is right of median")
+                print(f"obj: {obj.id} is right of median")
                 right_objects.append(obj)
             else:
-                # print(f"obj: {obj.id} is on median")
-                if len(objects) == 3:
-                    d1 = self.distance(
-                        (objects[0].position.x, objects[0].position.y),
-                        (median.position.x, median.position.y),
-                    )
-                    d2 = self.distance(
-                        (objects[2].position.x, objects[2].position.y),
-                        (median.position.x, median.position.y),
-                    )
-                    if d1 < d2:
-                        left_objects.append(obj)
-                    elif d2 < d1:
-                        right_objects.append(obj)
-                    else:
-                        left_objects.append(obj)
-                        right_objects.append(obj)
-                    pass
+                print(f"obj: {obj.id} is on median")
+                right_objects.append(obj)
                 left_objects.append(obj)
+                # if obj != median:
+                #     left_objects.append(obj)
 
         # print(f"Right objects: {len(right_objects)}")
         # print(f"Left objects: {len(left_objects)}")
 
-        if len(left_objects) == 0:
+        if len(left_objects) == 0 and len(objects) > 3:
             left_objects = right_objects[: len(right_objects) // 2]
             right_objects = right_objects[len(right_objects) // 2 :]
-        elif len(right_objects) == 0:
+        elif len(right_objects) == 0 and len(objects) > 3:
             right_objects = left_objects[: len(left_objects) // 2]
             left_objects = left_objects[len(left_objects) // 2 :]
 
