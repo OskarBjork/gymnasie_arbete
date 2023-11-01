@@ -77,16 +77,17 @@ class State:
         # pp.pprint(root_node)
         potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
         # print(len(potential_collision_nodes))
-        print("POTENTIAL COLLISION NODES: ")
-        pp.pprint(potential_collision_nodes)
+        # print("POTENTIAL COLLISION NODES: ")
+        # pp.pprint(potential_collision_nodes)
         # pp.pprint(self.objects)
+        print("POTENTIAL COLLISIONS: ")
         for node in potential_collision_nodes:
             object1 = node["objects"][0]
             object2 = node["objects"][1]
             # if object1 == object2:
             #     continue
             # print("POSSIBLE COLLISION: ")
-            # print([obj.id for obj in node["objects"]])
+            print([obj.id for obj in node["objects"]])
             # print(f"object1: {object1.id}")
             # print(f"object2: {object2.id}")
             if self.check_collision(object1, object2):
@@ -208,8 +209,8 @@ class State:
 
             if len(objects) == 3:
                 print("THREE OBJECTS")
-                print(objects_sorted_along_axis[0].id)
-                print(objects_sorted_along_axis[2].id)
+                # print(objects_sorted_along_axis[0].id)
+                # print(objects_sorted_along_axis[2].id)
                 d1 = self.distance(
                     (
                         objects_sorted_along_axis[0].position.x,
@@ -227,11 +228,13 @@ class State:
                 print(f"d1: {d1}")
                 print(f"d2: {d2}")
                 if d1 < d2:
-                    left_objects.append(obj)
+                    left_objects.append(objects_sorted_along_axis[0])
                     left_objects.append(median)
+                    print([obj.id for obj in left_objects])
                 elif d1 > d2:
-                    right_objects.append(obj)
+                    right_objects.append(objects_sorted_along_axis[2])
                     right_objects.append(median)
+                    print([obj.id for obj in right_objects])
                 else:
                     left_objects.append(obj)
                     right_objects.append(obj)
