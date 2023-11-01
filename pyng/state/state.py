@@ -78,6 +78,8 @@ class State:
         for node in potential_collision_nodes:
             object1 = node["objects"][0]
             object2 = node["objects"][1]
+            if object1 == object2:
+                continue
             print([obj.id for obj in node["objects"]])
             # print(f"object1: {object1.id}")
             # print(f"object2: {object2.id}")
@@ -228,8 +230,8 @@ class State:
         return left_objects, right_objects, k
 
     def longest_axis(self, bounding_box):
-        x_length = bounding_box[0][1] - bounding_box[0][0]
-        y_length = bounding_box[1][1] - bounding_box[1][0]
+        x_length = bounding_box[1][0] - bounding_box[0][0]
+        y_length = bounding_box[1][1] - bounding_box[0][1]  # BUGG: längden blir negativ
 
         if x_length > y_length:
             return 0
