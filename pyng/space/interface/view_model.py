@@ -18,7 +18,7 @@ class ViewModel:
         self.ui_manager = ui_manager
         self.font = pygame.font.Font(None, 36)
         
-        self.ui_mode = False # hitta annat sätt att gömma ui saker, funkar inte i ViewModel
+        self.ui_mode = True # hitta annat sätt att gömma ui saker, funkar inte i ViewModel
 
     def convert_coordinates(self, x, y) -> (float, float):
         return x, self.screen.get_height() - y
@@ -77,18 +77,19 @@ class ViewModel:
                 self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
                 20,
             )
-        self.render_text(
-            "Radius:",
-            BLACK,
-            (0, 80),
-            20,
-        )
+        if self.ui_mode == True:
+            self.render_text(
+                "Radius:",
+                BLACK,
+                (0, 80),
+                20,
+            )
 
     def render_ui(self, ui_manager):
         self.show_grid()
         ui_manager.draw_ui(self.screen)
-
-    def show_editor(self): 
+    
+    def show_mode_buttons(self):
         pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((0, -50), (0.33 * ORIGIN[0], 45)),
             text="Manipulate",
@@ -107,19 +108,25 @@ class ViewModel:
                      "bottom": "bottom"},
         )
         
-        
+        pass
+
+    def show_manipulate_editor(self):
+
+        pass
+
+    def show_spawn_editor(self): 
         pygame_gui.elements.UITextEntryLine(
             relative_rect=pygame.Rect((0, 100), (0.7 * ORIGIN[0], 50)),
             manager=self.ui_manager,
             object_id="#radius_input",
         )
-            
+        
         pygame_gui.elements.UITextEntryLine(
             relative_rect=pygame.Rect((0, 300), (0.7 * ORIGIN[0], 50)),
             manager=self.ui_manager,
             object_id="#lol_input",
         )
-
+        
         pass
 
     def set_caption(self, caption: str) -> None:

@@ -53,8 +53,15 @@ def delegate_event(event, state, view_model, UI_manager):
     
     if event == "manipulate":
         view_model.ui_mode = False
+        UI_manager.clear_and_reset()
+        view_model.show_manipulate_editor()
+        view_model.show_mode_buttons()
+        return
         
     
     elif event == "spawner":
         view_model.ui_mode = True
-        
+        UI_manager.clear_and_reset()
+        view_model.show_spawn_editor()
+        view_model.show_mode_buttons()
+        return

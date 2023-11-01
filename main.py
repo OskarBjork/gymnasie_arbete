@@ -38,8 +38,9 @@ def main():
     running = True
     prev_time = time.time()
 
-    view_model.show_editor()
-
+    view_model.show_mode_buttons()
+    view_model.show_spawn_editor()
+    
 
     obj1 = Rectangle(
         mass=30,
