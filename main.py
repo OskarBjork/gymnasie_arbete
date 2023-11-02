@@ -51,16 +51,18 @@ def main():
 
     state = State()
 
-    ui_manager = pygame_gui.UIManager((screen_width, screen_height))
+    ui_manager = pygame_gui.UIManager((screen_width, screen_height), "theme.json")
     view_model = ViewModel(screen, ui_manager)
-
+    
     view_model.set_caption("Pyng")
 
     screen.fill(BLACK)
     running = True
     prev_time = time.time()
 
-    view_model.show_editor()
+    view_model.show_mode_buttons()
+    view_model.show_spawn_editor()
+    
 
     obj1 = ConvexPolygon(
         mass=30,
@@ -105,7 +107,6 @@ def main():
         angle=math.pi / 4,
         id="orange",
     )
-
     obj5 = ConvexPolygon(
         mass=30,
         color=PINK,
