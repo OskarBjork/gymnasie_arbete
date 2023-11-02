@@ -3,7 +3,7 @@
     {
         "colours":
         {
-            "normal_bg": "#9e9e9e",
+            "normal_bg": "#c7c7c7",
             "hovered_bg": "#999999",
             "disabled_bg": "#25292e",
             "selected_bg": "#25292e",
@@ -11,9 +11,9 @@
             "normal_text": "#2C3E50",
             "hovered_text": "#2C3E50",
             "selected_text": "#FFFFFF",
-            "disabled_text": "#6d736f",
+            "disabled_text": "#1f2224",
             "active_text": "#4287f5",
-            "normal_border": "#2C3E50",
+            "normal_border": "#636363",
             "hovered_border": "#6a9bcc",
             "disabled_border": "#808080",
             "selected_border": "#8080B0",
@@ -23,6 +23,14 @@
             "disabled_text_shadow": "#10101070",
             "selected_text_shadow": "#10101070",
             "active_text_shadow": "#10101070"
+        },
+        "#spawner_view_changer_button": {
+            "images":
+            {
+                "normal_image": {
+                    "path": "squre.png" 
+                }
+            }
         },
         "misc":
         {
@@ -43,5 +51,57 @@
                 "hovered_normal": "0.1"
             }
         }
-    }
+    },
+    
+    "text_entry_line":
+    {
+        "colours":
+        {
+            "dark_bg": "#949494",
+            "selected_bg": "#55595e",
+            "normal_text": "#ffffff",
+            "selected_text": "#FFFFFF",
+            "normal_border": "#757575"
+        },
+        "font":
+        {
+            "size": 18
+        },
+        "misc":
+        {
+            "shape": "rounded_rectangle",
+            "shape_corner_radius": 10,
+            "border_width": "2",
+            "shadow_width": "5",
+            "padding": "4,2"
+        }
+    },
+
+    "selection_list":
+    {
+        "colours":
+        {
+            "dark_bg":"#21282D",
+            "normal_border": "#999999"
+        },
+
+        "font":{
+            "size": 30
+        },
+
+        "misc":
+        {
+            "shape": "rectangle",
+            "border_width": "1",
+            "shadow_width": "10",
+            "list_item_height": "40"
+        }
+    },
+    "selection_list.@selection_list_item":
+    {
+        "misc":
+        {
+            "border_width": "2"
+        }
+     }
 }

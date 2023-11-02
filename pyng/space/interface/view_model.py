@@ -18,7 +18,8 @@ class ViewModel:
         self.ui_manager = ui_manager
         self.font = pygame.font.Font(None, 36)
         
-        self.ui_mode = True # hitta annat sätt att gömma ui saker, funkar inte i ViewModel
+        self.ui_mode = True
+        self.shape = "rect"
 
     def convert_coordinates(self, x, y) -> (float, float):
         return x, self.screen.get_height() - y
@@ -77,13 +78,35 @@ class ViewModel:
                 self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
                 20,
             )
-        if self.ui_mode == True:
+        if self.ui_mode == True: # visar all text som ska vara på spawner skärmen
             self.render_text(
-                "Radius:",
+                "Spawner",
                 BLACK,
-                (0, 80),
-                20,
+                (10, 20),
+                60,
             )
+            
+            self.render_text(
+                "x-coordinate:",
+                BLACK,
+                (5, 218),
+                15,
+            )
+
+            self.render_text(
+                "y-coordinate:",
+                BLACK,
+                (5 + 0.35 * ORIGIN[0], 218),
+                15,
+            )
+
+            if self.shape == "circle":
+                self.render_text(
+                    "Radius:",
+                    BLACK,
+                    (5, 350),
+                    20,
+                )
 
     def render_ui(self, ui_manager):
         self.show_grid()
@@ -115,17 +138,48 @@ class ViewModel:
         pass
 
     def show_spawn_editor(self): 
-        pygame_gui.elements.UITextEntryLine(
-            relative_rect=pygame.Rect((0, 100), (0.7 * ORIGIN[0], 50)),
+        # Möjligt att lägga till bilder av formerna som knappar eller bara bilder som ersättning eller komplement till en UISelectionList
+            # pygame_gui.elements.UIImage(
+            #     relative_rect=pygame.Rect((32, 320), (32, 32)),
+            #     image_surface=pygame.Surface()
+            # )
+
+        pygame_gui.elements.UISelectionList( 
+            relative_rect=pygame.Rect((-5, 100), (0.35 * ORIGIN[0], 102)),
+            item_list= ["Rectangle", "Circle"],
             manager=self.ui_manager,
-            object_id="#radius_input",
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#shape_input",
         )
+
+        pygame_gui.elements.UITextEntryLine(
+                relative_rect=pygame.Rect((0, 230), (0.35 * ORIGIN[0], 55)),
+                manager=self.ui_manager,
+                object_id="#x_coordinate_input",
+            )
+
+        pygame_gui.elements.UITextEntryLine(
+                relative_rect=pygame.Rect((0.35 * ORIGIN[0], 230), (0.35 * ORIGIN[0], 55)),
+                manager=self.ui_manager,
+                object_id="#y_coordinate_input",
+            )
+
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((3, 285), (0.25* ORIGIN[0], 40)),
+            text="Spawn",
+            manager=self.ui_manager,
+            tool_tip_text="Spawns the selected shape on the specified coordinates",
+            object_id="#spawn_button",
+        )
+
+        if self.shape == "circle":
+            pygame_gui.elements.UITextEntryLine(
+                relative_rect=pygame.Rect((0, 370), (0.7 * ORIGIN[0], 55)),
+                manager=self.ui_manager,
+                object_id="#radius_input",
+            )
         
-        pygame_gui.elements.UITextEntryLine(
-            relative_rect=pygame.Rect((0, 300), (0.7 * ORIGIN[0], 50)),
-            manager=self.ui_manager,
-            object_id="#lol_input",
-        )
         
         pass
 
