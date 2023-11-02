@@ -104,29 +104,15 @@ class State:
         # print("PROJECTIONS Y: ")
         # pp.pprint(projections_y)
         potential_collisions = []
-        for tup in projections_x:
+        for i, tup in enumerate(projections_x):
             points = tup[0], tup[1]
-            for other_tup in projections_x:
+            for j, other_tup in enumerate(projections_x):
                 if tup == other_tup:
                     continue
                 other_points = other_tup[0], other_tup[1]
-                if self.overlaps(points, other_points):
-                    print("OVERLAP_x: ", tup[2].id, other_tup[2].id)
-                    other_tup[2].potential_collision = 1
-                    tup[2].potential_collision = 1
-
-        for tup in projections_y:
-            points = tup[0], tup[1]
-            for other_tup in projections_y:
-                if tup == other_tup:
-                    continue
-                other_points = other_tup[0], other_tup[1]
-                if (
-                    self.overlaps(points, other_points)
-                    and other_tup[2].potential_collision == 1
-                    and tup[2].potential_collision == 1
+                if self.overlaps(points, other_points) and self.overlaps(
+                    projections_y[i], projections_y[j]
                 ):
-                    print("OVERLAP_y: ", tup[2].id, other_tup[2].id)
                     potential_collisions.append((tup[2], other_tup[2]))
 
         return self.remove_duplicates(potential_collisions)
