@@ -37,6 +37,8 @@ class State:
 
     def update_all_vertices(self):
         for obj in self.objects:
+            if isinstance(obj, Circle):
+                continue
             obj.update_vertices()
 
     def add_objects(self, objs: [PhysObj]):
@@ -57,7 +59,7 @@ class State:
                 color=self.player_chosen_color,
                 position=position,
             )
-        self.add_object(obj)
+        self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
         if with_gravity:
             self.impose_gravity(obj)
@@ -133,7 +135,7 @@ class State:
     def get_projections_in_x_and_y_plane(self):
         projections_x = []
         projections_y = []
-        objects = self.objects
+        objects = [obj for obj in self.objects if not isinstance(obj, Circle)]
         for axis in (
             Vector2D(1, 0),
             Vector2D(0, 1),

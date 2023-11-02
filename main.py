@@ -98,7 +98,7 @@ def main():
     obj4 = ConvexPolygon(
         mass=30,
         color=ORANGE,
-        position=Vector2D(800, 450),
+        position=Vector2D(800, 550),
         velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
@@ -142,8 +142,6 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
-
-        state.check_collisions()
 
         state.step(dt)
 
