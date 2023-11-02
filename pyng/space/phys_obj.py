@@ -83,6 +83,7 @@ class ConvexPolygon(PhysObj):
         self.id = id
         self.vertices = self.update_vertices()
         self.bounding_box = self.calculate_polygon_bounding_box()
+        self.potential_collision = 0
 
     def update_vertices(self):
         p = self.position

@@ -72,26 +72,87 @@ class State:
 
     def find_collisions(self):
         print("\nNEW FRAME:\n")
-        root_node = self.build_bvh(self.objects)
+        # root_node = self.build_bvh(self.objects)
         # print("ROOT NODE: ")
         # pp.pprint(root_node)
-        potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
+        # potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
+        potential_collisions = self.sweep_and_prune()
+
+        for check in potential_collisions:
+            print([obj.id for obj in check])
         # print(len(potential_collision_nodes))
         # print("POTENTIAL COLLISION NODES: ")
         # pp.pprint(potential_collision_nodes)
         # pp.pprint(self.objects)
-        print("POTENTIAL COLLISIONS: ")
-        for node in potential_collision_nodes:
-            object1 = node["objects"][0]
-            object2 = node["objects"][1]
-            # if object1 == object2:
-            #     continue
-            # print("POSSIBLE COLLISION: ")
-            print([obj.id for obj in node["objects"]])
-            # print(f"object1: {object1.id}")
-            # print(f"object2: {object2.id}")
-            if self.check_collision(object1, object2):
-                print("COLLISION: ", [obj.id for obj in node["objects"]])
+        # print("POTENTIAL COLLISIONS: ")
+        # for node in potential_collision_nodes:
+        #     object1 = node["objects"][0]
+        #     object2 = node["objects"][1]
+        #     # if object1 == object2:
+        #     #     continue
+        #     # print("POSSIBLE COLLISION: ")
+        #     print([obj.id for obj in node["objects"]])
+        #     # print(f"object1: {object1.id}")
+        #     # print(f"object2: {object2.id}")
+        #     if self.check_collision(object1, object2):
+        #         print("COLLISION: ", [obj.id for obj in node["objects"]])
+
+    def sweep_and_prune(self):
+        projections_x, projections_y = self.get_projections_in_x_and_y_plane()
+        # print("PROJECTIONS X: ")
+        # pp.pprint(projections_x)
+        # print("PROJECTIONS Y: ")
+        # pp.pprint(projections_y)
+        potential_collisions = []
+        for tup in projections_x:
+            points = tup[0], tup[1]
+            for other_tup in projections_x:
+                if tup == other_tup:
+                    continue
+                other_points = other_tup[0], other_tup[1]
+                if self.overlaps(points, other_points):
+                    print("OVERLAP_x: ", tup[2].id, other_tup[2].id)
+                    other_tup[2].potential_collision = 1
+                    tup[2].potential_collision = 1
+
+        for tup in projections_y:
+            points = tup[0], tup[1]
+            for other_tup in projections_y:
+                if tup == other_tup:
+                    continue
+                other_points = other_tup[0], other_tup[1]
+                if (
+                    self.overlaps(points, other_points)
+                    and other_tup[2].potential_collision == 1
+                    and tup[2].potential_collision == 1
+                ):
+                    print("OVERLAP_y: ", tup[2].id, other_tup[2].id)
+                    potential_collisions.append((tup[2], other_tup[2]))
+
+        return self.remove_duplicates(potential_collisions)
+
+    def remove_duplicates(self, potential_collisions):
+        unique_collisions = set(
+            frozenset(collision) for collision in potential_collisions
+        )
+        return [tuple(collision) for collision in unique_collisions]
+
+    def get_projections_in_x_and_y_plane(self):
+        projections_x = []
+        projections_y = []
+        objects = self.objects
+        for axis in (
+            Vector2D(1, 0),
+            Vector2D(0, 1),
+        ):
+            for obj in objects:
+                min_proj, max_proj = self.projection(obj, axis)
+                if axis.x == 1:
+                    projections_x.append((min_proj, max_proj, obj))
+                else:
+                    projections_y.append((min_proj, max_proj, obj))
+
+        return projections_x, projections_y
 
     def build_bvh(self, objects, depth=0, max_depth=20, k=2):
         objects = list(set(objects))
