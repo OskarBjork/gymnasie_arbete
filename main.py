@@ -3,17 +3,39 @@
 # TODO: Ta bort allt klotter härifrån och sätt det in i andra klasser
 # TODO: TYPE ANNOTATIONS!
 
+# TODO: Collision detection
+# Broad phase: bounding volume hierarchies
+# Narrow phase: ?
+
 import time
 import sys
+import math
 
 import pygame
 import pygame_gui
+from rich.traceback import install
 
-from pyng.space.phys_obj import Circle, Point, Rectangle
+install(show_locals=True)
+
+from pyng.space.phys_obj import Circle, Point, ConvexPolygon
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.state import State
-from pyng.config import FPS, RED, BLACK, TEST_COORDINATE, BLUE, ORIGIN, GREEN
+from pyng.config import (
+    FPS,
+    RED,
+    BLACK,
+    TEST_COORDINATE,
+    BLUE,
+    ORIGIN,
+    GREEN,
+    ORANGE,
+    YELLOW,
+    PINK,
+    PURPLE,
+    GRAY,
+    LIGHT_BLUE,
+)
 from simulation.event_handler import handle_events, delegate_event
 
 
@@ -42,28 +64,72 @@ def main():
     view_model.show_spawn_editor()
     
 
-    obj1 = Rectangle(
+    obj1 = ConvexPolygon(
         mass=30,
-        width=20,
-        height=10,
         color=GREEN,
-        position=Vector2D(700, 670),
-        velocity=Vector2D(-100, 0),
+        position=Vector2D(999, 670),
+        # velocity=Vector2D(-100, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+        id="green",
     )
 
-    obj2 = Rectangle(
+    obj2 = ConvexPolygon(
         mass=30,
-        width=10,
-        height=10,
         color=RED,
-        position=Vector2D(300, 670),
-        velocity=Vector2D(100, 0),
+        position=Vector2D(100, 670),
+        # velocity=Vector2D(100, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+        id="red",
     )
 
+    obj3 = ConvexPolygon(
+        mass=30,
+        color=BLUE,
+        position=Vector2D(200, 500),
+        # velocity=Vector2D(0, 10),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+        id="blue",
+    )
 
+    obj4 = ConvexPolygon(
+        mass=30,
+        color=ORANGE,
+        position=Vector2D(800, 550),
+        velocity=Vector2D(100, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+        id="orange",
+    )
+    obj5 = ConvexPolygon(
+        mass=30,
+        color=PINK,
+        position=Vector2D(1000, 500),
+        velocity=Vector2D(0, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+        id="pink",
+    )
 
-    state.add_object(obj1)
-    state.add_object(obj2)
+    obj6 = ConvexPolygon(
+        mass=30,
+        color=PURPLE,
+        position=Vector2D(1500, 500),
+        velocity=Vector2D(0, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+        id="purple",
+    )
+
+    state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
 
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
@@ -78,11 +144,11 @@ def main():
 
         delegate_event(event, state, view_model, ui_manager)
 
-        state.check_collisions()
-
         state.step(dt)
 
         view_model.render_objects(state.objects)
+
+        state.find_collisions()
 
         view_model.render_ui(ui_manager)
 
