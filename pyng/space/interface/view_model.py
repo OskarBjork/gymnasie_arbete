@@ -141,8 +141,7 @@ class ViewModel:
             surface=self.screen,
             color=polygon.color,
             points=[
-                self.convert_coordinates(point.x, point.y)
-                for point in polygon.update_vertices()
+                self.convert_coordinates(point.x, point.y) for point in polygon.vertices
             ],
             width=0,
         )

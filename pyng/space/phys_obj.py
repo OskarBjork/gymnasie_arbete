@@ -95,6 +95,7 @@ class ConvexPolygon(PhysObj):
             x = p.x + s * math.cos(rotated_angle)
             y = p.y + s * math.sin(rotated_angle)
             vertices.append(Vector2D(x, y))
+        self.vertices = vertices
         return vertices
 
     def calculate_polygon_bounding_box(self):

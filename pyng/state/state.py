@@ -91,13 +91,13 @@ class State:
             # print(f"object1: {object1.id}")
             # print(f"object2: {object2.id}")
             if self.check_collision(object1, object2):
-                print("COLLISION")
+                print("COLLISION: ", [obj.id for obj in node["objects"]])
 
     def build_bvh(self, objects, depth=0, max_depth=20, k=2):
         objects = list(set(objects))
 
-        print("NEW BUILD BVH")
-        print([obj.id for obj in objects])
+        # print("NEW BUILD BVH")
+        # print([obj.id for obj in objects])
 
         if len(objects) == 0:
             return None
@@ -186,15 +186,15 @@ class State:
 
         median = objects_sorted_along_axis[len(objects_sorted_along_axis) // 2]
         median_position_in_axis = median.position.x if axis == 0 else median.position.y
-        print([obj.id for obj in objects_sorted_along_axis])
-        print(
-            [
-                obj.position.x if axis == 0 else obj.position.y
-                for obj in objects_sorted_along_axis
-            ]
-        )
-        print(f"median: {median.id}")
-        print("axis: ", axis)
+        # print([obj.id for obj in objects_sorted_along_axis])
+        # print(
+        #     [
+        #         obj.position.x if axis == 0 else obj.position.y
+        #         for obj in objects_sorted_along_axis
+        #     ]
+        # )
+        # print(f"median: {median.id}")
+        # print("axis: ", axis)
 
         left_objects = []
         right_objects = []
@@ -208,7 +208,7 @@ class State:
             #     print(obj.vertices)
 
             if len(objects) == 3:
-                print("THREE OBJECTS")
+                # print("THREE OBJECTS")
                 # print(objects_sorted_along_axis[0].id)
                 # print(objects_sorted_along_axis[2].id)
                 d1 = self.distance(
@@ -225,16 +225,16 @@ class State:
                     ),
                     (median.position.x, median.position.y),
                 )
-                print(f"d1: {d1}")
-                print(f"d2: {d2}")
+                # print(f"d1: {d1}")
+                # print(f"d2: {d2}")
                 if d1 < d2:
                     left_objects.append(objects_sorted_along_axis[0])
                     left_objects.append(median)
-                    print([obj.id for obj in left_objects])
+                    # print([obj.id for obj in left_objects])
                 elif d1 > d2:
                     right_objects.append(objects_sorted_along_axis[2])
                     right_objects.append(median)
-                    print([obj.id for obj in right_objects])
+                    # print([obj.id for obj in right_objects])
                 else:
                     left_objects.append(obj)
                     right_objects.append(obj)
@@ -242,13 +242,13 @@ class State:
 
             obj_position_in_axis = obj.position.x if axis == 0 else obj.position.y
             if obj_position_in_axis < median_position_in_axis:
-                print(f"obj: {obj.id} is left of median")
+                # print(f"obj: {obj.id} is left of median")
                 left_objects.append(obj)
             elif obj_position_in_axis > median_position_in_axis:
-                print(f"obj: {obj.id} is right of median")
+                # print(f"obj: {obj.id} is right of median")
                 right_objects.append(obj)
             else:
-                print(f"obj: {obj.id} is on median")
+                # print(f"obj: {obj.id} is on median")
                 right_objects.append(obj)
                 left_objects.append(obj)
                 # if obj != median:
@@ -283,6 +283,9 @@ class State:
         max_proj = float("-inf")
         for vertex in polygon.vertices:
             dot_product = vertex.x * axis.x + vertex.y * axis.y
+            # print("Vertex: ", vertex)
+            # print("Axis: ", axis)
+            # print("Projection: ", dot_product)
             min_proj = min(min_proj, dot_product)
             max_proj = max(max_proj, dot_product)
         return min_proj, max_proj
@@ -303,20 +306,18 @@ class State:
             right_leaf_nodes = self.find_leaf_nodes_with_two_objects(root["right"])
             leaf_nodes.extend(left_leaf_nodes)
             leaf_nodes.extend(right_leaf_nodes)
-
         return leaf_nodes
 
     def get_normals(self, polygon):
-        # Get the normals of the edges of a convex polygon
         normals = []
         for i in range(len(polygon.vertices)):
             v1 = polygon.vertices[i]
-            v2 = polygon.vertices[
-                (i + 1) % len(polygon.vertices)
-            ]  # Ser till så att sista och första vertex jämförs
+            v2 = polygon.vertices[(i + 1) % len(polygon.vertices)]
             edge = Vector2D(v2.x - v1.x, v2.y - v1.y)
             length = math.sqrt(edge.x**2 + edge.y**2)
-            normal = Vector2D(edge.x / length, -edge.y / length)  # Perpendicular vector
+            normal = Vector2D(
+                round(-edge.y / length, 5), round(edge.x / length, 5)
+            )  # Perpendicular vector
             normals.append(normal)
         return normals
 
@@ -325,30 +326,25 @@ class State:
         normals1 = self.get_normals(polygon1)
         normals2 = self.get_normals(polygon2)
 
-        for normal in normals1 + normals2:
+        all_normals = normals1 + normals2
+        # print(len(all_normals))
+
+        for i, normal in enumerate(all_normals):
+            # print("Polygon1: ", polygon1.id + "\n")
             projection1 = self.projection(polygon1, normal)
+            # print(f"projection1: {projection1}")
+            # print("Polygon2: ", polygon2.id + "\n")
             projection2 = self.projection(polygon2, normal)
+            # print(f"projection2: {projection2}\n")
 
             if not self.overlaps(projection1, projection2):
+                # print("Separating axis found")
+                # print(f"normal: {normal}")
+                # print(f"projection1: {projection1}")
+                # print(f"projection2: {projection2}\n")
                 return False  # Separating axis found
 
         return True  # No separating axis found, polygons overlap
-
-    def build_kd_tree(self, points, depth=0, k=2):
-        n = len(points)
-        if n <= 0:
-            return None
-        axis = depth % k
-        sorted_points = sorted(points, key=lambda point: point[axis])
-        median = n // 2
-
-        return {
-            "point": sorted_points[median],
-            "left": self.build_kd_tree(points=sorted_points[:median], depth=depth + 1),
-            "right": self.build_kd_tree(
-                points=sorted_points[median + 1 :], depth=depth + 1
-            ),
-        }
 
     def distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
