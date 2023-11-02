@@ -96,8 +96,8 @@ class State:
     def build_bvh(self, objects, depth=0, max_depth=20, k=2):
         objects = list(set(objects))
 
-        # print("NEW BUILD BVH")
-        # print([obj.id for obj in objects])
+        print("NEW BUILD BVH")
+        print([obj.id for obj in objects])
 
         if len(objects) == 0:
             return None
@@ -178,7 +178,7 @@ class State:
         return bounding_box
 
     def partition_objects(self, objects, bounding_box, k=2):
-        # print("new objects: ")
+        print("new objects: ")
         axis = self.longest_axis(bounding_box)
         objects_sorted_along_axis = sorted(
             objects, key=lambda obj: obj.position.x if axis == 0 else obj.position.y
@@ -186,15 +186,15 @@ class State:
 
         median = objects_sorted_along_axis[len(objects_sorted_along_axis) // 2]
         median_position_in_axis = median.position.x if axis == 0 else median.position.y
-        # print([obj.id for obj in objects_sorted_along_axis])
-        # print(
-        #     [
-        #         obj.position.x if axis == 0 else obj.position.y
-        #         for obj in objects_sorted_along_axis
-        #     ]
-        # )
-        # print(f"median: {median.id}")
-        # print("axis: ", axis)
+        print([obj.id for obj in objects_sorted_along_axis])
+        print(
+            [
+                obj.position.x if axis == 0 else obj.position.y
+                for obj in objects_sorted_along_axis
+            ]
+        )
+        print(f"median: {median.id}")
+        print("axis: ", axis)
 
         left_objects = []
         right_objects = []
@@ -208,7 +208,7 @@ class State:
             #     print(obj.vertices)
 
             if len(objects) == 3:
-                # print("THREE OBJECTS")
+                print("THREE OBJECTS")
                 # print(objects_sorted_along_axis[0].id)
                 # print(objects_sorted_along_axis[2].id)
                 d1 = self.distance(
@@ -230,11 +230,11 @@ class State:
                 if d1 < d2:
                     left_objects.append(objects_sorted_along_axis[0])
                     left_objects.append(median)
-                    # print([obj.id for obj in left_objects])
+                    print([obj.id for obj in left_objects])
                 elif d1 > d2:
                     right_objects.append(objects_sorted_along_axis[2])
                     right_objects.append(median)
-                    # print([obj.id for obj in right_objects])
+                    print([obj.id for obj in right_objects])
                 else:
                     left_objects.append(obj)
                     right_objects.append(obj)
@@ -242,13 +242,13 @@ class State:
 
             obj_position_in_axis = obj.position.x if axis == 0 else obj.position.y
             if obj_position_in_axis < median_position_in_axis:
-                # print(f"obj: {obj.id} is left of median")
+                print(f"obj: {obj.id} is left of median")
                 left_objects.append(obj)
             elif obj_position_in_axis > median_position_in_axis:
-                # print(f"obj: {obj.id} is right of median")
+                print(f"obj: {obj.id} is right of median")
                 right_objects.append(obj)
             else:
-                # print(f"obj: {obj.id} is on median")
+                print(f"obj: {obj.id} is on median")
                 right_objects.append(obj)
                 left_objects.append(obj)
                 # if obj != median:
