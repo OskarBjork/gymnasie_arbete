@@ -22,6 +22,8 @@ class State:
         self.player_chosen_shape = Circle
         self.player_chosen_radius = 10
         self.player_chosen_color = RED
+        self.player_chosen_x = 0
+        self.player_chosen_y = 0
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D):
@@ -46,19 +48,26 @@ class State:
             self.objects.append(obj)
 
     def create_object(
-        self, position: Vector2D, obj: PhysObj = None, with_gravity=False
+        self, position: Vector2D = None, obj: PhysObj = "circle", with_gravity=False
     ):
         if not (
             time.time() - self.time_since_last_object_creation > 0.1
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
-        if obj is None:
+        if obj == "circle":
             obj = Circle(
                 mass=self.player_chosen_mass,
                 radius=self.player_chosen_radius,
                 color=self.player_chosen_color,
-                position=position,
+                position=position if position is not None else Vector2D(self.player_chosen_x, self.player_chosen_y) + Vector2D(*ORIGIN),
             )
+
+        # if obj == "rect":
+        #     obj = ConvexPolygon(
+        #         mass=self.player_chosen_mass,
+                
+        #         position=
+        #     )
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
         if with_gravity:
@@ -73,7 +82,7 @@ class State:
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
     def find_collisions(self):
-        print("\nNEW FRAME:\n")
+        # print("\nNEW FRAME:\n")
         # root_node = self.build_bvh(self.objects)
         # print("ROOT NODE: ")
         # pp.pprint(root_node)
@@ -81,10 +90,10 @@ class State:
         potential_collisions = self.sweep_and_prune()
 
         for object1, object2 in potential_collisions:
-            print([obj.id for obj in [object1, object2]])
+            #print([obj.id for obj in [object1, object2]])
             collision_result = self.check_collision(object1, object2)
             if collision_result[0]:
-                print("COLLISION: ", [obj.id for obj in [object1, object2]])
+                #print("COLLISION: ", [obj.id for obj in [object1, object2]])
                 # self.resolve_collision(object1, object2)
                 # print("COLLISION: ", [obj.id for obj in node["objects"]])
                 object1.position = object1.position - collision_result[1] / 2
