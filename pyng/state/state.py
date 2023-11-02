@@ -78,8 +78,15 @@ class State:
         # potential_collision_nodes = self.find_leaf_nodes_with_two_objects(root_node)
         potential_collisions = self.sweep_and_prune()
 
-        for check in potential_collisions:
-            print([obj.id for obj in check])
+        for object1, object2 in potential_collisions:
+            print([obj.id for obj in [object1, object2]])
+            collision_result = self.check_collision(object1, object2)
+            if collision_result[0]:
+                print("COLLISION: ", [obj.id for obj in [object1, object2]])
+                # self.resolve_collision(object1, object2)
+                # print("COLLISION: ", [obj.id for obj in node["objects"]])
+                object1.position = object1.position - collision_result[1] / 2
+                object2.position = object2.position + collision_result[1] / 2
         # print(len(potential_collision_nodes))
         # print("POTENTIAL COLLISION NODES: ")
         # pp.pprint(potential_collision_nodes)
@@ -374,6 +381,9 @@ class State:
         normals2 = self.get_normals(polygon2)
 
         all_normals = normals1 + normals2
+
+        min_overlap = float("inf")
+        smallest_axis = None
         # print(len(all_normals))
 
         for i, normal in enumerate(all_normals):
@@ -384,14 +394,24 @@ class State:
             projection2 = self.projection(polygon2, normal)
             # print(f"projection2: {projection2}\n")
 
-            if not self.overlaps(projection1, projection2):
+            overlap = self.overlaps(projection1, projection2)
+
+            if not overlap:
                 # print("Separating axis found")
                 # print(f"normal: {normal}")
                 # print(f"projection1: {projection1}")
                 # print(f"projection2: {projection2}\n")
-                return False  # Separating axis found
+                return False, None  # Separating axis found
 
-        return True  # No separating axis found, polygons overlap
+            overlap_amount = min(projection1[1], projection2[1]) - max(
+                projection1[0], projection2[0]
+            )
+
+            if overlap_amount < min_overlap:
+                min_overlap = overlap_amount
+                smallest_axis = normal
+        mtv = smallest_axis * min_overlap
+        return True, mtv  # No separating axis found, polygons overlap
 
     def distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
