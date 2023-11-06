@@ -57,8 +57,6 @@ def main():
     view_model.set_caption("Pyng")
 
     screen.fill(BLACK)
-    running = True
-    prev_time = time.time()
 
     view_model.show_mode_buttons()
     view_model.show_spawn_editor()
@@ -79,7 +77,7 @@ def main():
         mass=30,
         color=RED,
         position=Vector2D(100, 670),
-        # velocity=Vector2D(100, 0),
+        velocity=Vector2D(200, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
@@ -93,7 +91,7 @@ def main():
         # velocity=Vector2D(0, 10),
         num_of_sides=4,
         side_length=100,
-        angle=math.pi / 4,
+        angle=math.pi / 4 + math.pi/2,
         id="blue",
     )
 
@@ -104,7 +102,7 @@ def main():
         velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
-        angle=math.pi / 4,
+        angle=math.pi / 2,
         id="orange",
     )
     obj5 = ConvexPolygon(
@@ -114,7 +112,7 @@ def main():
         velocity=Vector2D(0, 0),
         num_of_sides=4,
         side_length=100,
-        angle=math.pi / 4,
+        angle=math.pi / 6,
         id="pink",
     )
 
@@ -129,8 +127,12 @@ def main():
         id="purple",
     )
 
-    state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
+    #state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
+    state.add_objects([obj1, obj2])
 
+    running = True
+    prev_time = time.time()
+    frame_limit = 1 / 60
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass

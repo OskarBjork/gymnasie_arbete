@@ -12,12 +12,14 @@ class PhysObj:
         position=Vector2D(*ORIGIN),  # Centrumet av formen
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
+        id: str = None,
     ):
         self.mass = mass
         self.position = position
         self.velocity = velocity
         self.force = force
         self.color = color
+        self.id = id
 
     def is_inside_of(self, other_object) -> bool:
         pass
@@ -46,16 +48,17 @@ class Point(PhysObj):
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
+        id: str = None,
     ):
-        super().__init__(mass, color, position, velocity, force)
+        super().__init__(mass, color, position, velocity, force, id)
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
 
     def is_inside_of_other_object(self, other_object) -> bool:
         return (
-            self.position.x == other_object.position.x
-            and self.position.y == other_object.position.y
+                self.position.x == other_object.position.x
+                and self.position.y == other_object.position.y
         )
 
 
@@ -72,15 +75,10 @@ class ConvexPolygon(PhysObj):
         angle=0,
         id: str = None,
     ):
-        self.mass = mass
-        self.color = color
-        self.position = position
-        self.velocity = velocity
-        self.force = force
+        super().__init__(mass, color, position, velocity, force, id)
         self.num_of_sides = num_of_sides
         self.side_length = side_length
         self.angle = angle
-        self.id = id
         self.vertices = self.update_vertices()
         self.bounding_box = self.calculate_polygon_bounding_box()
         self.potential_collision = 0
@@ -106,8 +104,32 @@ class ConvexPolygon(PhysObj):
         max_y = max(v.y for v in self.vertices)
         return [(min_x, min_y), (max_x, max_y)]
 
+    def is_axis_aligned_rectangle(self) -> bool:
+        """ Återvänder sant om objektet är en rektangel som inte har roterats """
+        # TODO: Kolla om bättre implementation finns när det kommer till
+        #       om rektangeln roterats
+        non_rotated_angles = [math.pi / 4, 3 * math.pi / 4, 5 * math.pi / 4, 7 * math.pi / 4]
+        return self.num_of_sides == 4 and self.angle in non_rotated_angles
+
+    def check_axis_aligned_collision(self, other_rect) -> bool:
+        # Utgår ifrån att self.position är mitten av rektangel vilket det inte är rent grafiskt
+        side_len = self.side_length / 2
+        other_side_len = other_rect.side_length / 2
+
+        x_max = self.position.x + side_len
+        x_min = self.position.x - side_len
+        other_x_max = other_rect.position.x + other_side_len
+        other_x_min = other_rect.position.x - other_side_len
+
+        y_max = self.position.y + side_len
+        y_min = self.position.y - side_len
+        other_y_max = other_rect.position.y + other_side_len
+        other_y_min = other_rect.position.y - other_side_len
+        return x_min < other_x_max and other_x_min < x_max and y_min < other_y_max and other_y_min < y_max
+
     def is_inside_of(self, other_rect):
-        pass
+        if self.is_axis_aligned_rectangle() and other_rect.is_axis_aligned_rectangle():  # Använd AABB
+            return self.check_axis_aligned_collision(other_rect)
 
     def render(self, view_model):
         view_model.render_polygon(self)
@@ -122,22 +144,23 @@ class Circle(PhysObj):
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         radius=1,
+        id: str = None,
     ):
-        super().__init__(mass, color, position, velocity, force)
+        super().__init__(mass, color, position, velocity, force, id)
         self.radius = radius
 
     def render(self, view_model):
         view_model.render_circle(self)
 
     def is_inside_of(self, other) -> bool:
-        return self.position.distance_to(other.position) < self.radius + other.radius
+        if isinstance(other, Circle):
+            return self.position.distance_to(other.position) < self.radius + other.radius
 
 
 class CollisionResult:
     def __init__(self, contact_point: Vector2D, normal: Vector2D):
         self.contact_point = contact_point
         self.normal = normal
-
 
 # def RayVsRect(ray_origin: Vector2D, ray_direction: Vector2D, target: Rectangle) -> bool:
 #     t_near = (target.position - ray_origin).element_division(ray_direction)

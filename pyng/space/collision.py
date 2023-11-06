@@ -13,7 +13,7 @@ class AABB:
         pass
 
 
-def create_AABB_union(a: AABB, b: AABB) -> AABB:
+def create_aabb_union(a: AABB, b: AABB) -> AABB:
     lower_bound = min(a.lower_bound, b.lower_bound)
     upper_bound = max(a.upper_bound, b.upper_bound)
     return AABB(lower_bound, upper_bound)

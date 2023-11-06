@@ -41,6 +41,9 @@ class State:
                 continue
             obj.update_vertices()
 
+    def add_object(self, obj: PhysObj):
+        self.objects.append(obj
+
     def add_objects(self, objs: [PhysObj]):
         for obj in objs:
             self.objects.append(obj)
@@ -221,6 +224,8 @@ class State:
 
         bounding_box = [(float("inf"), float("inf")), (float("-inf"), float("-inf"))]
         for polygon in objects:
+            if not isinstance(polygon, ConvexPolygon):
+                continue
             for vertex in polygon.vertices:
                 bounding_box[0] = (
                     min(bounding_box[0][0], vertex.x),
@@ -427,30 +432,41 @@ class State:
                     self.resolve_collision(obj, other_obj)
 
     def resolve_collision(self, obj: PhysObj, other_obj: PhysObj):
-        if isinstance(obj, Circle) and isinstance(obj, Circle):
-            d = obj.position.distance_to(other_obj.position)
+        if isinstance(obj, Circle) and isinstance(other_obj, Circle):
+            self.resolve_circle_collision(obj, other_obj)
 
-            overlap_length = obj.radius + other_obj.radius - d
-
-            direction = obj.position - other_obj.position
-
-            direction = direction.normalize()
-
-            magnitude = overlap_length / 2
-
-            direction = direction * magnitude
-
-            obj.position = obj.position + direction
-
-            other_obj.position = other_obj.position - direction
-
-        elif obj.isinstance(Circle) and other_obj.isinstance(ConvexPolygon):
+        elif isinstance(obj, ConvexPolygon) and isinstance(other_obj, ConvexPolygon):
+            # TODO: Hantera kollision på rätt sätt
+            obj.position.x = obj.position.x - obj.velocity.x
+            obj.position.y = obj.position.y - obj.velocity.y
+            other_obj.position.x = other_obj.position.x - other_obj.velocity.x
+            other_obj.position.y = other_obj.position.y - other_obj.velocity.y
+        # elif obj.isinstance(Circle) and other_obj.isinstance(ConvexPolygon):
+        elif isinstance(obj, Circle) and isinstance(other_obj, ConvexPolygon):
             obj.position.x = obj.position.x - obj.velocity.x
             obj.position.y = obj.position.y - obj.velocity.y
             other_obj.position.x = other_obj.position.x - other_obj.velocity.x
             other_obj.position.y = other_obj.position.y - other_obj.velocity.y
 
         self.resolve_momentum(obj, other_obj)
+
+    @staticmethod
+    def resolve_circle_collision(obj: Circle, other_obj: Circle):
+        d = obj.position.distance_to(other_obj.position)
+
+        overlap_length = obj.radius + other_obj.radius - d
+
+        direction = obj.position - other_obj.position
+
+        direction = direction.normalize()
+
+        magnitude = overlap_length / 2
+
+        direction = direction * magnitude
+
+        obj.position = obj.position + direction
+
+        other_obj.position = other_obj.position - direction
 
     def resolve_momentum(self, obj1, obj2):
         obj1_momentum = obj1.velocity * obj1.mass
