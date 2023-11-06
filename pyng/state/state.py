@@ -44,7 +44,7 @@ class State:
             obj.update_vertices()
 
     def add_object(self, obj: PhysObj):
-        self.objects.append(obj
+        self.objects.append(obj)
 
     def add_objects(self, objs: [PhysObj]):
         for obj in objs:
@@ -62,13 +62,16 @@ class State:
                 mass=self.player_chosen_mass,
                 radius=self.player_chosen_radius,
                 color=self.player_chosen_color,
-                position=position if position is not None else Vector2D(self.player_chosen_x, self.player_chosen_y) + Vector2D(*ORIGIN),
+                position=position
+                if position is not None
+                else Vector2D(self.player_chosen_x, self.player_chosen_y)
+                + Vector2D(*ORIGIN),
             )
 
         # if obj == "rect":
         #     obj = ConvexPolygon(
         #         mass=self.player_chosen_mass,
-                
+
         #         position=
         #     )
         self.add_objects([obj])
@@ -93,10 +96,10 @@ class State:
         potential_collisions = self.sweep_and_prune()
 
         for object1, object2 in potential_collisions:
-            #print([obj.id for obj in [object1, object2]])
+            # print([obj.id for obj in [object1, object2]])
             collision_result = self.check_collision(object1, object2)
             if collision_result[0]:
-                #print("COLLISION: ", [obj.id for obj in [object1, object2]])
+                # print("COLLISION: ", [obj.id for obj in [object1, object2]])
                 # self.resolve_collision(object1, object2)
                 # print("COLLISION: ", [obj.id for obj in node["objects"]])
                 object1.position = object1.position - collision_result[1] / 2
@@ -412,14 +415,13 @@ class State:
 
             overlap = self.overlaps(projection1, projection2)
 
-
             if not overlap:
                 # print("Separating axis found")
                 # print(f"normal: {normal}")
                 # print(f"projection1: {projection1}")
                 # print(f"projection2: {projection2}\n")
                 return False, None  # Separating axis found
-            
+
             min1 = projection1[0]
             max1 = projection1[1]
             min2 = projection2[0]
@@ -436,22 +438,22 @@ class State:
         center_2 = self.find_arithmetic_mean(polygon2.vertices)
         direction = center_2 - center_1
 
-        if (self.dot_product(smallest_axis, direction) < 0):
+        if self.dot_product(smallest_axis, direction) < 0:
             smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
         mtv = smallest_axis * min_overlap
         return True, mtv  # No separating axis found, polygons overlap
-    
+
     def dot_product(self, vector_a, vector_b):
         return vector_a.x * vector_b.x + vector_a.y * vector_b.y
-    
+
     def find_arithmetic_mean(self, vertices):
         sum_x = 0
         sum_y = 0
         for v in vertices:
             sum_x += v.x
             sum_y += v.y
-        
-        return Vector2D(sum_x/len(vertices), sum_y/len(vertices))
+
+        return Vector2D(sum_x / len(vertices), sum_y / len(vertices))
 
     def distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)

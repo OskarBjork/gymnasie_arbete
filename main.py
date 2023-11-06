@@ -53,14 +53,13 @@ def main():
 
     ui_manager = pygame_gui.UIManager((screen_width, screen_height), "theme.json")
     view_model = ViewModel(screen, ui_manager)
-    
+
     view_model.set_caption("Pyng")
 
     screen.fill(BLACK)
 
     view_model.show_mode_buttons()
     view_model.show_spawn_editor()
-    
 
     obj1 = ConvexPolygon(
         mass=30,
@@ -91,7 +90,7 @@ def main():
         # velocity=Vector2D(0, 10),
         num_of_sides=4,
         side_length=100,
-        angle=math.pi / 4 + math.pi/2,
+        angle=math.pi / 4 + math.pi / 2,
         id="blue",
     )
 
@@ -127,8 +126,8 @@ def main():
         id="purple",
     )
 
-    #state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
-    state.add_objects([obj1, obj2])
+    state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
+    # state.add_objects([obj1, obj2])
 
     running = True
     prev_time = time.time()
