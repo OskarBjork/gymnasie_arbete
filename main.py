@@ -51,19 +51,21 @@ def main():
 
     state = State()
 
-    ui_manager = pygame_gui.UIManager((screen_width, screen_height))
+    ui_manager = pygame_gui.UIManager((screen_width, screen_height), "theme.json")
     view_model = ViewModel(screen, ui_manager)
-
+    
     view_model.set_caption("Pyng")
 
     screen.fill(BLACK)
 
-    view_model.show_editor()
+    view_model.show_mode_buttons()
+    view_model.show_spawn_editor()
+    
 
     obj1 = ConvexPolygon(
         mass=30,
         color=GREEN,
-        position=Vector2D(1000, 670),
+        position=Vector2D(999, 670),
         # velocity=Vector2D(-100, 0),
         num_of_sides=4,
         side_length=100,
@@ -85,7 +87,7 @@ def main():
     obj3 = ConvexPolygon(
         mass=30,
         color=BLUE,
-        position=Vector2D(500, 500),
+        position=Vector2D(200, 500),
         # velocity=Vector2D(0, 10),
         num_of_sides=4,
         side_length=100,
@@ -96,14 +98,13 @@ def main():
     obj4 = ConvexPolygon(
         mass=30,
         color=ORANGE,
-        position=Vector2D(700, 500),
-        velocity=Vector2D(50, 0),
+        position=Vector2D(800, 550),
+        velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 2,
         id="orange",
     )
-
     obj5 = ConvexPolygon(
         mass=30,
         color=PINK,
@@ -144,8 +145,6 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
-
-        state.check_collisions()
 
         state.step(dt)
 

@@ -81,6 +81,7 @@ class ConvexPolygon(PhysObj):
         self.angle = angle
         self.vertices = self.update_vertices()
         self.bounding_box = self.calculate_polygon_bounding_box()
+        self.potential_collision = 0
 
     def update_vertices(self):
         p = self.position
@@ -93,6 +94,7 @@ class ConvexPolygon(PhysObj):
             x = p.x + s * math.cos(rotated_angle)
             y = p.y + s * math.sin(rotated_angle)
             vertices.append(Vector2D(x, y))
+        self.vertices = vertices
         return vertices
 
     def calculate_polygon_bounding_box(self):
