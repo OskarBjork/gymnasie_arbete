@@ -28,6 +28,16 @@ class Vector2D:
         assert magnitude > 0
         return Vector2D(self.x, self.y) / magnitude
 
+    def dot(self, other) -> float:
+        """
+        Dot product (Skalärprodukt på svenska) innebär att man
+        utför en "operation" på två vektorer vars resultat är en skalär.
+        Detta utförs genom att multiplicera de två vektorernas magnituder
+        med cosinus av vinkeln emellan dem. Denna produkt representerar hur
+        nära de två vektorernas riktning är.
+        """
+        return self.x * other.x + self.y * other.y
+
     def __eq__(self, other) -> bool:
         return self.x == other.x and self.y == other.y
 
