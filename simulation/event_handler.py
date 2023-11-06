@@ -13,12 +13,16 @@ def handle_events(events: list[Event], UI_manager):
             pygame.quit()
             sys.exit()
 
-        if (
-            event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED
-            and event.ui_object_id == "#radius_input"
-        ):
-            print("Text entry finished. Text:", event.text)
-            return event.text
+        if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED:
+            if event.ui_object_id == "#radius_input":
+                return {"input_type": "radius", "text": event.text}
+            
+            if event.ui_object_id == "#x_coordinate_input":
+                return {"input_type": "x_val", "text": event.text}
+            
+            if event.ui_object_id == "#y_coordinate_input":
+                return {"input_type": "y_val", "text": event.text}
+
         
         if event.type == pygame_gui.UI_BUTTON_PRESSED:
             if event.ui_object_id == "#manipulate_view_changer_button":
@@ -52,14 +56,26 @@ def delegate_event(event, state, view_model, ui_manager):
     if event is None:
         return
 
-    if event == "mouse 1":
+    if event == "mouse 1" :
         state.parse_mouse_click(
             Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos())))
         )
         return
 
-    #elif isinstance(event, str):
-    #    state.player_chosen_radius = int(event)
+    
+    if isinstance(event, dict):
+        if event["input_type"] == "radius":
+            state.player_chosen_radius = int(event["text"])
+        
+        if event["input_type"] == "x_val":
+            state.player_chosen_x = int(event["text"])
+            return
+        
+        if event["input_type"] == "y_val":
+            state.player_chosen_y = int(event["text"])
+            return
+        
+        
     
     if event == "manipulate_mode":
         view_model.ui_mode = False
@@ -91,4 +107,5 @@ def delegate_event(event, state, view_model, ui_manager):
         return
     
     if event == "spawn":
+        state.create_object()
         return

@@ -22,6 +22,8 @@ class State:
         self.player_chosen_shape = Circle
         self.player_chosen_radius = 10
         self.player_chosen_color = RED
+        self.player_chosen_x = 0
+        self.player_chosen_y = 0
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D):
@@ -49,19 +51,26 @@ class State:
             self.objects.append(obj)
 
     def create_object(
-        self, position: Vector2D, obj: PhysObj = None, with_gravity=False
+        self, position: Vector2D = None, obj: PhysObj = "circle", with_gravity=False
     ):
         if not (
             time.time() - self.time_since_last_object_creation > 0.1
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
-        if obj is None:
+        if obj == "circle":
             obj = Circle(
                 mass=self.player_chosen_mass,
                 radius=self.player_chosen_radius,
                 color=self.player_chosen_color,
-                position=position,
+                position=position if position is not None else Vector2D(self.player_chosen_x, self.player_chosen_y) + Vector2D(*ORIGIN),
             )
+
+        # if obj == "rect":
+        #     obj = ConvexPolygon(
+        #         mass=self.player_chosen_mass,
+                
+        #         position=
+        #     )
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
         if with_gravity:
@@ -76,7 +85,7 @@ class State:
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
     def find_collisions(self):
-        print("\nNEW FRAME:\n")
+        # print("\nNEW FRAME:\n")
         # root_node = self.build_bvh(self.objects)
         # print("ROOT NODE: ")
         # pp.pprint(root_node)
@@ -84,10 +93,10 @@ class State:
         potential_collisions = self.sweep_and_prune()
 
         for object1, object2 in potential_collisions:
-            print([obj.id for obj in [object1, object2]])
+            #print([obj.id for obj in [object1, object2]])
             collision_result = self.check_collision(object1, object2)
             if collision_result[0]:
-                print("COLLISION: ", [obj.id for obj in [object1, object2]])
+                #print("COLLISION: ", [obj.id for obj in [object1, object2]])
                 # self.resolve_collision(object1, object2)
                 # print("COLLISION: ", [obj.id for obj in node["objects"]])
                 object1.position = object1.position - collision_result[1] / 2
@@ -403,22 +412,46 @@ class State:
 
             overlap = self.overlaps(projection1, projection2)
 
+
             if not overlap:
                 # print("Separating axis found")
                 # print(f"normal: {normal}")
                 # print(f"projection1: {projection1}")
                 # print(f"projection2: {projection2}\n")
                 return False, None  # Separating axis found
+            
+            min1 = projection1[0]
+            max1 = projection1[1]
+            min2 = projection2[0]
+            max2 = projection2[1]
 
-            overlap_amount = min(projection1[1], projection2[1]) - max(
-                projection1[0], projection2[0]
-            )
+            axis_depth = min(max2 - min1, max1 - min2)
 
-            if overlap_amount < min_overlap:
-                min_overlap = overlap_amount
+            if axis_depth < min_overlap:
+                min_overlap = axis_depth
                 smallest_axis = normal
+        min_overlap = min_overlap / (normal.magnitude())
+        smallest_axis = smallest_axis.normalize()
+        center_1 = self.find_arithmetic_mean(polygon1.vertices)
+        center_2 = self.find_arithmetic_mean(polygon2.vertices)
+        direction = center_2 - center_1
+
+        if (self.dot_product(smallest_axis, direction) < 0):
+            smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
         mtv = smallest_axis * min_overlap
         return True, mtv  # No separating axis found, polygons overlap
+    
+    def dot_product(self, vector_a, vector_b):
+        return vector_a.x * vector_b.x + vector_a.y * vector_b.y
+    
+    def find_arithmetic_mean(self, vertices):
+        sum_x = 0
+        sum_y = 0
+        for v in vertices:
+            sum_x += v.x
+            sum_y += v.y
+        
+        return Vector2D(sum_x/len(vertices), sum_y/len(vertices))
 
     def distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
