@@ -1,6 +1,7 @@
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.space.vectors import Vector2D
 from pyng.helper import projection, overlaps, find_arithmetic_mean, dot_product
+from pyng.config import GRAVITY_CONSTANT
 import math
 
 
@@ -96,8 +97,8 @@ class PhysicsEvaluator:
                 smallest_axis = normal
         min_overlap = min_overlap / (normal.magnitude())
         smallest_axis = smallest_axis.normalize()
-        center_1 = find_arithmetic_mean(polygon1.vertices)
-        center_2 = find_arithmetic_mean(polygon2.vertices)
+        center_1 = polygon1.position
+        center_2 = polygon2.position
         direction = center_2 - center_1
 
         if dot_product(smallest_axis, direction) < 0:
@@ -112,3 +113,6 @@ class PhysicsEvaluator:
         obj1.velocity = obj2_momentum / obj1.mass
 
         obj2.velocity = obj1_momentum / obj2.mass
+
+    def impose_gravity(self, obj: PhysObj):
+        obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)

@@ -386,3 +386,12 @@ def calculate_bounding_box(self, objects):
             )
 
     return bounding_box
+
+def longest_axis(self, bounding_box):
+        x_length = bounding_box[1][0] - bounding_box[0][0]
+        y_length = bounding_box[1][1] - bounding_box[0][1]  # BUGG: längden blir negativ
+
+        if x_length > y_length:
+            return 0
+        else:
+            return 1

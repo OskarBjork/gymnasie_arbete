@@ -2,14 +2,7 @@ from pyng.space.phys_obj import PhysObj, Point, Circle, ConvexPolygon
 from pyng.space.vectors import Vector2D
 from pyng.space.grid import Grid
 from pyng.config import ORIGIN, PIXELS_PER_METER, BLACK, RED, BLUE
-from pyng.helper import projection, overlaps
-
-from typing import Tuple
-
-
-def remove_duplicates(list: [PhysObj]):
-    unique_collisions = set(frozenset(tup) for tup in list)
-    return [tuple(phys_objs) for phys_objs in unique_collisions]
+from pyng.helper import projection, overlaps, remove_duplicates
 
 
 class PhysWorld:

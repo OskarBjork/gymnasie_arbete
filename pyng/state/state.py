@@ -4,7 +4,6 @@ from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
 import time
-import math
 import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -53,13 +52,15 @@ class State:
         for obj in objs:
             self.objects.append(obj)
 
-    def create_object(
-        self, position: Vector2D = None, obj: PhysObj = "circle", with_gravity=False
-    ):
-        if not (
-            time.time() - self.time_since_last_object_creation > 0.1
+    def del_object(self, obj: PhysObj):
+        self.objects.remove(obj)
+
+    def create_object(self, position=None, obj="circle", with_gravity=False):
+        if (
+            not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
+
         if obj == "circle":
             obj = Circle(
                 mass=self.player_chosen_mass,
@@ -70,15 +71,11 @@ class State:
                 else Vector2D(self.player_chosen_x, self.player_chosen_y)
                 + Vector2D(*ORIGIN),
             )
+
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
         if with_gravity:
-            self.impose_gravity(obj)
-
-    def del_object(self, obj: PhysObj):
-        self.objects.remove(obj)
-
-    # TODO Möjligtvis flytta fysikfunktioner till egen klass
+            self.physics_evaluator.impose_gravity(obj)
 
     def handle_collisions(self):
         collisions = self.phys_world.find_collisions(self.objects)
@@ -87,28 +84,5 @@ class State:
                 collision[0], collision[1]
             )
 
-    def impose_gravity(self, obj: PhysObj):
-        obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
-
-    def longest_axis(self, bounding_box):
-        x_length = bounding_box[1][0] - bounding_box[0][0]
-        y_length = bounding_box[1][1] - bounding_box[0][1]  # BUGG: längden blir negativ
-
-        if x_length > y_length:
-            return 0
-        else:
-            return 1
-
-    def dot_product(self, vector_a, vector_b):
-        return vector_a.x * vector_b.x + vector_a.y * vector_b.y
-
-    def distance(self, p1, p2):
-        return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
-
-    def check_collisions(self):
-        for obj in self.objects:
-            for other_obj in self.objects:
-                if obj == other_obj:
-                    continue
-                if obj.is_inside_of(other_obj):
-                    self.resolve_collision(obj, other_obj)
+    def object_creation_available(self):
+        return time.time() - self.time_since_last_object_creation > 0.1

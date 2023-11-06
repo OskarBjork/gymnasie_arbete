@@ -29,3 +29,8 @@ def find_arithmetic_mean(vertices):
         sum_y += v.y
 
     return Vector2D(sum_x / len(vertices), sum_y / len(vertices))
+
+
+def remove_duplicates(list):
+    unique_collisions = set(frozenset(tup) for tup in list)
+    return [tuple(phys_objs) for phys_objs in unique_collisions]
