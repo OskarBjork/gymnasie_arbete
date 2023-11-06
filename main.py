@@ -65,7 +65,7 @@ def main():
         mass=30,
         color=GREEN,
         position=Vector2D(999, 670),
-        # velocity=Vector2D(-100, 0),
+        velocity=Vector2D(-200, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
@@ -76,7 +76,7 @@ def main():
         mass=30,
         color=RED,
         position=Vector2D(100, 670),
-        velocity=Vector2D(200, 0),
+        velocity=Vector2D(0, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
@@ -97,11 +97,11 @@ def main():
     obj4 = ConvexPolygon(
         mass=30,
         color=ORANGE,
-        position=Vector2D(800, 550),
+        position=Vector2D(600, 550),
         velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
-        angle=math.pi / 2,
+        angle=math.pi / 4,
         id="orange",
     )
     obj5 = ConvexPolygon(
@@ -147,9 +147,9 @@ def main():
 
         state.step(dt)
 
-        view_model.render_objects(state.objects)
+        state.handle_collisions()
 
-        state.find_collisions()
+        view_model.render_objects(state.objects)
 
         view_model.render_ui(ui_manager)
 
