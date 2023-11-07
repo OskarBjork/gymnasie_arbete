@@ -31,13 +31,13 @@ class PhysWorld:
     def get_projections_in_x_and_y_plane(self, objects: [PhysObj]):
         projections_x = []
         projections_y = []
-        objects = [obj for obj in objects if not isinstance(obj, Circle)]
+        # objects = [obj for obj in objects if not isinstance(obj, Circle)]
         for axis in (
             Vector2D(1, 0),
             Vector2D(0, 1),
         ):
             for obj in objects:
-                min_proj, max_proj = projection(obj, axis)
+                min_proj, max_proj = obj.projection(axis)
                 if axis.x == 1:
                     projections_x.append((min_proj, max_proj, obj))
                 else:

@@ -33,7 +33,7 @@ class PhysicsEvaluator:
         obj.position = obj.position - (mtv / 2)
         other_obj.position = other_obj.position + (mtv / 2)
 
-    def resolve_circle_collision(obj: Circle, other_obj: Circle, overlap_length):
+    def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
         direction = obj.position - other_obj.position
 
         direction = direction.normalize()

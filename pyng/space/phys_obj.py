@@ -143,6 +143,16 @@ class ConvexPolygon(PhysObj):
         ):  # Använd AABB
             return self.check_axis_aligned_collision(other_rect)
 
+    def projection(self, axis):
+        """Går igenom alla vertices i ett objekt och projicerar dem på en axel, och returnerar sedan minsta och största värdena av dessa"""
+        min_proj = float("inf")
+        max_proj = float("-inf")
+        for vertex in self.vertices:
+            dot_product = vertex.x * axis.x + vertex.y * axis.y
+            min_proj = min(min_proj, dot_product)
+            max_proj = max(max_proj, dot_product)
+        return min_proj, max_proj
+
     def render(self, view_model):
         view_model.render_polygon(self)
 
@@ -169,6 +179,11 @@ class Circle(PhysObj):
             return (
                 self.position.distance_to(other.position) < self.radius + other.radius
             )
+
+    def projection(self, axis):
+        min_proj = self.position.dot(axis) - self.radius
+        max_proj = self.position.dot(axis) + self.radius
+        return min_proj, max_proj
 
 
 class CollisionResult:
