@@ -24,8 +24,19 @@ class PhysicsEvaluator:
                 return
             self.resolve_polygon_collision(obj, other_obj, mtv)
 
+        elif isinstance(obj, ConvexPolygon) and isinstance(other_obj, Circle):
+            collision_analysis = self.check_polygon_circle_collision(obj, other_obj)
+            collision_happened, mtv = collision_analysis
+            if not collision_happened:
+                return
+            self.resolve_polygon_collision(obj, other_obj, mtv)
+
         elif isinstance(obj, Circle) and isinstance(other_obj, ConvexPolygon):
-            pass
+            collision_analysis = self.check_polygon_circle_collision(obj, other_obj)
+            collision_happened, mtv = collision_analysis
+            if not collision_happened:
+                return
+            self.resolve_polygon_collision(obj, other_obj, mtv)
 
     def resolve_polygon_collision(
         self, obj: ConvexPolygon, other_obj: ConvexPolygon, mtv
@@ -33,7 +44,7 @@ class PhysicsEvaluator:
         obj.position = obj.position - (mtv / 2)
         other_obj.position = other_obj.position + (mtv / 2)
 
-    def resolve_circle_collision(obj: Circle, other_obj: Circle, overlap_length):
+    def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
         direction = obj.position - other_obj.position
 
         direction = direction.normalize()
@@ -101,10 +112,57 @@ class PhysicsEvaluator:
         center_2 = polygon2.position
         direction = center_2 - center_1
 
-        if dot_product(smallest_axis, direction) < 0:
+        if smallest_axis.dot(direction) < 0:
             smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
         mtv = smallest_axis * min_overlap
         return True, mtv  # No separating axis found, polygons overlap
+
+    def check_polygon_circle_collision(self, polygon, circle):
+        if isinstance(circle, ConvexPolygon) and isinstance(polygon, Circle):
+            return self.check_polygon_circle_collision(circle, polygon)
+        normals = self.get_normals(polygon)
+        min_overlap = float("inf")
+
+        for normal in normals:
+            projection1 = polygon.project(normal)
+            projection2 = circle.project(normal)
+
+            overlap = overlaps(projection1, projection2)
+
+            min1 = projection1[0]
+            max1 = projection1[1]
+            min2 = projection2[0]
+            max2 = projection2[1]
+
+            axis_depth = min(max2 - min1, max1 - min2)
+
+            if axis_depth < min_overlap:
+                min_overlap = axis_depth
+                smallest_axis = normal
+
+            if not overlap:
+                return False, None
+
+        min_overlap = min_overlap / (normal.magnitude())
+        smallest_axis = smallest_axis.normalize()
+        center_1 = polygon.position
+        center_2 = circle.position
+        direction = center_2 - center_1
+
+        if smallest_axis.dot(direction) < 0:
+            smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
+
+        return True, smallest_axis * min_overlap
+
+    def find_closest_point_on_polygon(self, polygon, circle):
+        result = -1
+        min_dist = float("inf")
+        for i, v in enumerate(polygon.vertices):
+            dist = v.distance_to(circle.position)
+            if dist < min_dist:
+                min_dist = dist
+                result = i
+        return result
 
     def resolve_momentum(self, obj1, obj2):
         obj1_momentum = obj1.velocity * obj1.mass
