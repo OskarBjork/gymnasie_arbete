@@ -43,6 +43,7 @@ class PhysicsEvaluator:
     ):
         obj.position = obj.position - (mtv / 2)
         other_obj.position = other_obj.position + (mtv / 2)
+        self.collision_response(obj, other_obj, mtv)
 
     def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
         direction = obj.position - other_obj.position
@@ -56,6 +57,7 @@ class PhysicsEvaluator:
         obj.position = obj.position + direction
 
         other_obj.position = other_obj.position - direction
+        self.collision_response(obj, other_obj, direction)
 
     def check_circle_collision(self, circle1: Circle, circle2: Circle):
         distance = circle1.position.distance_to(circle2.position)
@@ -171,6 +173,19 @@ class PhysicsEvaluator:
         obj1.velocity = obj2_momentum / obj1.mass
 
         obj2.velocity = obj1_momentum / obj2.mass
+
+    def collision_response(self, obj1, obj2, mtv):
+        if mtv.magnitude() == 0:
+            return
+        relative_velocity = obj1.velocity - obj2.velocity
+        e = min(obj1.restitution, obj2.restitution)
+        j = (
+            -(1 + e)
+            * relative_velocity.dot(mtv)
+            / (mtv.magnitude() ** 2 * (1 / obj1.mass + 1 / obj2.mass))
+        )
+        obj1.velocity = obj1.velocity + (mtv * (j / obj1.mass))
+        obj2.velocity = obj2.velocity - (mtv * (j / obj2.mass))
 
     def impose_gravity(self, obj: PhysObj):
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
