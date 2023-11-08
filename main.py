@@ -3,6 +3,7 @@
 # TODO: Ta bort allt klotter härifrån och sätt det in i andra klasser
 # TODO: TYPE ANNOTATIONS!
 
+
 # TODO: Collision detection
 # Broad phase: bounding volume hierarchies
 # Narrow phase: Separating axis theorem
@@ -10,6 +11,7 @@
 import time
 import sys
 import math
+import random
 
 import pygame
 import pygame_gui
@@ -35,6 +37,7 @@ from pyng.config import (
     PURPLE,
     GRAY,
     LIGHT_BLUE,
+    COLORS,
 )
 from simulation.event_handler import handle_events, delegate_event
 
@@ -64,8 +67,8 @@ def main():
     obj1 = ConvexPolygon(
         mass=30,
         color=GREEN,
-        position=Vector2D(999, 670),
-        # velocity=Vector2D(-200, 0),
+        position=Vector2D(1000, 670),
+        velocity=Vector2D(-200, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
@@ -75,58 +78,60 @@ def main():
     obj2 = ConvexPolygon(
         mass=30,
         color=RED,
-        position=Vector2D(100, 670),
-        velocity=Vector2D(0, 0),
+        position=Vector2D(400, 670),
+        velocity=Vector2D(200, 0),
         num_of_sides=4,
         side_length=100,
         angle=math.pi / 4,
         id="red",
     )
 
-    obj3 = ConvexPolygon(
-        mass=30,
-        color=BLUE,
-        position=Vector2D(200, 500),
-        # velocity=Vector2D(0, 10),
-        num_of_sides=4,
-        side_length=100,
-        angle=math.pi / 4 + math.pi / 2,
-        id="blue",
-    )
+    # state.generate_test_data()
 
-    obj4 = ConvexPolygon(
-        mass=30,
-        color=ORANGE,
-        position=Vector2D(600, 550),
-        # velocity=Vector2D(100, 0),
-        num_of_sides=4,
-        side_length=100,
-        angle=math.pi / 4,
-        id="orange",
-    )
-    obj5 = ConvexPolygon(
-        mass=30,
-        color=PINK,
-        position=Vector2D(1000, 500),
-        velocity=Vector2D(0, 0),
-        num_of_sides=4,
-        side_length=100,
-        angle=math.pi / 6,
-        id="pink",
-    )
+    # obj3 = ConvexPolygon(
+    #     mass=30,
+    #     color=BLUE,
+    #     position=Vector2D(200, 500),
+    #     # velocity=Vector2D(0, 10),
+    #     num_of_sides=4,
+    #     side_length=100,
+    #     angle=math.pi / 4 + math.pi / 2,
+    #     id="blue",
+    # )
 
-    obj6 = ConvexPolygon(
-        mass=30,
-        color=PURPLE,
-        position=Vector2D(1500, 500),
-        velocity=Vector2D(0, 0),
-        num_of_sides=4,
-        side_length=100,
-        angle=math.pi / 4,
-        id="purple",
-    )
+    # obj4 = ConvexPolygon(
+    #     mass=30,
+    #     color=ORANGE,
+    #     position=Vector2D(600, 550),
+    #     # velocity=Vector2D(100, 0),
+    #     num_of_sides=4,
+    #     side_length=100,
+    #     angle=math.pi / 4,
+    #     id="orange",
+    # )
+    # obj5 = ConvexPolygon(
+    #     mass=30,
+    #     color=PINK,
+    #     position=Vector2D(1000, 500),
+    #     velocity=Vector2D(0, 0),
+    #     num_of_sides=4,
+    #     side_length=100,
+    #     angle=math.pi / 6,
+    #     id="pink",
+    # )
 
-    state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
+    # obj6 = ConvexPolygon(
+    #     mass=30,
+    #     color=PURPLE,
+    #     position=Vector2D(1500, 500),
+    #     velocity=Vector2D(0, 0),
+    #     num_of_sides=4,
+    #     side_length=100,
+    #     angle=math.pi / 4,
+    #     id="purple",
+    # )
+
+    # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([obj1, obj2])
 
     running = True
@@ -144,6 +149,8 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
+
+        state.create_object(obj="circle", position=Vector2D(1000, 1000))
 
         state.step(dt)
 

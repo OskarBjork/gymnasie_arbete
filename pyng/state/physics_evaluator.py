@@ -43,7 +43,7 @@ class PhysicsEvaluator:
     ):
         obj.position = obj.position - (mtv / 2)
         other_obj.position = other_obj.position + (mtv / 2)
-        # self.collision_response(obj, other_obj, mtv)
+        self.collision_response(obj, other_obj, mtv)
 
     def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
         direction = obj.position - other_obj.position
@@ -57,12 +57,12 @@ class PhysicsEvaluator:
         obj.position = obj.position + direction
 
         other_obj.position = other_obj.position - direction
-        # self.collision_response(obj, other_obj, direction)
+        self.collision_response(obj, other_obj, direction)
 
     def resolve_polygon_circle_collision(self, circle, polygon, mtv):
         circle.position = circle.position + (mtv / 2)
         polygon.position = polygon.position - (mtv / 2)
-        # self.collision_response(circle, polygon, mtv)
+        self.collision_response(circle, polygon, mtv)
 
     def check_circle_collision(self, circle1: Circle, circle2: Circle):
         distance = circle1.position.distance_to(circle2.position)
@@ -182,6 +182,7 @@ class PhysicsEvaluator:
     def collision_response(self, obj1, obj2, mtv):
         if mtv.magnitude() == 0:
             return
+        mtv = mtv.normalize()
         relative_velocity = obj1.velocity - obj2.velocity
         e = min(obj1.restitution, obj2.restitution)
         j = (

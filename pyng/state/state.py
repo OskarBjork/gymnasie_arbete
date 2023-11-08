@@ -32,8 +32,8 @@ class State:
 
     def parse_mouse_click(self, mouse_pos: Vector2D):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
-            #if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
-                self.create_object(mouse_pos)
+            # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
+            self.create_object(mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
@@ -41,6 +41,14 @@ class State:
             # TODO: Fixa +=
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
+            obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+            if (
+                obj.position.y > 2000
+                or obj.position.x > 2000
+                or obj.position.y < ORIGIN[1]
+                or obj.position.x < ORIGIN[0]
+            ):
+                self.del_object(obj)
 
     def update_all_vertices(self):
         for obj in self.objects:
@@ -65,25 +73,25 @@ class State:
             return
 
         if obj == "circle":
-            object_type = random.choice(["circle", "polygon"])
+            object_type = random.choice(["circle"])
             if object_type == "circle":
                 obj = Circle(
-                    mass=random.randint(1, 100),
+                    mass=self.player_chosen_mass,
+                    # mass=random.randint(1, 100),
                     # num_of_sides=random.randint(3, 10),
                     # side_length=random.randint(1, 100),
-                    radius=random.randint(1, 100),
+                    radius=20,
                     color=random.choice(COLORS),
                     position=position
                     if position is not None
                     else Vector2D(self.player_chosen_x, self.player_chosen_y)
                     + Vector2D(*ORIGIN),
-                    velocity=Vector2D(
-                        random.randint(-300, 300), random.randint(-300, 300)
-                    ),
+                    velocity=Vector2D(500, 0),
                 )
             else:
                 obj = ConvexPolygon(
-                    mass=random.randint(1, 100),
+                    mass=self.player_chosen_mass,
+                    # mass=random.randint(1, 100),
                     num_of_sides=random.randint(3, 10),
                     side_length=random.randint(1, 100),
                     # radius=random.randint(1, 100),
@@ -92,9 +100,9 @@ class State:
                     if position is not None
                     else Vector2D(self.player_chosen_x, self.player_chosen_y)
                     + Vector2D(*ORIGIN),
-                    velocity=Vector2D(
-                        random.randint(-300, 300), random.randint(-300, 300)
-                    ),
+                    # velocity=Vector2D(
+                    #     random.randint(-300, 300), random.randint(-300, 300)
+                    # ),
                 )
 
         self.add_objects([obj])
@@ -149,9 +157,9 @@ class State:
                         color=random.choice(COLORS),
                         mass=random.randint(1, 100),
                         radius=random.randint(1, 100),
-                        velocity=Vector2D(
-                            random.randint(-100, 100), random.randint(-100, 100)
-                        ),
+                        # velocity=Vector2D(
+                        #     random.randint(-300, 300), random.randint(-300, 300)
+                        # ),
                         position=Vector2D(
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
@@ -167,17 +175,15 @@ class State:
                         mass=random.randint(1, 100),
                         num_of_sides=random.randint(3, 10),
                         side_length=random.randint(1, 100),
-                        angle=random.randint(0, 360),
-                        velocity=Vector2D(
-                            random.randint(-10, 10),
-                            random.randint(-10, 10),
-                            position=Vector2D(
-                                random.randint(100, 1000), random.randint(100, 1000)
-                            )
-                            + Vector2D(*ORIGIN),
-                        ),
+                        # velocity=Vector2D(
+                        #     random.randint(-300, 300), random.randint(-300, 300)
+                        # ),
+                        position=Vector2D(
+                            random.randint(100, 1000), random.randint(100, 1000)
+                        )
+                        + Vector2D(*ORIGIN),
                     )
-                ]
+                ],
             )
 
     def generate_test_data(self):
