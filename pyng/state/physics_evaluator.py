@@ -29,21 +29,21 @@ class PhysicsEvaluator:
             collision_happened, mtv = collision_analysis
             if not collision_happened:
                 return
-            self.resolve_polygon_collision(obj, other_obj, mtv)
+            self.resolve_polygon_circle_collision(other_obj, obj, mtv)
 
         elif isinstance(obj, Circle) and isinstance(other_obj, ConvexPolygon):
             collision_analysis = self.check_polygon_circle_collision(obj, other_obj)
             collision_happened, mtv = collision_analysis
             if not collision_happened:
                 return
-            self.resolve_polygon_collision(obj, other_obj, mtv)
+            self.resolve_polygon_circle_collision(obj, other_obj, mtv)
 
     def resolve_polygon_collision(
         self, obj: ConvexPolygon, other_obj: ConvexPolygon, mtv
     ):
         obj.position = obj.position - (mtv / 2)
         other_obj.position = other_obj.position + (mtv / 2)
-        self.collision_response(obj, other_obj, mtv)
+        # self.collision_response(obj, other_obj, mtv)
 
     def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
         direction = obj.position - other_obj.position
@@ -57,7 +57,12 @@ class PhysicsEvaluator:
         obj.position = obj.position + direction
 
         other_obj.position = other_obj.position - direction
-        self.collision_response(obj, other_obj, direction)
+        # self.collision_response(obj, other_obj, direction)
+
+    def resolve_polygon_circle_collision(self, circle, polygon, mtv):
+        circle.position = circle.position + (mtv / 2)
+        polygon.position = polygon.position - (mtv / 2)
+        # self.collision_response(circle, polygon, mtv)
 
     def check_circle_collision(self, circle1: Circle, circle2: Circle):
         distance = circle1.position.distance_to(circle2.position)

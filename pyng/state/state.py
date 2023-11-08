@@ -1,10 +1,11 @@
 from pyng.space.vectors import Vector2D
-from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT
+from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
 import time
 import pprint
+import random
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -62,15 +63,37 @@ class State:
             return
 
         if obj == "circle":
-            obj = Circle(
-                mass=self.player_chosen_mass,
-                radius=self.player_chosen_radius,
-                color=self.player_chosen_color,
-                position=position
-                if position is not None
-                else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                + Vector2D(*ORIGIN),
-            )
+            object_type = random.choice(["circle", "polygon"])
+            if object_type == "circle":
+                obj = Circle(
+                    mass=random.randint(1, 100),
+                    # num_of_sides=random.randint(3, 10),
+                    # side_length=random.randint(1, 100),
+                    radius=random.randint(1, 100),
+                    color=random.choice(COLORS),
+                    position=position
+                    if position is not None
+                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
+                    + Vector2D(*ORIGIN),
+                    velocity=Vector2D(
+                        random.randint(-300, 300), random.randint(-300, 300)
+                    ),
+                )
+            else:
+                obj = ConvexPolygon(
+                    mass=random.randint(1, 100),
+                    num_of_sides=random.randint(3, 10),
+                    side_length=random.randint(1, 100),
+                    # radius=random.randint(1, 100),
+                    color=random.choice(COLORS),
+                    position=position
+                    if position is not None
+                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
+                    + Vector2D(*ORIGIN),
+                    velocity=Vector2D(
+                        random.randint(-300, 300), random.randint(-300, 300)
+                    ),
+                )
 
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
@@ -86,3 +109,76 @@ class State:
 
     def object_creation_available(self):
         return time.time() - self.time_since_last_object_creation > 0.1
+
+    def generate_random_position(self):
+        while True:
+            position = Vector2D(
+                random.randint(100, 1000), random.randint(100, 1000)
+            ) + Vector2D(*ORIGIN)
+            circle = Circle(
+                color=RED,
+                mass=10,
+                radius=100,
+                position=position,
+            )
+            for obj in self.objects:
+                if isinstance(obj, Circle):
+                    if (
+                        self.physics_evaluator.check_circle_collision(circle, obj)[0]
+                        == True
+                    ):
+                        break
+                elif isinstance(obj, ConvexPolygon):
+                    if (
+                        self.physics_evaluator.check_polygon_circle_collision(
+                            obj, circle
+                        )[0]
+                        == True
+                    ):
+                        break
+            else:
+                return position
+
+    def generate_random_object(self, type_of_object: str):
+        if type_of_object == "circle":
+            self.add_objects(
+                [
+                    Circle(
+                        color=random.choice(COLORS),
+                        mass=random.randint(1, 100),
+                        radius=random.randint(1, 100),
+                        velocity=Vector2D(
+                            random.randint(-100, 100), random.randint(-100, 100)
+                        ),
+                        position=Vector2D(
+                            random.randint(100, 1000), random.randint(100, 1000)
+                        )
+                        + Vector2D(*ORIGIN),
+                    ),
+                ]
+            )
+        elif type_of_object == "polygon":
+            self.add_objects(
+                [
+                    ConvexPolygon(
+                        color=random.choice(COLORS),
+                        mass=random.randint(1, 100),
+                        num_of_sides=random.randint(3, 10),
+                        side_length=random.randint(1, 100),
+                        angle=random.randint(0, 360),
+                        velocity=Vector2D(
+                            random.randint(-10, 10),
+                            random.randint(-10, 10),
+                            position=Vector2D(
+                                random.randint(100, 1000), random.randint(100, 1000)
+                            )
+                            + Vector2D(*ORIGIN),
+                        ),
+                    )
+                ]
+            )
+
+    def generate_test_data(self):
+        for _ in range(20):
+            type_of_object = random.choice(["circle", "polygon"])
+            self.generate_random_object(type_of_object)

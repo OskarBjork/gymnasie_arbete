@@ -13,7 +13,7 @@ class PhysObj:
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         id: str = None,
-        restitution=0.5,
+        restitution=1,
     ):
         self.mass = mass
         self.position = position
@@ -51,7 +51,7 @@ class Point(PhysObj):
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         id: str = None,
-        restitution=0.5,
+        restitution=1,
     ):
         super().__init__(mass, color, position, velocity, force, id, restitution)
 
@@ -77,7 +77,7 @@ class ConvexPolygon(PhysObj):
         side_length=1,
         angle=0,
         id: str = None,
-        restitution=0.5,
+        restitution=1,
     ):
         super().__init__(mass, color, position, velocity, force, id, restitution)
         self.num_of_sides = num_of_sides
@@ -171,7 +171,7 @@ class Circle(PhysObj):
         force=Vector2D(0, 0),
         radius=1,
         id: str = None,
-        restitution=0.5,
+        restitution=1,
     ):
         super().__init__(mass, color, position, velocity, force, id, restitution)
         self.radius = radius
