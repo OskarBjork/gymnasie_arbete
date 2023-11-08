@@ -409,22 +409,46 @@ class State:
 
             overlap = self.overlaps(projection1, projection2)
 
+
             if not overlap:
                 # print("Separating axis found")
                 # print(f"normal: {normal}")
                 # print(f"projection1: {projection1}")
                 # print(f"projection2: {projection2}\n")
                 return False, None  # Separating axis found
+            
+            min1 = projection1[0]
+            max1 = projection1[1]
+            min2 = projection2[0]
+            max2 = projection2[1]
 
-            overlap_amount = min(projection1[1], projection2[1]) - max(
-                projection1[0], projection2[0]
-            )
+            axis_depth = min(max2 - min1, max1 - min2)
 
-            if overlap_amount < min_overlap:
-                min_overlap = overlap_amount
+            if axis_depth < min_overlap:
+                min_overlap = axis_depth
                 smallest_axis = normal
+        min_overlap = min_overlap / (normal.magnitude())
+        smallest_axis = smallest_axis.normalize()
+        center_1 = self.find_arithmetic_mean(polygon1.vertices)
+        center_2 = self.find_arithmetic_mean(polygon2.vertices)
+        direction = center_2 - center_1
+
+        if (self.dot_product(smallest_axis, direction) < 0):
+            smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
         mtv = smallest_axis * min_overlap
         return True, mtv  # No separating axis found, polygons overlap
+    
+    def dot_product(self, vector_a, vector_b):
+        return vector_a.x * vector_b.x + vector_a.y * vector_b.y
+    
+    def find_arithmetic_mean(self, vertices):
+        sum_x = 0
+        sum_y = 0
+        for v in vertices:
+            sum_x += v.x
+            sum_y += v.y
+        
+        return Vector2D(sum_x/len(vertices), sum_y/len(vertices))
 
     def distance(self, p1, p2):
         return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
