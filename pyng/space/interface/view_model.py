@@ -18,7 +18,7 @@ class ViewModel:
         self.ui_manager = ui_manager
         self.font = pygame.font.Font(None, 36)
         
-        self.ui_mode = True
+        self.ui_mode = True #True om i "spawner" läge
         self.shape = "rect"
 
     def convert_coordinates(self, x, y) -> (float, float):
@@ -107,6 +107,14 @@ class ViewModel:
                     (5, 350),
                     20,
                 )
+        
+        if self.ui_mode == False: # visar all text som ska vara på manipulate skärmen
+            self.render_text(
+                "Manipulate",
+                BLACK,
+                (10, 20),
+                60,
+            )
 
     def render_ui(self, ui_manager):
         self.show_grid()
@@ -171,6 +179,15 @@ class ViewModel:
             manager=self.ui_manager,
             tool_tip_text="Spawns the selected shape on the specified coordinates",
             object_id="#spawn_button",
+        )
+        
+        # Kanske inte ens behövs, eftersom när man är i "spawn skärmen"
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((10 + 0.25* ORIGIN[0], 285), (0.35* ORIGIN[0], 40)),
+            text="Mouse Spawn",
+            manager=self.ui_manager,
+            tool_tip_text="Spawns the selected shape when you left click somewhere on the coordinate grid",
+            object_id="#mouse_spawn_button",
         )
 
         if self.shape == "circle":
