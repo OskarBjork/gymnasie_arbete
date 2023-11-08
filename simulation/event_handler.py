@@ -53,7 +53,7 @@ def handle_events(events: list[Event], UI_manager):
         return "mouse 1"
 
 
-def delegate_event(event, state, view_model, UI_manager):
+def delegate_event(event, state, view_model, ui_manager):
     if event is None:
         return
 
