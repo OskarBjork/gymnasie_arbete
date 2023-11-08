@@ -3,6 +3,7 @@ from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
+
 import time
 import pprint
 import random
@@ -31,7 +32,8 @@ class State:
 
     def parse_mouse_click(self, mouse_pos: Vector2D):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
-            self.create_object(mouse_pos)
+            #if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
+                self.create_object(mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
