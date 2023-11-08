@@ -5,7 +5,7 @@
 
 # TODO: Collision detection
 # Broad phase: bounding volume hierarchies
-# Narrow phase: ?
+# Narrow phase: Separating axis theorem
 
 import time
 import sys
