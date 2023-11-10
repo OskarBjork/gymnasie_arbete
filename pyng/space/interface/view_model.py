@@ -108,26 +108,7 @@ class ViewModel:
                     (5, 350),
                     20,
                 )
-        else:
-            self.render_text(
-                "Tools",
-                BLACK,
-                (10, 20),
-                60,
-            )
-            if self.tool == "force":
-                self.render_text(
-                    "Force",
-                    BLACK,
-                    (10, 220),
-                    20,
-                )
-                self.render_text(
-                    "Angle:",
-                    BLACK,
-                    (10, 300),
-                    20,
-                )
+
     def render_ui(self, ui_manager):
         self.show_grid()
         ui_manager.draw_ui(self.screen)
@@ -230,6 +211,15 @@ class ViewModel:
             manager=self.ui_manager,
             tool_tip_text="Spawns the selected shape on the specified coordinates",
             object_id="#spawn_button",
+        )
+        
+        # Kanske inte ens behövs, eftersom när man är i "spawn skärmen"
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((10 + 0.25* ORIGIN[0], 285), (0.35* ORIGIN[0], 40)),
+            text="Mouse Spawn",
+            manager=self.ui_manager,
+            tool_tip_text="Spawns the selected shape when you left click somewhere on the coordinate grid",
+            object_id="#mouse_spawn_button",
         )
 
         if self.shape == "circle":

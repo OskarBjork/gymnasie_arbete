@@ -178,6 +178,57 @@ def build_bvh(objects, depth=0, max_depth=20):
     }
 
 
+def build_bvh_2(self, objects, depth=0, max_depth=20, k=2):
+    objects = list(set(objects))
+
+    if len(objects) == 0:
+        return None
+
+    if len(objects) == 1:
+        return {
+            "objects": objects,
+            "bounding_box": self.calculate_bounding_box(objects),
+            "left": None,
+            "right": None,
+        }
+
+    if len(objects) == 2:
+        return {
+            "objects": objects,
+            "bounding_box": self.calculate_bounding_box(objects),
+            "left": None,
+            "right": None,
+        }
+
+    if depth >= max_depth:
+        return {
+            "objects": objects,
+            "bounding_box": self.calculate_bounding_box(objects),
+            "left": None,
+            "right": None,
+        }
+
+    bounding_box = self.calculate_bounding_box(objects)
+
+    if len(objects) == 2:
+        left_objects = [objects[0]]
+        right_objects = [objects[1]]
+    else:
+        left_objects, right_objects, k = self.partition_objects(
+            objects, bounding_box, k=k
+        )
+
+    left_child = self.build_bvh(left_objects, depth + 1, max_depth, k=k)
+    right_child = self.build_bvh(right_objects, depth + 1, max_depth, k=k)
+
+    return {
+        "objects": objects,
+        "bounding_box": bounding_box,
+        "left": left_child,
+        "right": right_child,
+    }
+
+
 def partition_objects(objects, bounding_box):
     axis = longest_axis(bounding_box)
     midpoint = (bounding_box[axis][0] + bounding_box[axis][1]) / 2
@@ -204,6 +255,82 @@ def partition_objects(objects, bounding_box):
     return left_objects, right_objects
 
 
+def partition_objects_2(self, objects, bounding_box, k=2):
+    print("new objects: ")
+    axis = self.longest_axis(bounding_box)
+    objects_sorted_along_axis = sorted(
+        objects, key=lambda obj: obj.position.x if axis == 0 else obj.position.y
+    )
+
+    median = objects_sorted_along_axis[len(objects_sorted_along_axis) // 2]
+    median_position_in_axis = median.position.x if axis == 0 else median.position.y
+    print([obj.id for obj in objects_sorted_along_axis])
+    print(
+        [
+            obj.position.x if axis == 0 else obj.position.y
+            for obj in objects_sorted_along_axis
+        ]
+    )
+    print(f"median: {median.id}")
+    print("axis: ", axis)
+
+    left_objects = []
+    right_objects = []
+
+    for index, obj in enumerate(objects_sorted_along_axis):
+        obj.update_vertices()
+        obj.bounding_box = obj.calculate_polygon_bounding_box()
+
+        if len(objects) == 3:
+            print("THREE OBJECTS")
+            d1 = self.distance(
+                (
+                    objects_sorted_along_axis[0].position.x,
+                    objects_sorted_along_axis[0].position.y,
+                ),
+                (median.position.x, median.position.y),
+            )
+            d2 = self.distance(
+                (
+                    objects_sorted_along_axis[2].position.x,
+                    objects_sorted_along_axis[2].position.y,
+                ),
+                (median.position.x, median.position.y),
+            )
+            if d1 < d2:
+                left_objects.append(objects_sorted_along_axis[0])
+                left_objects.append(median)
+                print([obj.id for obj in left_objects])
+            elif d1 > d2:
+                right_objects.append(objects_sorted_along_axis[2])
+                right_objects.append(median)
+                print([obj.id for obj in right_objects])
+            else:
+                left_objects.append(obj)
+                right_objects.append(obj)
+            break
+
+        obj_position_in_axis = obj.position.x if axis == 0 else obj.position.y
+        if obj_position_in_axis < median_position_in_axis:
+            left_objects.append(obj)
+        elif obj_position_in_axis > median_position_in_axis:
+            right_objects.append(obj)
+        else:
+            right_objects.append(obj)
+            left_objects.append(obj)
+
+    if len(left_objects) == 0 and len(objects) > 3:
+        left_objects = right_objects[: len(right_objects) // 2]
+        right_objects = right_objects[len(right_objects) // 2 :]
+    elif len(right_objects) == 0 and len(objects) > 3:
+        right_objects = left_objects[: len(left_objects) // 2]
+        left_objects = left_objects[len(left_objects) // 2 :]
+
+    k += 1
+
+    return left_objects, right_objects, k
+
+
 def longest_axis(bounding_box):
     x_length = bounding_box[0][1] - bounding_box[0][0]
     y_length = bounding_box[1][1] - bounding_box[1][0]
@@ -215,3 +342,56 @@ def longest_axis(bounding_box):
         return 1
     else:
         return 2
+
+
+def find_leaf_nodes_with_two_objects(self, root):
+    leaf_nodes = []
+
+    if root is None:
+        return leaf_nodes
+    if root["left"] is None and root["right"] is None and len(root["objects"]) == 2:
+        leaf_nodes.append(root)
+    else:
+        left_leaf_nodes = self.find_leaf_nodes_with_two_objects(root["left"])
+        right_leaf_nodes = self.find_leaf_nodes_with_two_objects(root["right"])
+        leaf_nodes.extend(left_leaf_nodes)
+        leaf_nodes.extend(right_leaf_nodes)
+    return leaf_nodes
+
+
+def calculate_bounding_box(self, objects):
+    if not objects:
+        return None
+
+    if len(objects) == 1:
+        polygon = objects[0]
+        min_x = min(v.x for v in polygon.vertices)
+        max_x = max(v.x for v in polygon.vertices)
+        min_y = min(v.y for v in polygon.vertices)
+        max_y = max(v.y for v in polygon.vertices)
+        return [(min_x, min_y), (max_x, max_y)]
+
+    bounding_box = [(float("inf"), float("inf")), (float("-inf"), float("-inf"))]
+    for polygon in objects:
+        if not isinstance(polygon, ConvexPolygon):
+            continue
+        for vertex in polygon.vertices:
+            bounding_box[0] = (
+                min(bounding_box[0][0], vertex.x),
+                min(bounding_box[0][1], vertex.y),
+            )
+            bounding_box[1] = (
+                max(bounding_box[1][0], vertex.x),
+                max(bounding_box[1][1], vertex.y),
+            )
+
+    return bounding_box
+
+def longest_axis(self, bounding_box):
+        x_length = bounding_box[1][0] - bounding_box[0][0]
+        y_length = bounding_box[1][1] - bounding_box[0][1]  # BUGG: längden blir negativ
+
+        if x_length > y_length:
+            return 0
+        else:
+            return 1

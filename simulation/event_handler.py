@@ -4,6 +4,7 @@ import pygame
 import pygame_gui
 from pygame.event import Event
 from pyng.space.vectors import Vector2D
+from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 
 
 def handle_events(events: list[Event], UI_manager):
@@ -13,7 +14,7 @@ def handle_events(events: list[Event], UI_manager):
             pygame.quit()
             sys.exit()
 
-        if event.type == pygame_gui.UI_TEXT_ENTRY_CHANGED:
+        if event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED: #kan ändras till UI_TEXT_ENTRY_CHANGED när inmatningssäker
             if event.ui_object_id == "#radius_input":
                 return {"input_type": "radius", "text": event.text}
             
@@ -52,7 +53,7 @@ def handle_events(events: list[Event], UI_manager):
         return "mouse 1"
 
 
-def delegate_event(event, state, view_model, UI_manager):
+def delegate_event(event, state, view_model, ui_manager):
     if event is None:
         return
 
@@ -94,6 +95,7 @@ def delegate_event(event, state, view_model, UI_manager):
     
     if event == "rect":
         view_model.shape = "rect"
+        # state.player_chosen_shape = Lägg till när det finns metod för rektanglar
         UI_manager.clear_and_reset()
         view_model.show_spawn_editor()
         view_model.show_mode_buttons()
@@ -101,6 +103,7 @@ def delegate_event(event, state, view_model, UI_manager):
 
     if event == "circle":
         view_model.shape = "circle"
+        state.player_chosen_shape = Circle
         UI_manager.clear_and_reset()
         view_model.show_spawn_editor()
         view_model.show_mode_buttons()
