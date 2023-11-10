@@ -19,7 +19,8 @@ class ViewModel:
         self.font = pygame.font.Font(None, 36)
         
         self.ui_mode = True
-        self.shape = "rect"
+        self.shape = "circle"
+        self.tool = "force"
 
     def convert_coordinates(self, x, y) -> (float, float):
         return x, self.screen.get_height() - y
@@ -107,7 +108,26 @@ class ViewModel:
                     (5, 350),
                     20,
                 )
-
+        else:
+            self.render_text(
+                "Tools",
+                BLACK,
+                (10, 20),
+                60,
+            )
+            if self.tool == "force":
+                self.render_text(
+                    "Force",
+                    BLACK,
+                    (10, 220),
+                    20,
+                )
+                self.render_text(
+                    "Angle:",
+                    BLACK,
+                    (10, 300),
+                    20,
+                )
     def render_ui(self, ui_manager):
         self.show_grid()
         ui_manager.draw_ui(self.screen)
@@ -134,7 +154,46 @@ class ViewModel:
         pass
 
     def show_manipulate_editor(self):
+        pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect((-5, 100), (0.35 * ORIGIN[0], 142)),
+            item_list= ["Move", "Force", "Velocity"],
+            manager=self.ui_manager,
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#tool_selected_input",
+        )
+        match self.tool:
+            case "move":
+                pass
 
+            case "force":
+                
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 235), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#force_input",
+                )
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 315), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#angle_input",
+                )
+
+            case "velocity":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 500), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#angle_input",
+                )
+                
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 600), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#force_input",
+                )
+        
+         
+        
         pass
 
     def show_spawn_editor(self): 
