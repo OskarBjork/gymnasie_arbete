@@ -4,6 +4,7 @@ from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
 
+import math
 import time
 import pprint
 import random
@@ -13,8 +14,8 @@ pp = pprint.PrettyPrinter(indent=2)
 
 class State:
     def __init__(
-        self,
-        objects: [PhysObj] = [],
+            self,
+            objects: [PhysObj] = [],
     ) -> None:
         self.objects = objects
         self.time_since_last_object_creation = time.time()
@@ -33,7 +34,7 @@ class State:
     def parse_mouse_click(self, mouse_pos: Vector2D):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
-            self.create_object(mouse_pos)
+            self.create_object(obj="lol", position=mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
@@ -41,12 +42,14 @@ class State:
             # TODO: Fixa +=
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
-            obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+            if not obj.is_static:
+                # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+                pass
             if (
-                obj.position.y > 2000
-                or obj.position.x > 2000
-                or obj.position.y < ORIGIN[1]
-                or obj.position.x < ORIGIN[0]
+                    obj.position.y > 2000
+                    or obj.position.x > 2000
+                    or obj.position.y < ORIGIN[1]
+                    or obj.position.x < ORIGIN[0]
             ):
                 self.del_object(obj)
 
@@ -68,42 +71,41 @@ class State:
 
     def create_object(self, position=None, obj="circle", with_gravity=False):
         if (
-            not self.object_creation_available()
+                not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
 
         if obj == "circle":
-            object_type = random.choice(["circle"])
-            if object_type == "circle":
-                obj = Circle(
-                    mass=self.player_chosen_mass,
-                    # mass=random.randint(1, 100),
-                    # num_of_sides=random.randint(3, 10),
-                    # side_length=random.randint(1, 100),
-                    radius=20,
-                    color=random.choice(COLORS),
-                    position=position
-                    if position is not None
-                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                    + Vector2D(*ORIGIN),
-                    velocity=Vector2D(500, 0),
-                )
-            else:
-                obj = ConvexPolygon(
-                    mass=self.player_chosen_mass,
-                    # mass=random.randint(1, 100),
-                    num_of_sides=random.randint(3, 10),
-                    side_length=random.randint(1, 100),
-                    # radius=random.randint(1, 100),
-                    color=random.choice(COLORS),
-                    position=position
-                    if position is not None
-                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                    + Vector2D(*ORIGIN),
-                    # velocity=Vector2D(
-                    #     random.randint(-300, 300), random.randint(-300, 300)
-                    # ),
-                )
+            obj = Circle(
+                mass=self.player_chosen_mass,
+                # mass=random.randint(1, 100),
+                # num_of_sides=random.randint(3, 10),
+                # side_length=random.randint(1, 100),
+                radius=20,
+                color=random.choice(COLORS),
+                position=position
+                if position is not None
+                else Vector2D(self.player_chosen_x, self.player_chosen_y)
+                     + Vector2D(*ORIGIN),  # NOTE: Galen indentation
+                velocity=Vector2D(500, 0)
+            )
+        else:
+            obj = ConvexPolygon(
+                mass=self.player_chosen_mass,
+                # mass=random.randint(1, 100),
+                #num_of_sides=random.randint(3, 10),
+                num_of_sides=4,
+                #side_length=random.randint(1, 100),
+                side_length=25,
+                # radius=random.randint(1, 100),
+                color=random.choice(COLORS),
+                angle=math.pi / 4,
+                position=position
+                if position is not None
+                else Vector2D(self.player_chosen_x, self.player_chosen_y)
+                     + Vector2D(*ORIGIN),  # NOTE: Galen indentation
+                velocity=Vector2D(500, 0),
+            )
 
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
@@ -134,16 +136,16 @@ class State:
             for obj in self.objects:
                 if isinstance(obj, Circle):
                     if (
-                        self.physics_evaluator.check_circle_collision(circle, obj)[0]
-                        == True
+                            self.physics_evaluator.check_circle_collision(circle, obj)[0]
+                            == True  # NOTE: Galen indentation
                     ):
                         break
                 elif isinstance(obj, ConvexPolygon):
                     if (
-                        self.physics_evaluator.check_polygon_circle_collision(
-                            obj, circle
-                        )[0]
-                        == True
+                            self.physics_evaluator.check_polygon_circle_collision(
+                                obj, circle
+                            )[0]
+                            == True  # NOTE: Galen indentation
                     ):
                         break
             else:
@@ -163,7 +165,7 @@ class State:
                         position=Vector2D(
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
-                        + Vector2D(*ORIGIN),
+                                 + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                     ),
                 ]
             )
@@ -181,7 +183,7 @@ class State:
                         position=Vector2D(
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
-                        + Vector2D(*ORIGIN),
+                                 + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                     )
                 ],
             )

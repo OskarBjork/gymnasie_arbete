@@ -131,6 +131,56 @@ def main():
     #     id="purple",
     # )
 
+    static_box = ConvexPolygon(
+        mass=100,
+        color=BLUE,
+        position=Vector2D(1200 + 700, 600),
+        velocity=Vector2D(0, 0),
+        num_of_sides=4,
+        side_length=500,
+        angle=math.pi / 4,
+        is_static=True
+    )
+
+    static_box2 = ConvexPolygon(
+        mass=100,
+        color=GREEN,
+        position=Vector2D(1200 + 700, 1000),
+        velocity=Vector2D(0, 0),
+        num_of_sides=4,
+        side_length=50,
+        angle=math.pi / 4,
+        is_static=True
+    )
+
+    moving_box = ConvexPolygon(
+        mass=100,
+        color=PURPLE,
+        position=Vector2D(1200, 600),
+        velocity=Vector2D(100, 0),
+        num_of_sides=4,
+        side_length=100,
+        angle=math.pi / 4,
+    )
+
+    moving_circle = Circle(
+        mass=100,
+        color=RED,
+        position=Vector2D(1200, 300),
+        velocity=Vector2D(50, 0),
+        radius=50
+    )
+
+    static_circle = Circle(
+        mass=100,
+        color=YELLOW,
+        position=Vector2D(1380, 300),
+        velocity=Vector2D(0, 0),
+        radius=50,
+        is_static=True
+    )
+
+    state.add_objects([static_box, static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([obj1, obj2])
 
@@ -150,7 +200,7 @@ def main():
 
         delegate_event(event, state, view_model, ui_manager)
 
-        state.create_object(obj="circle", position=Vector2D(1000, 1000))
+        state.create_object(obj="lol", position=Vector2D(1000, 1000))
 
         state.step(dt)
 

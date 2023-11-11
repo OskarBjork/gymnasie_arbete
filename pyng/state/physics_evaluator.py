@@ -10,6 +10,9 @@ class PhysicsEvaluator:
         pass
 
     def analyze_and_handle_collision(self, obj: PhysObj, other_obj: PhysObj):
+        if obj.is_static and other_obj.is_static:
+            return
+
         if isinstance(obj, Circle) and isinstance(other_obj, Circle):
             collision_analysis = self.check_circle_collision(obj, other_obj)
             collision_happened, overlap_length = collision_analysis
@@ -41,27 +44,43 @@ class PhysicsEvaluator:
     def resolve_polygon_collision(
         self, obj: ConvexPolygon, other_obj: ConvexPolygon, mtv
     ):
-        obj.position = obj.position - (mtv / 2)
-        other_obj.position = other_obj.position + (mtv / 2)
+        if obj.is_static:
+            other_obj.position = other_obj.position + mtv
+        elif other_obj.is_static:
+            obj.position = obj.position - mtv
+        else:
+            obj.position = obj.position - (mtv / 2)
+            other_obj.position = other_obj.position + (mtv / 2)
         self.collision_response(obj, other_obj, mtv)
 
     def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
         direction = obj.position - other_obj.position
 
+        if not direction.magnitude() > 0:
+            return # FIXME: Hantera situationen
         direction = direction.normalize()
 
         magnitude = overlap_length / 2
 
         direction = direction * magnitude
 
-        obj.position = obj.position + direction
-
-        other_obj.position = other_obj.position - direction
+        if other_obj.is_static:
+            obj.position = obj.position + direction
+        elif obj.is_static:
+            other_obj.position = other_obj.position - direction
+        else:
+            obj.position = obj.position + direction
+            other_obj.position = other_obj.position - direction
         self.collision_response(obj, other_obj, direction)
 
     def resolve_polygon_circle_collision(self, circle, polygon, mtv):
-        circle.position = circle.position + (mtv / 2)
-        polygon.position = polygon.position - (mtv / 2)
+        if circle.is_static:
+            polygon.position = polygon.position - mtv
+        elif polygon.is_static:
+            circle.position = circle.position + mtv
+        else:
+            circle.position = circle.position + (mtv / 2)
+            polygon.position = polygon.position - (mtv / 2)
         self.collision_response(circle, polygon, mtv)
 
     def check_circle_collision(self, circle1: Circle, circle2: Circle):
@@ -175,9 +194,9 @@ class PhysicsEvaluator:
         obj1_momentum = obj1.velocity * obj1.mass
         obj2_momentum = obj2.velocity * obj2.mass
 
-        obj1.velocity = obj2_momentum / obj1.mass
+        obj1.velocity = obj2_momentum * obj1.inverse_mass
 
-        obj2.velocity = obj1_momentum / obj2.mass
+        obj2.velocity = obj1_momentum * obj2.inverse_mass
 
     def collision_response(self, obj1, obj2, mtv):
         if mtv.magnitude() == 0:
@@ -188,10 +207,10 @@ class PhysicsEvaluator:
         j = (
             -(1 + e)
             * relative_velocity.dot(mtv)
-            / (mtv.magnitude() ** 2 * (1 / obj1.mass + 1 / obj2.mass))
+            / (mtv.magnitude() ** 2 * (obj1.inverse_mass + obj2.inverse_mass))
         )
-        obj1.velocity = obj1.velocity + (mtv * (j / obj1.mass))
-        obj2.velocity = obj2.velocity - (mtv * (j / obj2.mass))
+        obj1.velocity = obj1.velocity + (mtv * (j * obj1.inverse_mass))
+        obj2.velocity = obj2.velocity - (mtv * (j * obj2.inverse_mass))
 
     def impose_gravity(self, obj: PhysObj):
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
