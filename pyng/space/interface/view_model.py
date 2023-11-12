@@ -107,6 +107,13 @@ class ViewModel:
                     (5, 350),
                     20,
                 )
+
+                self.render_text(
+                    "Mass:",
+                    BLACK,
+                    (5, 450),
+                    20,
+                )
         
         if self.ui_mode == False: # visar all text som ska vara på manipulate skärmen
             self.render_text(
@@ -161,6 +168,15 @@ class ViewModel:
             object_id="#shape_input",
         )
 
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((0.35 * ORIGIN[0] + 5, 110), (0.35 * ORIGIN[0], 40)),
+            text="Clear",
+            manager=self.ui_manager,
+            tool_tip_text="Deletes all objects if double clicked",
+            allow_double_clicks=True,
+            object_id="#clear_button",
+        )
+
         pygame_gui.elements.UITextEntryLine(
                 relative_rect=pygame.Rect((0, 230), (0.35 * ORIGIN[0], 55)),
                 manager=self.ui_manager,
@@ -195,6 +211,12 @@ class ViewModel:
                 relative_rect=pygame.Rect((0, 370), (0.7 * ORIGIN[0], 55)),
                 manager=self.ui_manager,
                 object_id="#radius_input",
+            )
+            
+            pygame_gui.elements.UITextEntryLine(
+                relative_rect=pygame.Rect((0, 470), (0.7 * ORIGIN[0], 55)),
+                manager=self.ui_manager,
+                object_id="#mass_input",
             )
         
         

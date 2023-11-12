@@ -57,44 +57,44 @@ class State:
 
     def del_object(self, obj: PhysObj):
         self.objects.remove(obj)
+    
+    def del_all_objects(self):
+        self.objects = []
 
     def create_object(self, position=None, obj="circle", with_gravity=False):
         if (
             not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
-
-        if obj == "circle":
-            object_type = random.choice(["circle", "polygon"])
-            if object_type == "circle":
+        if position is not None: #Mus spawns
+            if ( # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
+                position.x == self.objects[-1].position.x 
+                and position.y == self.objects[-1].position.y
+            ):
+                return
+                position.x += 1
+            
+            if obj == "circle":
                 obj = Circle(
-                    mass=random.randint(1, 100),
-                    # num_of_sides=random.randint(3, 10),
-                    # side_length=random.randint(1, 100),
-                    radius=random.randint(1, 100),
-                    color=random.choice(COLORS),
-                    position=position
-                    if position is not None
-                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                    + Vector2D(*ORIGIN),
-                    velocity=Vector2D(
-                        random.randint(-300, 300), random.randint(-300, 300)
-                    ),
+                    mass=self.player_chosen_mass,
+                    color=self.player_chosen_color,
+                    position= position,
+                    radius=self.player_chosen_radius,
                 )
-            else:
-                obj = ConvexPolygon(
-                    mass=random.randint(1, 100),
-                    num_of_sides=random.randint(3, 10),
-                    side_length=random.randint(1, 100),
-                    # radius=random.randint(1, 100),
-                    color=random.choice(COLORS),
-                    position=position
-                    if position is not None
-                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                    + Vector2D(*ORIGIN),
-                    velocity=Vector2D(
-                        random.randint(-300, 300), random.randint(-300, 300)
-                    ),
+        else: #Spawn knapp spawns
+            if ( # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
+                self.player_chosen_x == self.objects[-1].position.x 
+                and self.player_chosen_y == self.objects[-1].position.y
+            ):
+                return
+                self.player_chosen_x += 1
+            
+            if obj == "circle":
+                obj = Circle(
+                    mass=self.player_chosen_mass,
+                    color=self.player_chosen_color,
+                    position= Vector2D(self.player_chosen_x + ORIGIN[0], self.player_chosen_y + ORIGIN[1]),
+                    radius=self.player_chosen_radius,
                 )
 
         self.add_objects([obj])
