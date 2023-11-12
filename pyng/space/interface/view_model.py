@@ -18,8 +18,9 @@ class ViewModel:
         self.ui_manager = ui_manager
         self.font = pygame.font.Font(None, 36)
         
-        self.ui_mode = True #True om i "spawner" läge
-        self.shape = "rect"
+        self.ui_mode = True
+        self.shape = "circle"
+        self.tool = "force"
 
     def convert_coordinates(self, x, y) -> (float, float):
         return x, self.screen.get_height() - y
@@ -149,7 +150,46 @@ class ViewModel:
         pass
 
     def show_manipulate_editor(self):
+        pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect((-5, 100), (0.35 * ORIGIN[0], 142)),
+            item_list= ["Move", "Force", "Velocity"],
+            manager=self.ui_manager,
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#tool_selected_input",
+        )
+        match self.tool:
+            case "move":
+                pass
 
+            case "force":
+                
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 235), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#force_input",
+                )
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 315), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#angle_input",
+                )
+
+            case "velocity":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 500), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#angle_input",
+                )
+                
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 600), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#force_input",
+                )
+        
+         
+        
         pass
 
     def show_spawn_editor(self): 
