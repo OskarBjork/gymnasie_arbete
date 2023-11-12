@@ -24,15 +24,16 @@ class State:
         self.default_object = Circle(color=RED, mass=10, radius=10)
         self.player_chosen_mass = 10
         self.player_chosen_shape = Circle
+        self.player_chosen_tool = "force"
         self.player_chosen_radius = 10
         self.player_chosen_color = RED
         self.player_chosen_x = 0
         self.player_chosen_y = 0
         pass
 
-    def parse_mouse_click(self, mouse_pos: Vector2D):
+    def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
-            #if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
+            if view_model.ui_mode == True: #om man är i "spawn" läge
                 self.create_object(mouse_pos)
 
     def step(self, delta_time: float):

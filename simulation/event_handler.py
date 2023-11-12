@@ -48,6 +48,15 @@ def handle_events(events: list[Event], UI_manager):
             
             if event.text == "Circle":
                 return "circle"
+            
+            if event.text == "Move":
+                return "move"
+            
+            if event.text == "Force":
+                return "force"
+            
+            if event.text == "Velocity":
+                return "velocity"
         
         if event.type != pygame.KEYDOWN:
             continue
@@ -66,7 +75,8 @@ def delegate_event(event, state, view_model, UI_manager):
 
     if event == "mouse 1" :
         state.parse_mouse_click(
-            Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos())))
+            Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos()))),
+            view_model
         )
         return
 
@@ -90,42 +100,56 @@ def delegate_event(event, state, view_model, UI_manager):
         
         
         
-    
-    if event == "manipulate_mode":
-        view_model.ui_mode = False
-        UI_manager.clear_and_reset()
-        view_model.show_manipulate_editor()
-        view_model.show_mode_buttons()
-        return
+    match event:
+        case "manipulate_mode":
+            view_model.ui_mode = False
+            UI_manager.clear_and_reset()
+            view_model.show_manipulate_editor()
+            view_model.show_mode_buttons()  
         
-    
-    if event == "spawner_mode":
-        view_model.ui_mode = True
-        UI_manager.clear_and_reset()
-        view_model.show_spawn_editor()
-        view_model.show_mode_buttons()
-        return
-    
-    if event == "rect":
-        view_model.shape = "rect"
-        # state.player_chosen_shape = Lägg till när det finns metod för rektanglar
-        UI_manager.clear_and_reset()
-        view_model.show_spawn_editor()
-        view_model.show_mode_buttons()
-        return
+        case "spawner_mode":
+            view_model.ui_mode = True
+            UI_manager.clear_and_reset()
+            view_model.show_spawn_editor()
+            view_model.show_mode_buttons()
+        
+        case "rect":
+            view_model.shape = "rect"
+            # state.player_chosen_shape = Lägg till när det finns metod för rektanglar
+            UI_manager.clear_and_reset()
+            view_model.show_spawn_editor()
+            view_model.show_mode_buttons()
 
-    if event == "circle":
-        view_model.shape = "circle"
-        state.player_chosen_shape = Circle
-        UI_manager.clear_and_reset()
-        view_model.show_spawn_editor()
-        view_model.show_mode_buttons()
-        return
-    
-    if event == "clear":
-        state.del_all_objects()
-        return
-    
-    if event == "spawn":
-        state.create_object()
-        return
+        case "circle":
+            view_model.shape = "circle"
+            state.player_chosen_shape = Circle
+            UI_manager.clear_and_reset()
+            view_model.show_spawn_editor()
+            view_model.show_mode_buttons()
+        
+        case "move":
+            view_model.tool = "move"
+            state.player_cosen_tool = "move" # kan ändras i framtiden, lade bara till för jag tror det kommer behövas
+            UI_manager.clear_and_reset()
+            view_model.show_manipulate_editor()
+            view_model.show_mode_buttons()
+
+        case "force":
+            view_model.tool = "force"
+            state.player_cosen_tool = "force" # kan ändras i framtiden, lade bara till för jag tror det kommer behövas
+            UI_manager.clear_and_reset()
+            view_model.show_manipulate_editor()
+            view_model.show_mode_buttons()
+
+        case "velocity":
+            view_model.tool = "velocity"
+            state.player_cosen_tool = "velocity" # kan ändras i framtiden, lade bara till för jag tror det kommer behövas
+            UI_manager.clear_and_reset()
+            view_model.show_manipulate_editor()
+            view_model.show_mode_buttons()
+        
+        case "clear":
+            state.del_all_objects()
+        
+        case "spawn":
+            state.create_object()
