@@ -18,7 +18,7 @@ class ViewModel:
         self.ui_manager = ui_manager
         self.font = pygame.font.Font(None, 36)
         
-        self.ui_mode = True
+        self.ui_mode = True #True om i spawn läge
         self.shape = "circle"
         self.tool = "force"
 
