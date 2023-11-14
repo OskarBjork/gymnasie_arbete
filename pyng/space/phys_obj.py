@@ -13,6 +13,7 @@ class PhysObj:
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         id: str = None,
+        restitution=1,
     ):
         self.mass = mass
         self.position = position
@@ -20,6 +21,7 @@ class PhysObj:
         self.force = force
         self.color = color
         self.id = id
+        self.restitution = restitution
 
     def is_inside_of(self, other_object) -> bool:
         pass
@@ -49,8 +51,9 @@ class Point(PhysObj):
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         id: str = None,
+        restitution=1,
     ):
-        super().__init__(mass, color, position, velocity, force, id)
+        super().__init__(mass, color, position, velocity, force, id, restitution)
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
@@ -74,8 +77,9 @@ class ConvexPolygon(PhysObj):
         side_length=1,
         angle=0,
         id: str = None,
+        restitution=1,
     ):
-        super().__init__(mass, color, position, velocity, force, id)
+        super().__init__(mass, color, position, velocity, force, id, restitution)
         self.num_of_sides = num_of_sides
         self.side_length = side_length
         self.angle = angle
@@ -167,8 +171,9 @@ class Circle(PhysObj):
         force=Vector2D(0, 0),
         radius=1,
         id: str = None,
+        restitution=1,
     ):
-        super().__init__(mass, color, position, velocity, force, id)
+        super().__init__(mass, color, position, velocity, force, id, restitution)
         self.radius = radius
 
     def render(self, view_model):
