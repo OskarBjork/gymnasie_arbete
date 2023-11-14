@@ -25,16 +25,18 @@ class State:
         self.default_object = Circle(color=RED, mass=10, radius=10)
         self.player_chosen_mass = 10
         self.player_chosen_shape = Circle
+        self.player_chosen_tool = "force"
         self.player_chosen_radius = 10
         self.player_chosen_color = RED
         self.player_chosen_x = 0
         self.player_chosen_y = 0
         pass
 
-    def parse_mouse_click(self, mouse_pos: Vector2D):
+    def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
-            # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
-            self.create_object(obj="lol", position=mouse_pos)
+
+            if view_model.ui_mode == True: #om man är i "spawn" läge
+                self.create_object(mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
@@ -68,6 +70,9 @@ class State:
 
     def del_object(self, obj: PhysObj):
         self.objects.remove(obj)
+    
+    def del_all_objects(self):
+        self.objects = []
 
     def create_object(self, position=None, obj="circle", with_gravity=False):
         if (
@@ -75,37 +80,36 @@ class State:
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
 
-        if obj == "circle":
-            obj = Circle(
-                mass=self.player_chosen_mass,
-                # mass=random.randint(1, 100),
-                # num_of_sides=random.randint(3, 10),
-                # side_length=random.randint(1, 100),
-                radius=20,
-                color=random.choice(COLORS),
-                position=position
-                if position is not None
-                else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                     + Vector2D(*ORIGIN),  # NOTE: Galen indentation
-                velocity=Vector2D(500, 0)
-            )
-        else:
-            obj = ConvexPolygon(
-                mass=self.player_chosen_mass,
-                # mass=random.randint(1, 100),
-                #num_of_sides=random.randint(3, 10),
-                num_of_sides=4,
-                #side_length=random.randint(1, 100),
-                side_length=25,
-                # radius=random.randint(1, 100),
-                color=random.choice(COLORS),
-                angle=math.pi / 4,
-                position=position
-                if position is not None
-                else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                     + Vector2D(*ORIGIN),  # NOTE: Galen indentation
-                velocity=Vector2D(500, 0),
-            )
+        if position is not None: #Mus spawns
+            if ( # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
+                position.x == self.objects[-1].position.x 
+                and position.y == self.objects[-1].position.y
+            ):
+                return
+                position.x += 1
+            
+            if obj == "circle":
+                obj = Circle(
+                    mass=self.player_chosen_mass,
+                    color=self.player_chosen_color,
+                    position= position,
+                    radius=self.player_chosen_radius,
+                )
+        else: #Spawn knapp spawns
+            if ( # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
+                self.player_chosen_x == self.objects[-1].position.x 
+                and self.player_chosen_y == self.objects[-1].position.y
+            ):
+                return
+                self.player_chosen_x += 1
+            
+            if obj == "circle":
+                obj = Circle(
+                    mass=self.player_chosen_mass,
+                    color=self.player_chosen_color,
+                    position= Vector2D(self.player_chosen_x + ORIGIN[0], self.player_chosen_y + ORIGIN[1]),
+                    radius=self.player_chosen_radius,
+                )
 
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
