@@ -109,6 +109,55 @@ class ViewModel:
                     20,
                 )
 
+                self.render_text(
+                    "Mass:",
+                    BLACK,
+                    (5, 450),
+                    20,
+                )
+        
+        if self.ui_mode == False: # visar all text som ska vara på manipulate skärmen
+            self.render_text(
+                "Manipulate",
+                BLACK,
+                (10, 20),
+                60,
+            )
+            match self.tool:
+                case "move":
+                    pass
+                
+                case "force":
+                    self.render_text(
+                        "Force [Newton]:",
+                        BLACK,
+                        (10, 245),
+                        20,
+                    )
+
+                    self.render_text(
+                        "Angle [rad]:",
+                        BLACK,
+                        (10, 335),
+                        20,
+                    )
+                
+                case "velocity":
+                    self.render_text(
+                        "Velocity [m/s]:",
+                        BLACK,
+                        (10, 245),
+                        20,
+                    )
+
+                    self.render_text(
+                        "Angle [rad]:",
+                        BLACK,
+                        (10, 335),
+                        20,
+                    )
+
+
     def render_ui(self, ui_manager):
         self.show_grid()
         ui_manager.draw_ui(self.screen)
@@ -150,27 +199,27 @@ class ViewModel:
             case "force":
                 
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 235), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((5, 265), (0.7 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
                     object_id="#force_input",
                 )
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 315), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((5, 355), (0.7 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
                     object_id="#angle_input",
                 )
 
             case "velocity":
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 500), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((5, 265), (0.7 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
                     object_id="#angle_input",
                 )
                 
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 600), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((5, 355), (0.7 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
-                    object_id="#force_input",
+                    object_id="#velocity_input",
                 )
         
          
@@ -191,6 +240,34 @@ class ViewModel:
             allow_multi_select=False,
             allow_double_clicks=False,
             object_id="#shape_input",
+        )
+        
+        # Gör ett sätt att välja färg, men helst med bilder av färgen istället för bara text. inte nödvändigt men coolt.
+        pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect((-5, 350), (0.35 * ORIGIN[0], 142)),
+            item_list= ["Red", "Green", "Blue"], #fler färger senare
+            manager=self.ui_manager,
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#color_input",
+        )
+
+        pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect((0.35 * ORIGIN[0] - 20, 350), (0.35 * ORIGIN[0], 142)),
+            item_list= ["Yellow", "Purple", "Orange"], #fler färger senare
+            manager=self.ui_manager,
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#color_input",
+        )
+
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((0.35 * ORIGIN[0] + 5, 110), (0.35 * ORIGIN[0], 40)),
+            text="Clear",
+            manager=self.ui_manager,
+            tool_tip_text="Deletes all objects if double clicked",
+            allow_double_clicks=True,
+            object_id="#clear_button",
         )
 
         pygame_gui.elements.UITextEntryLine(
@@ -227,6 +304,12 @@ class ViewModel:
                 relative_rect=pygame.Rect((0, 370), (0.7 * ORIGIN[0], 55)),
                 manager=self.ui_manager,
                 object_id="#radius_input",
+            )
+            
+            pygame_gui.elements.UITextEntryLine(
+                relative_rect=pygame.Rect((0, 470), (0.7 * ORIGIN[0], 55)),
+                manager=self.ui_manager,
+                object_id="#mass_input",
             )
         
         
