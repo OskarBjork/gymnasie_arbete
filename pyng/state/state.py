@@ -4,6 +4,7 @@ from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
 
+import math
 import time
 import pprint
 import random
@@ -13,8 +14,8 @@ pp = pprint.PrettyPrinter(indent=2)
 
 class State:
     def __init__(
-        self,
-        objects: [PhysObj] = [],
+            self,
+            objects: [PhysObj] = [],
     ) -> None:
         self.objects = objects
         self.time_since_last_object_creation = time.time()
@@ -33,6 +34,7 @@ class State:
 
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
+
             if view_model.ui_mode == True: #om man är i "spawn" läge
                 self.create_object(mouse_pos)
 
@@ -42,6 +44,16 @@ class State:
             # TODO: Fixa +=
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
+            if not obj.is_static:
+                # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+                pass
+            if (
+                    obj.position.y > 2000
+                    or obj.position.x > 2000
+                    or obj.position.y < ORIGIN[1]
+                    or obj.position.x < ORIGIN[0]
+            ):
+                self.del_object(obj)
 
     def update_all_vertices(self):
         for obj in self.objects:
@@ -64,9 +76,10 @@ class State:
 
     def create_object(self, position=None, obj="circle", with_gravity=False):
         if (
-            not self.object_creation_available()
+                not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
+
         if position is not None: #Mus spawns
             if ( # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
                 position.x == self.objects[-1].position.x 
@@ -127,16 +140,16 @@ class State:
             for obj in self.objects:
                 if isinstance(obj, Circle):
                     if (
-                        self.physics_evaluator.check_circle_collision(circle, obj)[0]
-                        == True
+                            self.physics_evaluator.check_circle_collision(circle, obj)[0]
+                            == True  # NOTE: Galen indentation
                     ):
                         break
                 elif isinstance(obj, ConvexPolygon):
                     if (
-                        self.physics_evaluator.check_polygon_circle_collision(
-                            obj, circle
-                        )[0]
-                        == True
+                            self.physics_evaluator.check_polygon_circle_collision(
+                                obj, circle
+                            )[0]
+                            == True  # NOTE: Galen indentation
                     ):
                         break
             else:
@@ -150,13 +163,13 @@ class State:
                         color=random.choice(COLORS),
                         mass=random.randint(1, 100),
                         radius=random.randint(1, 100),
-                        velocity=Vector2D(
-                            random.randint(-100, 100), random.randint(-100, 100)
-                        ),
+                        # velocity=Vector2D(
+                        #     random.randint(-300, 300), random.randint(-300, 300)
+                        # ),
                         position=Vector2D(
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
-                        + Vector2D(*ORIGIN),
+                                 + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                     ),
                 ]
             )
@@ -168,17 +181,15 @@ class State:
                         mass=random.randint(1, 100),
                         num_of_sides=random.randint(3, 10),
                         side_length=random.randint(1, 100),
-                        angle=random.randint(0, 360),
-                        velocity=Vector2D(
-                            random.randint(-10, 10),
-                            random.randint(-10, 10),
-                            position=Vector2D(
-                                random.randint(100, 1000), random.randint(100, 1000)
-                            )
-                            + Vector2D(*ORIGIN),
-                        ),
+                        # velocity=Vector2D(
+                        #     random.randint(-300, 300), random.randint(-300, 300)
+                        # ),
+                        position=Vector2D(
+                            random.randint(100, 1000), random.randint(100, 1000)
+                        )
+                                 + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                     )
-                ]
+                ],
             )
 
     def generate_test_data(self):

@@ -12,14 +12,20 @@ class PhysObj:
         position=Vector2D(*ORIGIN),  # Centrumet av formen
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
+        is_static=False,
         id: str = None,
-        restitution=1,
+        restitution=0,
     ):
         self.mass = mass
+        if not is_static:
+            self.inverse_mass = 1 / self.mass
+        else:
+            self.inverse_mass = 0
         self.position = position
         self.velocity = velocity
         self.force = force
         self.color = color
+        self.is_static = is_static
         self.id = id
         self.restitution = restitution
 
@@ -30,7 +36,8 @@ class PhysObj:
         self.force = self.force + force
 
     def update_velocity(self, delta_time: float):
-        self.velocity = self.velocity + (self.force / self.mass) * delta_time
+        #self.velocity = self.velocity + (self.force / self.mass) * delta_time
+        self.velocity = self.velocity + (self.force * self.inverse_mass) * delta_time
 
     def update_position(self, delta_time: float):
         self.position = self.position + self.velocity * delta_time
@@ -50,10 +57,11 @@ class Point(PhysObj):
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
+        is_static=False,
         id: str = None,
-        restitution=1,
+        restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, id, restitution)
+        super().__init__(mass, color, position, velocity, force, is_static, id, restitution)
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
@@ -76,10 +84,11 @@ class ConvexPolygon(PhysObj):
         num_of_sides=4,
         side_length=1,
         angle=0,
+        is_static=False,
         id: str = None,
-        restitution=1,
+        restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, id, restitution)
+        super().__init__(mass, color, position, velocity, force, is_static, id, restitution)
         self.num_of_sides = num_of_sides
         self.side_length = side_length
         self.angle = angle
@@ -170,10 +179,11 @@ class Circle(PhysObj):
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         radius=1,
+        is_static=False,
         id: str = None,
-        restitution=1,
+        restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, id, restitution)
+        super().__init__(mass, color, position, velocity, force, is_static, id, restitution)
         self.radius = radius
 
     def render(self, view_model):
