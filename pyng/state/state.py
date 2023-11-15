@@ -1,6 +1,6 @@
 from pyng.space.vectors import Vector2D
-from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS
-from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
+from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS, OBJECT_CREATION_COOLDOWN
+from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
 
@@ -45,7 +45,7 @@ class State:
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
             if not obj.is_static:
-                # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+                obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
                 pass
             if (
                     obj.position.y > 2000
@@ -82,25 +82,36 @@ class State:
 
         if position is not None: #Mus spawns
             if ( # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
-                position.x == self.objects[-1].position.x 
+                len(self.objects) != 0
+                and position.x == self.objects[-1].position.x 
                 and position.y == self.objects[-1].position.y
             ):
-                return
                 position.x += 1
+            match obj:
+                case "circle":
+                    obj = Circle(
+                        mass=self.player_chosen_mass,
+                        color=self.player_chosen_color,
+                        position=position,
+                        radius=self.player_chosen_radius,
+                        velocity=Vector2D(700,0)
+                    )
+                
+                case "rect":
+                    obj = Rectangle(
+                        mass=self.player_chosen_mass,
+                        color=self.player_chosen_color,
+                        position=position,
+                        
+
+                    )
             
-            if obj == "circle":
-                obj = Circle(
-                    mass=self.player_chosen_mass,
-                    color=self.player_chosen_color,
-                    position= position,
-                    radius=self.player_chosen_radius,
-                )
         else: #Spawn knapp spawns
             if ( # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
-                self.player_chosen_x == self.objects[-1].position.x 
+                len(self.objects) != 0
+                and self.player_chosen_x == self.objects[-1].position.x 
                 and self.player_chosen_y == self.objects[-1].position.y
             ):
-                return
                 self.player_chosen_x += 1
             
             if obj == "circle":
@@ -109,6 +120,7 @@ class State:
                     color=self.player_chosen_color,
                     position= Vector2D(self.player_chosen_x + ORIGIN[0], self.player_chosen_y + ORIGIN[1]),
                     radius=self.player_chosen_radius,
+                    velocity=Vector2D(700,0),
                 )
 
         self.add_objects([obj])
@@ -124,7 +136,7 @@ class State:
             )
 
     def object_creation_available(self):
-        return time.time() - self.time_since_last_object_creation > 0.1
+        return time.time() - self.time_since_last_object_creation > OBJECT_CREATION_COOLDOWN
 
     def generate_random_position(self):
         while True:

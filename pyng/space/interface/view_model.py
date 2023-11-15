@@ -242,7 +242,8 @@ class ViewModel:
             object_id="#shape_input",
         )
         
-        # Gör ett sätt att välja färg, men helst med bilder av färgen istället för bara text. inte nödvändigt men coolt.
+        # Gör ett sätt att välja färg, men helst med bilder av färgen istället för bara text. inte nödvändigt men coolt. Byt kanske till drop down väljare.
+        """
         pygame_gui.elements.UISelectionList(
             relative_rect=pygame.Rect((-5, 350), (0.35 * ORIGIN[0], 142)),
             item_list= ["Red", "Green", "Blue"], #fler färger senare
@@ -260,7 +261,7 @@ class ViewModel:
             allow_double_clicks=False,
             object_id="#color_input",
         )
-
+        """
         pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((0.35 * ORIGIN[0] + 5, 110), (0.35 * ORIGIN[0], 40)),
             text="Clear",
@@ -269,7 +270,7 @@ class ViewModel:
             allow_double_clicks=True,
             object_id="#clear_button",
         )
-
+        
         pygame_gui.elements.UITextEntryLine(
                 relative_rect=pygame.Rect((0, 230), (0.35 * ORIGIN[0], 55)),
                 manager=self.ui_manager,

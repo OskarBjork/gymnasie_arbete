@@ -83,6 +83,8 @@ class ConvexPolygon(PhysObj):
         force=Vector2D(0, 0),
         num_of_sides=4,
         side_length=1,
+        side_width=1,
+        side_height=1,
         angle=0,
         is_static=False,
         id: str = None,
@@ -95,6 +97,8 @@ class ConvexPolygon(PhysObj):
         self.vertices = self.update_vertices()
         self.bounding_box = self.calculate_polygon_bounding_box()
         self.potential_collision = 0
+        self.side_width = side_width
+        self.side_height = side_height
 
     def update_vertices(self):
         p = self.position
@@ -169,6 +173,24 @@ class ConvexPolygon(PhysObj):
     def render(self, view_model):
         view_model.render_polygon(self)
 
+
+class Rectangle(ConvexPolygon):
+    def __init__(
+        self,
+        mass: int, 
+        color: (int, int, int),
+        position: (int, int),
+        velocity: (int, int),
+        force: (int, int),
+        angle: float,
+        is_static: bool,
+        id: str,
+        restitution, # vet inte om den är en int eller float
+        side_width: int,
+        side_height: int,
+    ):
+        super().__init__(mass, color, position, velocity, force, angle, is_static, id, restitution, side_width, side_height)
+    
 
 class Circle(PhysObj):
     def __init__(

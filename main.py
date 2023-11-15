@@ -200,8 +200,6 @@ def main():
 
         delegate_event(event, state, view_model, ui_manager)
 
-        state.create_object(obj="lol", position=Vector2D(1000, 1000))
-
         state.step(dt)
 
         state.handle_collisions()
@@ -211,6 +209,8 @@ def main():
         view_model.render_ui(ui_manager)
 
         view_model.update(ui_refresh_rate)
+
+        state.create_object(position=Vector2D(550,1000), with_gravity=True)
 
     pygame.quit()
 
