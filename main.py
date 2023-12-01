@@ -19,7 +19,7 @@ from rich.traceback import install
 
 install(show_locals=True)
 
-from pyng.space.phys_obj import Circle, Point, ConvexPolygon
+from pyng.space.phys_obj import Circle, Point, ConvexPolygon, Rectangle
 from pyng.space.vectors import Vector2D
 from pyng.space.interface.view_model import ViewModel
 from pyng.state.state import State
@@ -134,7 +134,7 @@ def main():
     static_box = ConvexPolygon(
         mass=100,
         color=BLUE,
-        position=Vector2D(1200 + 700, 600),
+        position=Vector2D(700, 600),
         velocity=Vector2D(0, 0),
         num_of_sides=4,
         side_length=500,
@@ -145,9 +145,9 @@ def main():
     static_box2 = ConvexPolygon(
         mass=100,
         color=GREEN,
-        position=Vector2D(1200 + 700, 1000),
+        position=Vector2D(700, 1000),
         velocity=Vector2D(0, 0),
-        num_of_sides=4,
+        num_of_sides=1000,
         side_length=50,
         angle=math.pi / 4,
         is_static=True
@@ -180,7 +180,22 @@ def main():
         is_static=True
     )
 
-    state.add_objects([static_box, static_box2, moving_box, moving_circle, static_circle])
+    rect = Rectangle(
+        mass=10,
+        color=PURPLE,
+        position=Vector2D(500, 500),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
+        angle=math.pi / 4,
+        height=100,
+        width=200,
+        is_static=True,
+        id=None,
+        restitution=0
+    )
+
+    state.add_object(rect)
+    #state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([obj1, obj2])
 
@@ -210,7 +225,7 @@ def main():
 
         view_model.update(ui_refresh_rate)
 
-        state.create_object(position=Vector2D(550,1000), with_gravity=True)
+        # state.create_object(position=Vector2D(550,1000), with_gravity=True)
 
     pygame.quit()
 

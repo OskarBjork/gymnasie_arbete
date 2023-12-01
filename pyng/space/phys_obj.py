@@ -83,8 +83,6 @@ class ConvexPolygon(PhysObj):
         force=Vector2D(0, 0),
         num_of_sides=4,
         side_length=1,
-        side_width=1,
-        side_height=1,
         angle=0,
         is_static=False,
         id: str = None,
@@ -97,8 +95,6 @@ class ConvexPolygon(PhysObj):
         self.vertices = self.update_vertices()
         self.bounding_box = self.calculate_polygon_bounding_box()
         self.potential_collision = 0
-        self.side_width = side_width
-        self.side_height = side_height
 
     def update_vertices(self):
         p = self.position
@@ -177,7 +173,7 @@ class ConvexPolygon(PhysObj):
 class Rectangle(ConvexPolygon):
     def __init__(
         self,
-        mass: int, 
+        mass: int,
         color: (int, int, int),
         position: (int, int),
         velocity: (int, int),
@@ -186,11 +182,61 @@ class Rectangle(ConvexPolygon):
         is_static: bool,
         id: str,
         restitution, # vet inte om den är en int eller float
-        side_width: int,
-        side_height: int,
+        width: int,
+        height: int,
     ):
-        super().__init__(mass, color, position, velocity, force, angle, is_static, id, restitution, side_width, side_height)
-    
+        self.width = width
+        self.height = height
+        super().__init__(
+            mass=mass,
+            color=color,
+            position=position,
+            velocity=velocity,
+            force=force,
+            num_of_sides=4,
+            side_length=None,
+            angle=angle,
+            is_static=is_static,
+            id=id,
+            restitution=restitution)
+
+    def update_vertices(self):
+        p = self.position
+        k = self.num_of_sides
+        w = self.width
+        h = self.height
+        angle = self.angle
+        vertices = []
+        for i in range(k):
+            rotated_angle = angle + 2 * math.pi * i / k
+            x = p.x + w * math.cos(rotated_angle)
+            y = p.y + h * math.sin(rotated_angle)
+            vertices.append(Vector2D(x, y))
+        self.vertices = vertices
+        return vertices
+
+    def check_axis_aligned_collision(self, other_rect) -> bool:
+        # Utgår ifrån att self.position är mitten av rektangel vilket det inte är rent grafiskt
+        w = self.width / 2
+        h = self.height / 2
+        other_w = other_rect.width / 2
+        other_h = other_rect.height / 2
+
+        x_max = self.position.x + w
+        x_min = self.position.x - w
+        other_x_max = other_rect.position.x + other_w
+        other_x_min = other_rect.position.x - other_w
+
+        y_max = self.position.y + h
+        y_min = self.position.y - h
+        other_y_max = other_rect.position.y + h
+        other_y_min = other_rect.position.y - h
+        return (
+            x_min < other_x_max
+            and other_x_min < x_max
+            and y_min < other_y_max
+            and other_y_min < y_max
+        )
 
 class Circle(PhysObj):
     def __init__(

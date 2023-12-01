@@ -94,7 +94,7 @@ class State:
                         color=self.player_chosen_color,
                         position=position,
                         radius=self.player_chosen_radius,
-                        velocity=Vector2D(700,0)
+                        velocity=Vector2D(0,0)
                     )
                 
                 case "rect":
@@ -120,7 +120,7 @@ class State:
                     color=self.player_chosen_color,
                     position= Vector2D(self.player_chosen_x + ORIGIN[0], self.player_chosen_y + ORIGIN[1]),
                     radius=self.player_chosen_radius,
-                    velocity=Vector2D(700,0),
+                    velocity=Vector2D(0,0)
                 )
 
         self.add_objects([obj])
