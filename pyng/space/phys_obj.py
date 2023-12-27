@@ -21,7 +21,7 @@ class PhysObj:
             self.inverse_mass = 1 / self.mass
         else:
             self.inverse_mass = 0
-        self.position = relative_to_origin(position)
+        self.position = position
         self.velocity = velocity
         self.force = force
         self.color = color
@@ -180,14 +180,14 @@ class Rectangle(ConvexPolygon):
         mass: int,
         color: (int, int, int),
         position: (int, int),
-        velocity: (int, int),
-        force: (int, int),
-        angle: float,
-        is_static: bool,
-        id: str,
-        restitution,  # vet inte om den är en int eller float
         width: int,
         height: int,
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
+        angle=math.pi/4,
+        is_static=False,
+        id=None,
+        restitution=0  # vet inte om den är en int eller float
     ):
         self.width = width
         self.height = height
