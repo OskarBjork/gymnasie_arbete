@@ -3,6 +3,7 @@ from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS, OBJECT_CREATION_C
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
+from pyng.space.interface.view_model import relative_to_origin
 
 import math
 import time
@@ -35,9 +36,8 @@ class State:
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
-                self.create_object(mouse_pos)
+                self.create_object(position=mouse_pos)
             # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
-            self.create_object(position=mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
@@ -75,14 +75,20 @@ class State:
 
     def del_all_objects(self):
         self.objects = []
-   
-  
-    def create_object(self, position=None, obj_type="circle", with_gravity=False):
+
+    def create_object(
+        self, position=None, obj_type="circle", with_gravity=False, manual_spawn=False
+    ):
         if (
             not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
-        obj = None
+
+        if manual_spawn:
+            print(self.player_chosen_x, self.player_chosen_y)
+            position = relative_to_origin(
+                Vector2D(self.player_chosen_x, self.player_chosen_y)
+            )
 
         match obj_type:
             case "circle":

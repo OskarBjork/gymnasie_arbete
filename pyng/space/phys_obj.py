@@ -21,7 +21,7 @@ class PhysObj:
             self.inverse_mass = 1 / self.mass
         else:
             self.inverse_mass = 0
-        self.position = relative_to_origin(position)
+        self.position = position
         self.velocity = velocity
         self.force = force
         self.color = color
