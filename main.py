@@ -214,7 +214,6 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
-
         state.step(dt)
 
         state.handle_collisions()

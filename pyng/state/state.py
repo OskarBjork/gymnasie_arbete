@@ -36,6 +36,8 @@ class State:
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
                 self.create_object(mouse_pos)
+            # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
+            self.create_object(position=mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
@@ -73,55 +75,22 @@ class State:
 
     def del_all_objects(self):
         self.objects = []
-
-    def create_object(self, position=None, obj="circle", with_gravity=False):
+   
+  
+    def create_object(self, position=None, obj_type="circle", with_gravity=False):
         if (
             not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
+        obj = None
 
-        if position is not None:  # Mus spawns
-            if (  # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
-                len(self.objects) != 0
-                and position.x == self.objects[-1].position.x
-                and position.y == self.objects[-1].position.y
-            ):
-                position.x += 1
-            match obj:
-                case "circle":
-                    obj = Circle(
-                        mass=self.player_chosen_mass,
-                        color=self.player_chosen_color,
-                        position=position - Vector2D(*ORIGIN),
-                        radius=self.player_chosen_radius,
-                        velocity=Vector2D(0, 0),
-                    )
-
-                case "rect":
-                    obj = Rectangle(
-                        mass=self.player_chosen_mass,
-                        color=self.player_chosen_color,
-                        position=position,
-                    )
-
-        else:  # Spawn knapp spawns
-            if (  # om objektet försöker spawnas på samma plats som förra flyttas den 1 koordinat i åt höger i x-led, kanske vill läggas i "object_creation_avaliable" för tydlighet
-                len(self.objects) != 0
-                and self.player_chosen_x == self.objects[-1].position.x
-                and self.player_chosen_y == self.objects[-1].position.y
-            ):
-                self.player_chosen_x += 1
-
-            if obj == "circle":
+        match obj_type:
+            case "circle":
                 obj = Circle(
-                    mass=self.player_chosen_mass,
-                    color=self.player_chosen_color,
-                    position=Vector2D(
-                        self.player_chosen_x + ORIGIN[0],
-                        self.player_chosen_y + ORIGIN[1],
-                    ),
+                    color=RED,
+                    mass=10,
+                    position=position,
                     radius=self.player_chosen_radius,
-                    velocity=Vector2D(0, 0),
                 )
 
         self.add_objects([obj])
