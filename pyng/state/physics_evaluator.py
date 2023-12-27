@@ -7,6 +7,8 @@ from pyng.helper import (
     dot_product,
     length_squared,
     distance_squared,
+    float_nearly_equal,
+    vector_nearly_equal,
 )
 from pyng.config import GRAVITY_CONSTANT
 from pyng.space.collision import CollisionManifold
@@ -273,6 +275,49 @@ class PhysicsEvaluator:
             circle1.position - (dir * circle1.radius)
         ]  # Detta kommer ge tillbaka en punkt på skärmen och inte i världen
 
+    def find_polygon_polygon_contact_points(self, polygon1, polygon2):
+        contact1 = Vector2D(0, 0)
+        contact2 = Vector2D(0, 0)
+        contact_count = 0
+
+        min_dist_squared = float("inf")
+
+        for p in polygon1.vertices:
+            for j, va in enumerate(polygon2.vertices):
+                vb = polygon2.vertices[(j + 1) % len(polygon2.vertices)]
+                distance_squared, contact = self.point_segment_distance(p, va, vb)
+
+                if distance_squared == min_dist_squared:
+                    if (
+                        not contact == contact1
+                    ):  # Floating point jämförelse, kan vara farligt
+                        contact2 = contact
+                        contact_count = 2
+
+                elif distance_squared < min_dist_squared:
+                    min_dist_squared = distance_squared
+                    contact_count = 1
+                    contact1 = contact
+
+        for p in polygon2.vertices:
+            for j, va in enumerate(polygon1.vertices):
+                vb = polygon1.vertices[(j + 1) % len(polygon1.vertices)]
+                distance_squared, contact = self.point_segment_distance(p, va, vb)
+
+                if distance_squared == min_dist_squared:
+                    if (
+                        not contact == contact1
+                    ):  # Floating point jämförelse, kan vara farligt
+                        contact2 = contact
+                        contact_count = 2
+
+                elif distance_squared < min_dist_squared:
+                    min_dist_squared = distance_squared
+                    contact_count = 1
+                    contact1 = contact
+
+        return [contact1, contact2, contact_count]
+
     def find_polygon_circle_contact_points(self, polygon, circle):
         min_dist_squared = float("inf")
         closest_contact = None
@@ -292,8 +337,7 @@ class PhysicsEvaluator:
         if isinstance(body_A, Circle) and isinstance(body_B, Circle):
             return self.find_circles_contact_point(body_A, body_B)
         elif isinstance(body_A, ConvexPolygon) and isinstance(body_B, ConvexPolygon):
-            # return self.find_polygon_polygon_contact_points(body_A, body_B)
-            return None
+            return self.find_polygon_polygon_contact_points(body_A, body_B)
         elif isinstance(body_A, ConvexPolygon) and isinstance(body_B, Circle):
             return self.find_polygon_circle_contact_points(body_A, body_B)
         elif isinstance(body_A, Circle) and isinstance(body_B, ConvexPolygon):

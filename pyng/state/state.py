@@ -59,10 +59,10 @@ class State:
                 obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
                 pass
             if (
-                    obj.position.y > 2000
-                    or obj.position.x > 2000
-                    or obj.position.y < ORIGIN[1]
-                    or obj.position.x < ORIGIN[0]
+                obj.position.y > 2000
+                or obj.position.x > 2000
+                or obj.position.y < ORIGIN[1]
+                or obj.position.x < ORIGIN[0]
             ):
                 # self.del_object(obj)
                 pass
@@ -86,14 +86,18 @@ class State:
     def del_all_objects(self):
         self.objects = []
 
-    def create_object(self, position=None, obj_type="circle", with_gravity=False, manual_spawn=False):
+    def create_object(
+        self, position=None, obj_type="circle", with_gravity=False, manual_spawn=False
+    ):
         if (
-                not self.object_creation_available()
+            not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
 
         if manual_spawn:
-            position = relative_to_origin(Vector2D(self.player_chosen_x, self.player_chosen_y))
+            position = relative_to_origin(
+                Vector2D(self.player_chosen_x, self.player_chosen_y)
+            )
         obj = None
 
         match obj_type:
@@ -109,8 +113,8 @@ class State:
                     color=RED,
                     mass=self.player_chosen_mass,
                     position=position,
-                    width=10,
-                    height=10,
+                    width=100,
+                    height=100,
                 )
 
         self.add_objects([obj])
@@ -119,6 +123,7 @@ class State:
             self.physics_evaluator.impose_gravity(obj)
 
     def handle_collisions(self):
+        print("Handling collisions\n")
         collisions = self.phys_world.find_collisions(self.objects)
         collision_manifolds = []
         for collision in collisions:
@@ -136,16 +141,18 @@ class State:
             if manifold.contact1 is not None:
                 contact_points.append(manifold.contact1)
             if manifold.contact2 is not None:
+                print("contact2 is not None", manifold.contact2)
                 contact_points.append(manifold.contact2)
 
         for point in contact_points:
+            print(point - Vector2D(*ORIGIN))
             circle = Circle(color=ORANGE, mass=10, position=point, radius=20)
             self.view_model.render_circle(circle)
 
     def object_creation_available(self):
         return (
-                time.time() - self.time_since_last_object_creation
-                > OBJECT_CREATION_COOLDOWN
+            time.time() - self.time_since_last_object_creation
+            > OBJECT_CREATION_COOLDOWN
         )
 
     def generate_random_position(self):
@@ -162,16 +169,16 @@ class State:
             for obj in self.objects:
                 if isinstance(obj, Circle):
                     if (
-                            self.physics_evaluator.check_circle_collision(circle, obj)[0]
-                            == True  # NOTE: Galen indentation
+                        self.physics_evaluator.check_circle_collision(circle, obj)[0]
+                        == True  # NOTE: Galen indentation
                     ):
                         break
                 elif isinstance(obj, ConvexPolygon):
                     if (
-                            self.physics_evaluator.check_polygon_circle_collision(
-                                obj, circle
-                            )[0]
-                            == True  # NOTE: Galen indentation
+                        self.physics_evaluator.check_polygon_circle_collision(
+                            obj, circle
+                        )[0]
+                        == True  # NOTE: Galen indentation
                     ):
                         break
             else:
@@ -191,7 +198,7 @@ class State:
                         position=Vector2D(
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
-                                 + Vector2D(*ORIGIN),  # NOTE: Galen indentation
+                        + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                     ),
                 ]
             )
@@ -209,7 +216,7 @@ class State:
                         position=Vector2D(
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
-                                 + Vector2D(*ORIGIN),  # NOTE: Galen indentation
+                        + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                     )
                 ],
             )

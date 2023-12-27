@@ -27,3 +27,4 @@ COLORS = (
     LIGHT_BLUE,
 )
 OBJECT_CREATION_COOLDOWN = 0.05
+EPSILON = 0.05  # En halv millimeter
