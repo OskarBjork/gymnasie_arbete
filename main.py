@@ -200,7 +200,7 @@ def main():
 
         delegate_event(event, state, view_model, ui_manager)
 
-        state.create_object(obj="lol", position=Vector2D(1000, 1000))
+        state.create_object(obj="circle", position=Vector2D(1000, 1000))
 
         state.step(dt)
 
