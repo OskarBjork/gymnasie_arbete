@@ -1,6 +1,6 @@
 from pyng.space.vectors import Vector2D
 from pyng.config import RED, ORIGIN
-from pyng.space.interface.view_model import ViewModel
+from pyng.space.interface.view_model import ViewModel, relative_to_origin
 import math
 
 
@@ -12,14 +12,20 @@ class PhysObj:
         position=Vector2D(*ORIGIN),  # Centrumet av formen
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
+        is_static=False,
         id: str = None,
         restitution=0,
     ):
         self.mass = mass
-        self.position = position
+        if not is_static:
+            self.inverse_mass = 1 / self.mass
+        else:
+            self.inverse_mass = 0
+        self.position = relative_to_origin(position)
         self.velocity = velocity
         self.force = force
         self.color = color
+        self.is_static = is_static
         self.id = id
         self.restitution = restitution
 
@@ -30,7 +36,8 @@ class PhysObj:
         self.force = self.force + force
 
     def update_velocity(self, delta_time: float):
-        self.velocity = self.velocity + (self.force / self.mass) * delta_time
+        # self.velocity = self.velocity + (self.force / self.mass) * delta_time
+        self.velocity = self.velocity + (self.force * self.inverse_mass) * delta_time
 
     def update_position(self, delta_time: float):
         self.position = self.position + self.velocity * delta_time
@@ -50,10 +57,13 @@ class Point(PhysObj):
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
+        is_static=False,
         id: str = None,
         restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, id, restitution)
+        super().__init__(
+            mass, color, position, velocity, force, is_static, id, restitution
+        )
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
@@ -76,10 +86,13 @@ class ConvexPolygon(PhysObj):
         num_of_sides=4,
         side_length=1,
         angle=0,
+        is_static=False,
         id: str = None,
         restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, id, restitution)
+        super().__init__(
+            mass, color, position, velocity, force, is_static, id, restitution
+        )
         self.num_of_sides = num_of_sides
         self.side_length = side_length
         self.angle = angle
@@ -161,6 +174,76 @@ class ConvexPolygon(PhysObj):
         view_model.render_polygon(self)
 
 
+class Rectangle(ConvexPolygon):
+    def __init__(
+        self,
+        mass: int,
+        color: (int, int, int),
+        position: (int, int),
+        velocity: (int, int),
+        force: (int, int),
+        angle: float,
+        is_static: bool,
+        id: str,
+        restitution,  # vet inte om den är en int eller float
+        width: int,
+        height: int,
+    ):
+        self.width = width
+        self.height = height
+        super().__init__(
+            mass=mass,
+            color=color,
+            position=position,
+            velocity=velocity,
+            force=force,
+            num_of_sides=4,
+            side_length=None,
+            angle=angle,
+            is_static=is_static,
+            id=id,
+            restitution=restitution,
+        )
+
+    def update_vertices(self):
+        p = self.position
+        k = self.num_of_sides
+        w = self.width
+        h = self.height
+        angle = self.angle
+        vertices = []
+        for i in range(k):
+            rotated_angle = angle + 2 * math.pi * i / k
+            x = p.x + w * math.cos(rotated_angle)
+            y = p.y + h * math.sin(rotated_angle)
+            vertices.append(Vector2D(x, y))
+        self.vertices = vertices
+        return vertices
+
+    def check_axis_aligned_collision(self, other_rect) -> bool:
+        # Utgår ifrån att self.position är mitten av rektangel vilket det inte är rent grafiskt
+        w = self.width / 2
+        h = self.height / 2
+        other_w = other_rect.width / 2
+        other_h = other_rect.height / 2
+
+        x_max = self.position.x + w
+        x_min = self.position.x - w
+        other_x_max = other_rect.position.x + other_w
+        other_x_min = other_rect.position.x - other_w
+
+        y_max = self.position.y + h
+        y_min = self.position.y - h
+        other_y_max = other_rect.position.y + h
+        other_y_min = other_rect.position.y - h
+        return (
+            x_min < other_x_max
+            and other_x_min < x_max
+            and y_min < other_y_max
+            and other_y_min < y_max
+        )
+
+
 class Circle(PhysObj):
     def __init__(
         self,
@@ -170,10 +253,13 @@ class Circle(PhysObj):
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         radius=1,
+        is_static=False,
         id: str = None,
         restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, id, restitution)
+        super().__init__(
+            mass, color, position, velocity, force, is_static, id, restitution
+        )
         self.radius = radius
 
     def render(self, view_model):

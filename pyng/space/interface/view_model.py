@@ -5,9 +5,18 @@ import pygame_gui
 from pygame import Surface
 
 from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER, ORIGIN
+from pyng.space.vectors import Vector2D
 
 
 # TODO: Flytta
+
+
+def convert_coordinates(screen, x, y) -> (float, float):
+    return x, screen.get_height() - y
+
+
+def relative_to_origin(position_vector):
+    return position_vector + Vector2D(*ORIGIN)
 
 
 class ViewModel:
@@ -17,9 +26,10 @@ class ViewModel:
         self.height = screen.get_height()
         self.ui_manager = ui_manager
         self.font = pygame.font.Font(None, 36)
-        
-        self.ui_mode = True #True om i "spawner" läge
-        self.shape = "rect"
+
+        self.ui_mode = True  # True om i spawn läge
+        self.shape = "circle"
+        self.tool = "force"
 
     def convert_coordinates(self, x, y) -> (float, float):
         return x, self.screen.get_height() - y
@@ -78,14 +88,14 @@ class ViewModel:
                 self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
                 20,
             )
-        if self.ui_mode == True: # visar all text som ska vara på spawner skärmen
+        if self.ui_mode == True:  # visar all text som ska vara på spawner skärmen
             self.render_text(
                 "Spawner",
                 BLACK,
                 (10, 20),
                 60,
             )
-            
+
             self.render_text(
                 "x-coordinate:",
                 BLACK,
@@ -107,83 +117,192 @@ class ViewModel:
                     (5, 350),
                     20,
                 )
-        
-        if self.ui_mode == False: # visar all text som ska vara på manipulate skärmen
+
+                self.render_text(
+                    "Mass:",
+                    BLACK,
+                    (5, 450),
+                    20,
+                )
+
+        if self.ui_mode == False:  # visar all text som ska vara på manipulate skärmen
             self.render_text(
                 "Manipulate",
                 BLACK,
                 (10, 20),
                 60,
             )
+            match self.tool:
+                case "move":
+                    pass
+
+                case "force":
+                    self.render_text(
+                        "Force [Newton]:",
+                        BLACK,
+                        (10, 245),
+                        20,
+                    )
+
+                    self.render_text(
+                        "Angle [rad]:",
+                        BLACK,
+                        (10, 335),
+                        20,
+                    )
+
+                case "velocity":
+                    self.render_text(
+                        "Velocity [m/s]:",
+                        BLACK,
+                        (10, 245),
+                        20,
+                    )
+
+                    self.render_text(
+                        "Angle [rad]:",
+                        BLACK,
+                        (10, 335),
+                        20,
+                    )
 
     def render_ui(self, ui_manager):
         self.show_grid()
         ui_manager.draw_ui(self.screen)
-    
+
     def show_mode_buttons(self):
         pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((0, -50), (0.33 * ORIGIN[0], 45)),
             text="Manipulate",
             manager=self.ui_manager,
             object_id="#manipulate_view_changer_button",
-            anchors={"left": "left",
-                     "bottom": "bottom"},
+            anchors={"left": "left", "bottom": "bottom"},
         )
-        
+
         pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((5 + 0.33 * ORIGIN[0], -50), (0.33 * ORIGIN[0], 45)),
+            relative_rect=pygame.Rect(
+                (5 + 0.33 * ORIGIN[0], -50), (0.33 * ORIGIN[0], 45)
+            ),
             text=f"Spawner",
             manager=self.ui_manager,
             object_id="#spawner_view_changer_button",
-            anchors={"left": "left",
-                     "bottom": "bottom"},
+            anchors={"left": "left", "bottom": "bottom"},
         )
-        
+
         pass
 
     def show_manipulate_editor(self):
+        pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect((-5, 100), (0.35 * ORIGIN[0], 142)),
+            item_list=["Move", "Force", "Velocity"],
+            manager=self.ui_manager,
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#tool_selected_input",
+        )
+        match self.tool:
+            case "move":
+                pass
+
+            case "force":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 265), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#force_input",
+                )
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 355), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#angle_input",
+                )
+
+            case "velocity":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 265), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#angle_input",
+                )
+
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 355), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#velocity_input",
+                )
 
         pass
 
-    def show_spawn_editor(self): 
+    def show_spawn_editor(self):
         # Möjligt att lägga till bilder av formerna som knappar eller bara bilder som ersättning eller komplement till en UISelectionList
-            # pygame_gui.elements.UIImage(
-            #     relative_rect=pygame.Rect((32, 320), (32, 32)),
-            #     image_surface=pygame.Surface()
-            # )
+        # pygame_gui.elements.UIImage(
+        #     relative_rect=pygame.Rect((32, 320), (32, 32)),
+        #     image_surface=pygame.Surface()
+        # )
 
-        pygame_gui.elements.UISelectionList( 
+        pygame_gui.elements.UISelectionList(
             relative_rect=pygame.Rect((-5, 100), (0.35 * ORIGIN[0], 102)),
-            item_list= ["Rectangle", "Circle"],
+            item_list=["Rectangle", "Circle"],
             manager=self.ui_manager,
             allow_multi_select=False,
             allow_double_clicks=False,
             object_id="#shape_input",
         )
 
-        pygame_gui.elements.UITextEntryLine(
-                relative_rect=pygame.Rect((0, 230), (0.35 * ORIGIN[0], 55)),
-                manager=self.ui_manager,
-                object_id="#x_coordinate_input",
-            )
+        # Gör ett sätt att välja färg, men helst med bilder av färgen istället för bara text. inte nödvändigt men coolt. Byt kanske till drop down väljare.
+        """
+        pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect((-5, 350), (0.35 * ORIGIN[0], 142)),
+            item_list= ["Red", "Green", "Blue"], #fler färger senare
+            manager=self.ui_manager,
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#color_input",
+        )
+
+        pygame_gui.elements.UISelectionList(
+            relative_rect=pygame.Rect((0.35 * ORIGIN[0] - 20, 350), (0.35 * ORIGIN[0], 142)),
+            item_list= ["Yellow", "Purple", "Orange"], #fler färger senare
+            manager=self.ui_manager,
+            allow_multi_select=False,
+            allow_double_clicks=False,
+            object_id="#color_input",
+        )
+        """
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect(
+                (0.35 * ORIGIN[0] + 5, 110), (0.35 * ORIGIN[0], 40)
+            ),
+            text="Clear",
+            manager=self.ui_manager,
+            tool_tip_text="Deletes all objects if double clicked",
+            allow_double_clicks=True,
+            object_id="#clear_button",
+        )
 
         pygame_gui.elements.UITextEntryLine(
-                relative_rect=pygame.Rect((0.35 * ORIGIN[0], 230), (0.35 * ORIGIN[0], 55)),
-                manager=self.ui_manager,
-                object_id="#y_coordinate_input",
-            )
+            relative_rect=pygame.Rect((0, 230), (0.35 * ORIGIN[0], 55)),
+            manager=self.ui_manager,
+            object_id="#x_coordinate_input",
+        )
+
+        pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((0.35 * ORIGIN[0], 230), (0.35 * ORIGIN[0], 55)),
+            manager=self.ui_manager,
+            object_id="#y_coordinate_input",
+        )
 
         pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((3, 285), (0.25* ORIGIN[0], 40)),
+            relative_rect=pygame.Rect((3, 285), (0.25 * ORIGIN[0], 40)),
             text="Spawn",
             manager=self.ui_manager,
             tool_tip_text="Spawns the selected shape on the specified coordinates",
             object_id="#spawn_button",
         )
-        
+
         # Kanske inte ens behövs, eftersom när man är i "spawn skärmen"
         pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((10 + 0.25* ORIGIN[0], 285), (0.35* ORIGIN[0], 40)),
+            relative_rect=pygame.Rect(
+                (10 + 0.25 * ORIGIN[0], 285), (0.35 * ORIGIN[0], 40)
+            ),
             text="Mouse Spawn",
             manager=self.ui_manager,
             tool_tip_text="Spawns the selected shape when you left click somewhere on the coordinate grid",
@@ -196,8 +315,13 @@ class ViewModel:
                 manager=self.ui_manager,
                 object_id="#radius_input",
             )
-        
-        
+
+            pygame_gui.elements.UITextEntryLine(
+                relative_rect=pygame.Rect((0, 470), (0.7 * ORIGIN[0], 55)),
+                manager=self.ui_manager,
+                object_id="#mass_input",
+            )
+
         pass
 
     def set_caption(self, caption: str) -> None:
