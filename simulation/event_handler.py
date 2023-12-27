@@ -77,7 +77,7 @@ def delegate_event(event, state, view_model, ui_manager):
     if event == "mouse 1":
         state.parse_mouse_click(
             Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos()))),
-            view_model
+            view_model,
         )
         return
 
@@ -140,6 +140,7 @@ def delegate_event(event, state, view_model, ui_manager):
 
         case "velocity":
             view_model.tool = "velocity"
+
             state.player_chosen_tool = "velocity"  # kan ändras i framtiden, lade bara till för jag tror det kommer behövas
             ui_manager.clear_and_reset()
             view_model.show_manipulate_editor()

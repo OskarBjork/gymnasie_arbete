@@ -16,6 +16,14 @@ def projection(polygon, axis):
     return min_proj, max_proj
 
 
+def length_squared(v: Vector2D):
+    return v.x * v.x + v.y * v.y
+
+
+def distance_squared(v1: Vector2D, v2: Vector2D):
+    return length_squared(v1 - v2)
+
+
 def overlaps(projection1, projection2):
     """Kollar om två projektioner överlappar varandra, utifrån deras minsta och största värden"""
     return projection1[1] >= projection2[0] and projection1[0] <= projection2[1]

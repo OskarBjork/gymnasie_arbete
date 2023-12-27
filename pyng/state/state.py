@@ -1,9 +1,17 @@
 from pyng.space.interface.view_model import relative_to_origin
 from pyng.space.vectors import Vector2D
-from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS, OBJECT_CREATION_COOLDOWN
-from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle
+from pyng.config import (
+    ORIGIN,
+    RED,
+    GRAVITY_CONSTANT,
+    COLORS,
+    OBJECT_CREATION_COOLDOWN,
+    ORANGE,
+)
+from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle, Point
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
+from pyng.space.interface.view_model import relative_to_origin
 
 import math
 import time
@@ -15,10 +23,12 @@ pp = pprint.PrettyPrinter(indent=2)
 
 class State:
     def __init__(
-            self,
-            objects: [PhysObj] = [],
+        self,
+        objects: [PhysObj] = [],
+        view_model=None,
     ) -> None:
         self.objects = objects
+        self.view_model = view_model
         self.time_since_last_object_creation = time.time()
         self.physics_evaluator = PhysicsEvaluator()
         self.phys_world = PhysWorld()
@@ -36,9 +46,8 @@ class State:
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
-                self.create_object(mouse_pos)
+                self.create_object(position=mouse_pos)
             # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
-            self.create_object(position=mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
@@ -60,7 +69,7 @@ class State:
 
     def update_all_vertices(self):
         for obj in self.objects:
-            if isinstance(obj, Circle):
+            if isinstance(obj, Circle) or isinstance(obj, Point):
                 continue
             obj.update_vertices()
 
@@ -111,10 +120,27 @@ class State:
 
     def handle_collisions(self):
         collisions = self.phys_world.find_collisions(self.objects)
+        collision_manifolds = []
         for collision in collisions:
-            self.physics_evaluator.analyze_and_handle_collision(
+            result = self.physics_evaluator.create_collision_manifold(
                 collision[0], collision[1]
             )
+
+            if result is not None:
+                collision_manifolds.append(result)
+
+        contact_points = []
+
+        for manifold in collision_manifolds:
+            self.physics_evaluator.resolve_any_collision(manifold)
+            if manifold.contact1 is not None:
+                contact_points.append(manifold.contact1)
+            if manifold.contact2 is not None:
+                contact_points.append(manifold.contact2)
+
+        for point in contact_points:
+            circle = Circle(color=ORANGE, mass=10, position=point, radius=20)
+            self.view_model.render_circle(circle)
 
     def object_creation_available(self):
         return (
