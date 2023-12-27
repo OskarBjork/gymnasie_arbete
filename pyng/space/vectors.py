@@ -93,3 +93,6 @@ class Vector2D:
 
     def get_distance_to(self, other) -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
+
+    def dot(self, other):
+        return self.x * other.x + self.y * other.y
