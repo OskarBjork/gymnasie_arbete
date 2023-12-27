@@ -52,11 +52,10 @@ def main():
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
 
-    state = State()
-
     ui_manager = pygame_gui.UIManager((screen_width, screen_height), "theme.json")
     view_model = ViewModel(screen, ui_manager)
 
+    state = State(view_model=view_model)
     view_model.set_caption("Pyng")
 
     screen.fill(BLACK)
@@ -183,7 +182,7 @@ def main():
     rect = Rectangle(
         mass=10,
         color=PURPLE,
-        position=Vector2D(1000, 30),
+        position=Vector2D(1000, 300),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         angle=math.pi / 4,

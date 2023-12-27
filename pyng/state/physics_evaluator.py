@@ -1,6 +1,13 @@
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.space.vectors import Vector2D
-from pyng.helper import projection, overlaps, find_arithmetic_mean, dot_product
+from pyng.helper import (
+    projection,
+    overlaps,
+    find_arithmetic_mean,
+    dot_product,
+    length_squared,
+    distance_squared,
+)
 from pyng.config import GRAVITY_CONSTANT
 from pyng.space.collision import CollisionManifold
 import math
@@ -31,6 +38,9 @@ class PhysicsEvaluator:
             try:
                 manifold.contact1 = contact_points[0]
                 manifold.contact_count += 1
+            except:
+                pass
+            try:
                 manifold.contact2 = contact_points[1]
                 manifold.contact_count += 1
             except:
@@ -234,6 +244,25 @@ class PhysicsEvaluator:
         obj1.velocity = obj1.velocity + (mtv * (j * obj1.inverse_mass))
         obj2.velocity = obj2.velocity - (mtv * (j * obj2.inverse_mass))
 
+    def point_segment_distance(self, point, a, b):
+        ab = b - a
+        ap = point - a
+
+        proj = ap.dot(ab)
+        ab_length_squared = length_squared(ab)
+        d = proj / ab_length_squared
+
+        if d < 0:
+            contact = a
+        elif d >= 1:
+            contact = b
+        else:
+            contact = ab * d + a
+
+        distance_squared = length_squared(ap - contact)
+
+        return (distance_squared, contact)
+
     def impose_gravity(self, obj: PhysObj):
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
@@ -241,20 +270,31 @@ class PhysicsEvaluator:
         ab = circle1.position - circle2.position
         dir = ab.normalize()
         return [
-            circle1.position + (dir * circle1.radius)
+            circle1.position - (dir * circle1.radius)
         ]  # Detta kommer ge tillbaka en punkt på skärmen och inte i världen
-        pass
+
+    def find_polygon_circle_contact_points(self, polygon, circle):
+        min_dist_squared = float("inf")
+        closest_contact = None
+        for i, vertice in enumerate(polygon.vertices):
+            va = vertice
+            vb = polygon.vertices[(i + 1) % len(polygon.vertices)]
+            distance_squared, contact = self.point_segment_distance(
+                circle.position, vb, va
+            )
+            if distance_squared < min_dist_squared:
+                min_dist_squared = distance_squared
+                closest_contact = contact
+
+        return [closest_contact]
 
     def find_contact_points(self, body_A, body_B):
         if isinstance(body_A, Circle) and isinstance(body_B, Circle):
-            # return self.find_circles_contact_point(body_A, body_B)
-            return None
+            return self.find_circles_contact_point(body_A, body_B)
         elif isinstance(body_A, ConvexPolygon) and isinstance(body_B, ConvexPolygon):
             # return self.find_polygon_polygon_contact_points(body_A, body_B)
             return None
         elif isinstance(body_A, ConvexPolygon) and isinstance(body_B, Circle):
-            # return self.find_polygon_circle_contact_points(body_A, body_B)
-            return None
+            return self.find_polygon_circle_contact_points(body_A, body_B)
         elif isinstance(body_A, Circle) and isinstance(body_B, ConvexPolygon):
-            # return self.find_polygon_circle_contact_points(body_B, body_A)
-            return None
+            return self.find_polygon_circle_contact_points(body_B, body_A)

@@ -1,5 +1,12 @@
 from pyng.space.vectors import Vector2D
-from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS, OBJECT_CREATION_COOLDOWN
+from pyng.config import (
+    ORIGIN,
+    RED,
+    GRAVITY_CONSTANT,
+    COLORS,
+    OBJECT_CREATION_COOLDOWN,
+    ORANGE,
+)
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle, Point
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
@@ -17,8 +24,10 @@ class State:
     def __init__(
         self,
         objects: [PhysObj] = [],
+        view_model=None,
     ) -> None:
         self.objects = objects
+        self.view_model = view_model
         self.time_since_last_object_creation = time.time()
         self.physics_evaluator = PhysicsEvaluator()
         self.phys_world = PhysWorld()
@@ -123,10 +132,9 @@ class State:
             if manifold.contact2 is not None:
                 contact_points.append(manifold.contact2)
 
-        # for point in contact_points:
-        #     self.objects.append(
-        #         Point(color=RED, position=point, is_static=True, mass=1)
-        #     )
+        for point in contact_points:
+            circle = Circle(color=ORANGE, mass=10, position=point, radius=20)
+            self.view_model.render_circle(circle)
 
     def object_creation_available(self):
         return (
