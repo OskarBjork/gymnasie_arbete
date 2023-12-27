@@ -33,7 +33,7 @@ class State:
     def parse_mouse_click(self, mouse_pos: Vector2D):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
-            self.create_object(mouse_pos)
+            self.create_object(position=mouse_pos)
 
     def step(self, delta_time: float):
         self.update_all_vertices()
@@ -66,43 +66,21 @@ class State:
     def del_object(self, obj: PhysObj):
         self.objects.remove(obj)
 
-    def create_object(self, position=None, obj="circle", with_gravity=False):
+    def create_object(self, position=None, obj_type="circle", with_gravity=False):
         if (
             not self.object_creation_available()
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
 
-        if obj == "circle":
-            object_type = random.choice(["circle"])
-            if object_type == "circle":
+        obj = None
+
+        match obj_type:
+            case "circle":
                 obj = Circle(
-                    mass=self.player_chosen_mass,
-                    # mass=random.randint(1, 100),
-                    # num_of_sides=random.randint(3, 10),
-                    # side_length=random.randint(1, 100),
-                    radius=20,
-                    color=random.choice(COLORS),
-                    position=position
-                    if position is not None
-                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                    + Vector2D(*ORIGIN),
-                    velocity=Vector2D(0, 0),
-                )
-            else:
-                obj = ConvexPolygon(
-                    mass=self.player_chosen_mass,
-                    # mass=random.randint(1, 100),
-                    num_of_sides=random.randint(3, 10),
-                    side_length=random.randint(1, 100),
-                    # radius=random.randint(1, 100),
-                    color=random.choice(COLORS),
-                    position=position
-                    if position is not None
-                    else Vector2D(self.player_chosen_x, self.player_chosen_y)
-                    + Vector2D(*ORIGIN),
-                    # velocity=Vector2D(
-                    #     random.randint(-300, 300), random.randint(-300, 300)
-                    # ),
+                    color=RED,
+                    mass=10,
+                    position=position,
+                    radius=self.player_chosen_radius,
                 )
 
         self.add_objects([obj])
