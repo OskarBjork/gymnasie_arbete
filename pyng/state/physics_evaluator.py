@@ -259,7 +259,7 @@ class PhysicsEvaluator:
         else:
             contact = ab * d + a
 
-        distance_squared = length_squared(ap - contact)
+        distance_squared = length_squared(point - contact)
 
         return (distance_squared, contact)
 
