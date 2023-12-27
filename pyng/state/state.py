@@ -85,7 +85,6 @@ class State:
             return
 
         if manual_spawn:
-            print(self.player_chosen_x, self.player_chosen_y)
             position = relative_to_origin(
                 Vector2D(self.player_chosen_x, self.player_chosen_y)
             )
@@ -106,10 +105,17 @@ class State:
 
     def handle_collisions(self):
         collisions = self.phys_world.find_collisions(self.objects)
+        collision_manifolds = []
         for collision in collisions:
-            self.physics_evaluator.analyze_and_handle_collision(
+            result = self.physics_evaluator.create_collision_manifold(
                 collision[0], collision[1]
             )
+
+            if result is not None:
+                collision_manifolds.append(result)
+
+        for manifold in collision_manifolds:
+            self.physics_evaluator.resolve_any_collision(manifold)
 
     def object_creation_available(self):
         return (

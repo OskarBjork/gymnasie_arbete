@@ -2,6 +2,7 @@ from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon
 from pyng.space.vectors import Vector2D
 from pyng.helper import projection, overlaps, find_arithmetic_mean, dot_product
 from pyng.config import GRAVITY_CONSTANT
+from pyng.space.collision import CollisionManifold
 import math
 
 
@@ -9,37 +10,47 @@ class PhysicsEvaluator:
     def __init__(self) -> None:
         pass
 
-    def analyze_and_handle_collision(self, obj: PhysObj, other_obj: PhysObj):
+    def create_collision_manifold(self, obj: PhysObj, other_obj: PhysObj):
         if obj.is_static and other_obj.is_static:
             return
+        collision_analysis = self.check_any_collision(obj, other_obj)
+        collision_happened = collision_analysis[0]
+        normal = collision_analysis[2]
+        displacement = collision_analysis[1]
+        if collision_happened:
+            return CollisionManifold(
+                obj,
+                other_obj,
+                normal=normal,
+                depth=displacement,
+                contact1=Vector2D(0, 0),
+                contact2=Vector2D(0, 0),
+                contact_count=0,
+            )
 
+        return None
+
+    def check_any_collision(self, obj: PhysObj, other_obj: PhysObj):
         if isinstance(obj, Circle) and isinstance(other_obj, Circle):
-            collision_analysis = self.check_circle_collision(obj, other_obj)
-            collision_happened, overlap_length = collision_analysis
-            if not collision_happened:
-                return
-            self.resolve_circle_collision(obj, other_obj, overlap_length)
-
+            return self.check_circle_collision(obj, other_obj)
         elif isinstance(obj, ConvexPolygon) and isinstance(other_obj, ConvexPolygon):
-            collision_analysis = self.check_polygon_collision(obj, other_obj)
-            collision_happened, mtv = collision_analysis
-            if not collision_happened:
-                return
-            self.resolve_polygon_collision(obj, other_obj, mtv)
-
+            return self.check_polygon_collision(obj, other_obj)
         elif isinstance(obj, ConvexPolygon) and isinstance(other_obj, Circle):
-            collision_analysis = self.check_polygon_circle_collision(obj, other_obj)
-            collision_happened, mtv = collision_analysis
-            if not collision_happened:
-                return
-            self.resolve_polygon_circle_collision(other_obj, obj, mtv)
-
+            return self.check_polygon_circle_collision(obj, other_obj)
         elif isinstance(obj, Circle) and isinstance(other_obj, ConvexPolygon):
-            collision_analysis = self.check_polygon_circle_collision(obj, other_obj)
-            collision_happened, mtv = collision_analysis
-            if not collision_happened:
-                return
-            self.resolve_polygon_circle_collision(obj, other_obj, mtv)
+            return self.check_polygon_circle_collision(obj, other_obj)
+
+    def resolve_any_collision(self, manifold: CollisionManifold):
+        object1 = manifold.body_A
+        object2 = manifold.body_B
+        if isinstance(object1, Circle) and isinstance(object2, Circle):
+            self.resolve_circle_collision(object1, object2, manifold.depth)
+        elif isinstance(object1, ConvexPolygon) and isinstance(object2, ConvexPolygon):
+            self.resolve_polygon_collision(object1, object2, manifold.depth)
+        elif isinstance(object1, ConvexPolygon) and isinstance(object2, Circle):
+            self.resolve_polygon_circle_collision(object2, object1, manifold.depth)
+        elif isinstance(object1, Circle) and isinstance(object2, ConvexPolygon):
+            self.resolve_polygon_circle_collision(object1, object2, manifold.depth)
 
     def resolve_polygon_collision(
         self, obj: ConvexPolygon, other_obj: ConvexPolygon, mtv
@@ -57,7 +68,7 @@ class PhysicsEvaluator:
         direction = obj.position - other_obj.position
 
         if not direction.magnitude() > 0:
-            return # FIXME: Hantera situationen
+            return  # FIXME: Hantera situationen
         direction = direction.normalize()
 
         magnitude = overlap_length / 2
@@ -88,6 +99,7 @@ class PhysicsEvaluator:
         return (
             distance < circle1.radius + circle2.radius,
             circle1.radius + circle2.radius - distance,
+            (circle1.position - circle2.position).normalize(),
         )
 
     def get_normals(self, polygon):
@@ -141,7 +153,7 @@ class PhysicsEvaluator:
         if smallest_axis.dot(direction) < 0:
             smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
         mtv = smallest_axis * min_overlap
-        return True, mtv  # No separating axis found, polygons overlap
+        return True, mtv, smallest_axis  # No separating axis found, polygons overlap
 
     def check_polygon_circle_collision(self, polygon, circle):
         if isinstance(circle, ConvexPolygon) and isinstance(polygon, Circle):
@@ -178,7 +190,7 @@ class PhysicsEvaluator:
         if smallest_axis.dot(direction) < 0:
             smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
 
-        return True, smallest_axis * min_overlap
+        return True, smallest_axis * min_overlap, smallest_axis
 
     def find_closest_point_on_polygon(self, polygon, circle):
         result = -1
@@ -214,3 +226,12 @@ class PhysicsEvaluator:
 
     def impose_gravity(self, obj: PhysObj):
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
+
+    def find_circles_contact_point(circle1, circle2):
+        ab = circle1.position - circle2.position
+        dir = ab.normalize()
+        return circle1.position + (dir * circle1.radius)
+        pass
+
+    def find_contact_points(body_A, body_B):
+        pass
