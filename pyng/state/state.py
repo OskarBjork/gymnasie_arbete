@@ -1,6 +1,6 @@
 from pyng.space.vectors import Vector2D
 from pyng.config import ORIGIN, RED, GRAVITY_CONSTANT, COLORS, OBJECT_CREATION_COOLDOWN
-from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle
+from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle, Point
 from pyng.state.physics_evaluator import PhysicsEvaluator
 from pyng.state.phys_world import PhysWorld
 from pyng.space.interface.view_model import relative_to_origin
@@ -59,7 +59,7 @@ class State:
 
     def update_all_vertices(self):
         for obj in self.objects:
-            if isinstance(obj, Circle):
+            if isinstance(obj, Circle) or isinstance(obj, Point):
                 continue
             obj.update_vertices()
 
@@ -114,8 +114,19 @@ class State:
             if result is not None:
                 collision_manifolds.append(result)
 
+        contact_points = []
+
         for manifold in collision_manifolds:
             self.physics_evaluator.resolve_any_collision(manifold)
+            if manifold.contact1 is not None:
+                contact_points.append(manifold.contact1)
+            if manifold.contact2 is not None:
+                contact_points.append(manifold.contact2)
+
+        # for point in contact_points:
+        #     self.objects.append(
+        #         Point(color=RED, position=point, is_static=True, mass=1)
+        #     )
 
     def object_creation_available(self):
         return (

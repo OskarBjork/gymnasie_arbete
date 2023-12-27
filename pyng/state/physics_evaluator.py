@@ -18,15 +18,25 @@ class PhysicsEvaluator:
         normal = collision_analysis[2]
         displacement = collision_analysis[1]
         if collision_happened:
-            return CollisionManifold(
+            contact_points = self.find_contact_points(obj, other_obj)
+            manifold = CollisionManifold(
                 obj,
                 other_obj,
                 normal=normal,
                 depth=displacement,
-                contact1=Vector2D(0, 0),
-                contact2=Vector2D(0, 0),
-                contact_count=0,
+                contact1=None,
+                contact2=None,
+                contact_count=1,
             )
+            try:
+                manifold.contact1 = contact_points[0]
+                manifold.contact_count += 1
+                manifold.contact2 = contact_points[1]
+                manifold.contact_count += 1
+            except:
+                pass
+
+            return manifold
 
         return None
 
@@ -227,11 +237,24 @@ class PhysicsEvaluator:
     def impose_gravity(self, obj: PhysObj):
         obj.add_force(Vector2D(0, GRAVITY_CONSTANT) * obj.mass)
 
-    def find_circles_contact_point(circle1, circle2):
+    def find_circles_contact_point(self, circle1, circle2):
         ab = circle1.position - circle2.position
         dir = ab.normalize()
-        return circle1.position + (dir * circle1.radius)
+        return [
+            circle1.position + (dir * circle1.radius)
+        ]  # Detta kommer ge tillbaka en punkt på skärmen och inte i världen
         pass
 
-    def find_contact_points(body_A, body_B):
-        pass
+    def find_contact_points(self, body_A, body_B):
+        if isinstance(body_A, Circle) and isinstance(body_B, Circle):
+            # return self.find_circles_contact_point(body_A, body_B)
+            return None
+        elif isinstance(body_A, ConvexPolygon) and isinstance(body_B, ConvexPolygon):
+            # return self.find_polygon_polygon_contact_points(body_A, body_B)
+            return None
+        elif isinstance(body_A, ConvexPolygon) and isinstance(body_B, Circle):
+            # return self.find_polygon_circle_contact_points(body_A, body_B)
+            return None
+        elif isinstance(body_A, Circle) and isinstance(body_B, ConvexPolygon):
+            # return self.find_polygon_circle_contact_points(body_B, body_A)
+            return None
