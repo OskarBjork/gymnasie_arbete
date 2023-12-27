@@ -1,6 +1,6 @@
 from pyng.space.vectors import Vector2D
 from pyng.config import RED, ORIGIN
-from pyng.space.interface.view_model import ViewModel
+from pyng.space.interface.view_model import ViewModel, relative_to_origin
 import math
 
 
@@ -21,7 +21,7 @@ class PhysObj:
             self.inverse_mass = 1 / self.mass
         else:
             self.inverse_mass = 0
-        self.position = position
+        self.position = relative_to_origin(position)
         self.velocity = velocity
         self.force = force
         self.color = color
@@ -36,7 +36,7 @@ class PhysObj:
         self.force = self.force + force
 
     def update_velocity(self, delta_time: float):
-        #self.velocity = self.velocity + (self.force / self.mass) * delta_time
+        # self.velocity = self.velocity + (self.force / self.mass) * delta_time
         self.velocity = self.velocity + (self.force * self.inverse_mass) * delta_time
 
     def update_position(self, delta_time: float):
@@ -61,7 +61,9 @@ class Point(PhysObj):
         id: str = None,
         restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, is_static, id, restitution)
+        super().__init__(
+            mass, color, position, velocity, force, is_static, id, restitution
+        )
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
@@ -88,7 +90,9 @@ class ConvexPolygon(PhysObj):
         id: str = None,
         restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, is_static, id, restitution)
+        super().__init__(
+            mass, color, position, velocity, force, is_static, id, restitution
+        )
         self.num_of_sides = num_of_sides
         self.side_length = side_length
         self.angle = angle
@@ -181,7 +185,7 @@ class Rectangle(ConvexPolygon):
         angle: float,
         is_static: bool,
         id: str,
-        restitution, # vet inte om den är en int eller float
+        restitution,  # vet inte om den är en int eller float
         width: int,
         height: int,
     ):
@@ -198,7 +202,8 @@ class Rectangle(ConvexPolygon):
             angle=angle,
             is_static=is_static,
             id=id,
-            restitution=restitution)
+            restitution=restitution,
+        )
 
     def update_vertices(self):
         p = self.position
@@ -238,6 +243,7 @@ class Rectangle(ConvexPolygon):
             and other_y_min < y_max
         )
 
+
 class Circle(PhysObj):
     def __init__(
         self,
@@ -251,7 +257,9 @@ class Circle(PhysObj):
         id: str = None,
         restitution=0,
     ):
-        super().__init__(mass, color, position, velocity, force, is_static, id, restitution)
+        super().__init__(
+            mass, color, position, velocity, force, is_static, id, restitution
+        )
         self.radius = radius
 
     def render(self, view_model):

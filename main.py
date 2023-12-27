@@ -139,7 +139,7 @@ def main():
         num_of_sides=4,
         side_length=500,
         angle=math.pi / 4,
-        is_static=True
+        is_static=True,
     )
 
     static_box2 = ConvexPolygon(
@@ -150,7 +150,7 @@ def main():
         num_of_sides=1000,
         side_length=50,
         angle=math.pi / 4,
-        is_static=True
+        is_static=True,
     )
 
     moving_box = ConvexPolygon(
@@ -168,7 +168,7 @@ def main():
         color=RED,
         position=Vector2D(1200, 300),
         velocity=Vector2D(50, 0),
-        radius=50
+        radius=50,
     )
 
     static_circle = Circle(
@@ -177,25 +177,25 @@ def main():
         position=Vector2D(1380, 300),
         velocity=Vector2D(0, 0),
         radius=50,
-        is_static=True
+        is_static=True,
     )
 
     rect = Rectangle(
         mass=10,
         color=PURPLE,
-        position=Vector2D(500, 500),
+        position=Vector2D(1000, 30),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         angle=math.pi / 4,
-        height=100,
-        width=200,
+        height=50,
+        width=1300,
         is_static=True,
         id=None,
-        restitution=0
+        restitution=0,
     )
 
     state.add_object(rect)
-    #state.add_objects([static_box2, moving_box, moving_circle, static_circle])
+    # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([obj1, obj2])
 
