@@ -74,7 +74,7 @@ def delegate_event(event, state, view_model, UI_manager):
     if event is None:
         return
 
-    if event == "mouse 1":
+    if event == "mouse 1" :
         state.parse_mouse_click(
             Vector2D(*(view_model.convert_coordinates(*pygame.mouse.get_pos()))),
             view_model
@@ -85,6 +85,7 @@ def delegate_event(event, state, view_model, UI_manager):
         if event["input_type"] == "radius":
             state.player_chosen_radius = int(event["text"])
             return
+
         
         if event["input_type"] == "mass":
             state.player_chosen_mass = int(event["text"])
