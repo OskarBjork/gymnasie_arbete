@@ -86,7 +86,7 @@ class State:
                     if position is not None
                     else Vector2D(self.player_chosen_x, self.player_chosen_y)
                     + Vector2D(*ORIGIN),
-                    velocity=Vector2D(500, 0),
+                    velocity=Vector2D(0, 0),
                 )
             else:
                 obj = ConvexPolygon(
