@@ -1,4 +1,5 @@
 from pyng.space.vectors import Vector2D
+from pyng.config import EPSILON
 
 
 def dot_product(v1: Vector2D, v2: Vector2D):
@@ -14,6 +15,22 @@ def projection(polygon, axis):
         min_proj = min(min_proj, dot_product)
         max_proj = max(max_proj, dot_product)
     return min_proj, max_proj
+
+
+def length_squared(v: Vector2D):
+    return v.x * v.x + v.y * v.y
+
+
+def float_nearly_equal(a, b):
+    return abs(a - b) < EPSILON
+
+
+def vector_nearly_equal(v1: Vector2D, v2: Vector2D):
+    return float_nearly_equal(v1.x, v2.x) and float_nearly_equal(v1.y, v2.y)
+
+
+def distance_squared(v1: Vector2D, v2: Vector2D):
+    return length_squared(v1 - v2)
 
 
 def overlaps(projection1, projection2):

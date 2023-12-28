@@ -14,20 +14,19 @@ class PhysObj:
         force=Vector2D(0, 0),
         is_static=False,
         id: str = None,
-        restitution=0,
     ):
         self.mass = mass
         if not is_static:
             self.inverse_mass = 1 / self.mass
         else:
             self.inverse_mass = 0
-        self.position = relative_to_origin(position)
+        self.position = position
         self.velocity = velocity
         self.force = force
         self.color = color
         self.is_static = is_static
         self.id = id
-        self.restitution = restitution
+        self.restitution = 0.5
 
     def is_inside_of(self, other_object) -> bool:
         pass
@@ -59,11 +58,8 @@ class Point(PhysObj):
         force=Vector2D(0, 0),
         is_static=False,
         id: str = None,
-        restitution=0,
     ):
-        super().__init__(
-            mass, color, position, velocity, force, is_static, id, restitution
-        )
+        super().__init__(mass, color, position, velocity, force, is_static, id)
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
@@ -88,11 +84,8 @@ class ConvexPolygon(PhysObj):
         angle=0,
         is_static=False,
         id: str = None,
-        restitution=0,
     ):
-        super().__init__(
-            mass, color, position, velocity, force, is_static, id, restitution
-        )
+        super().__init__(mass, color, position, velocity, force, is_static, id)
         self.num_of_sides = num_of_sides
         self.side_length = side_length
         self.angle = angle
@@ -180,14 +173,13 @@ class Rectangle(ConvexPolygon):
         mass: int,
         color: (int, int, int),
         position: (int, int),
-        velocity: (int, int),
-        force: (int, int),
-        angle: float,
-        is_static: bool,
-        id: str,
-        restitution,  # vet inte om den är en int eller float
         width: int,
         height: int,
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
+        angle=math.pi / 4,
+        is_static=False,
+        id=None,  # vet inte om den är en int eller float
     ):
         self.width = width
         self.height = height
@@ -202,7 +194,6 @@ class Rectangle(ConvexPolygon):
             angle=angle,
             is_static=is_static,
             id=id,
-            restitution=restitution,
         )
 
     def update_vertices(self):
@@ -255,11 +246,8 @@ class Circle(PhysObj):
         radius=1,
         is_static=False,
         id: str = None,
-        restitution=0,
     ):
-        super().__init__(
-            mass, color, position, velocity, force, is_static, id, restitution
-        )
+        super().__init__(mass, color, position, velocity, force, is_static, id)
         self.radius = radius
 
     def render(self, view_model):

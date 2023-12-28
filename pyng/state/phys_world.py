@@ -36,6 +36,8 @@ class PhysWorld:
             Vector2D(0, 1),
         ):
             for obj in objects:
+                if isinstance(obj, Point):
+                    continue
                 min_proj, max_proj = obj.project(axis)
                 if axis.x == 1:
                     projections_x.append((min_proj, max_proj, obj))

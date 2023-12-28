@@ -52,11 +52,10 @@ def main():
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
 
-    state = State()
-
     ui_manager = pygame_gui.UIManager((screen_width, screen_height), "theme.json")
     view_model = ViewModel(screen, ui_manager)
 
+    state = State(view_model=view_model)
     view_model.set_caption("Pyng")
 
     screen.fill(BLACK)
@@ -183,7 +182,7 @@ def main():
     rect = Rectangle(
         mass=10,
         color=PURPLE,
-        position=Vector2D(1000, 30),
+        position=Vector2D(1000, 300),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         angle=math.pi / 4,
@@ -191,10 +190,9 @@ def main():
         width=1300,
         is_static=True,
         id=None,
-        restitution=0,
     )
 
-    state.add_object(rect)
+    # state.add_object(rect)
     # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([obj1, obj2])
@@ -202,6 +200,7 @@ def main():
     running = True
     prev_time = time.time()
     frame_limit = 1 / 60
+    # state.generate_test_data()
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass
