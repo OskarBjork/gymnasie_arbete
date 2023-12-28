@@ -139,43 +139,75 @@ class PhysicsEvaluator:
 
     def check_polygon_collision(self, polygon1, polygon2):
         """Går igenom alla normaler till båda polygonerna och projicerar alla vertexer på dessa, och kollar sedan om de överlappar varandra"""
-        normals1 = self.get_normals(polygon1)
-        normals2 = self.get_normals(polygon2)
+        depth = float("inf")
+        normal = None
 
-        all_normals = normals1 + normals2
+        for polygon in [polygon1, polygon2]:
+            for i in range(len(polygon.vertices)):
+                va = polygon.vertices[i]
+                vb = polygon.vertices[(i + 1) % len(polygon.vertices)]
 
-        min_overlap = float("inf")
-        smallest_axis = None
+                edge = vb - va
+                axis = Vector2D(-edge.y, edge.x)
+                axis = axis.normalize()
 
-        for i, normal in enumerate(all_normals):
-            projection1 = projection(polygon1, normal)
-            projection2 = projection(polygon2, normal)
+                minA, maxA = polygon1.project(axis)
+                minB, maxB = polygon2.project(axis)
 
-            overlap = overlaps(projection1, projection2)
+                if minA >= maxB or minB >= maxA:
+                    return False, None, None
 
-            if not overlap:
-                return False, None, None  # Separating axis found
+                axis_depth = min(maxB - minA, maxA - minB)
 
-            min1 = projection1[0]
-            max1 = projection1[1]
-            min2 = projection2[0]
-            max2 = projection2[1]
+                if axis_depth < depth:
+                    depth = axis_depth
+                    normal = axis
 
-            axis_depth = min(max2 - min1, max1 - min2)
+        direction = polygon2.position - polygon1.position
 
-            if axis_depth < min_overlap:
-                min_overlap = axis_depth
-                smallest_axis = normal
-        # min_overlap = min_overlap / (normal.magnitude())
-        smallest_axis = smallest_axis.normalize()
-        center_1 = polygon1.position
-        center_2 = polygon2.position
-        direction = center_2 - center_1
+        if direction.dot(normal) < 0:
+            normal = Vector2D(-normal.x, -normal.y)
 
-        if smallest_axis.dot(direction) < 0:
-            smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
-        mtv = smallest_axis * min_overlap
-        return True, mtv, smallest_axis  # No separating axis found, polygons overlap
+        mtv = normal * depth
+
+        return True, mtv, normal
+        # normals1 = self.get_normals(polygon1)
+        # normals2 = self.get_normals(polygon2)
+
+        # all_normals = normals1 + normals2
+
+        # min_overlap = float("inf")
+        # smallest_axis = None
+
+        # for i, normal in enumerate(all_normals):
+        #     projection1 = projection(polygon1, normal)
+        #     projection2 = projection(polygon2, normal)
+
+        #     overlap = overlaps(projection1, projection2)
+
+        #     if not overlap:
+        #         return False, None, None  # Separating axis found
+
+        #     min1 = projection1[0]
+        #     max1 = projection1[1]
+        #     min2 = projection2[0]
+        #     max2 = projection2[1]
+
+        #     axis_depth = min(max2 - min1, max1 - min2)
+
+        #     if axis_depth < min_overlap:
+        #         min_overlap = axis_depth
+        #         smallest_axis = normal
+        # # min_overlap = min_overlap / (normal.magnitude())
+        # smallest_axis = smallest_axis.normalize()
+        # center_1 = polygon1.position
+        # center_2 = polygon2.position
+        # direction = center_2 - center_1
+
+        # if smallest_axis.dot(direction) < 0:
+        #     smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
+        # mtv = smallest_axis * min_overlap
+        # return True, mtv, smallest_axis  # No separating axis found, polygons overlap
 
     def check_polygon_circle_collision(self, polygon, circle):
         if isinstance(circle, ConvexPolygon) and isinstance(polygon, Circle):
