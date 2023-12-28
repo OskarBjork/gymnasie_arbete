@@ -35,7 +35,7 @@ class State:
 
         self.default_object = Circle(color=RED, mass=10, radius=10)
         self.player_chosen_mass = 10
-        self.player_chosen_shape = Circle
+        self.player_chosen_shape = "circle"
         self.player_chosen_tool = "force"
         self.player_chosen_radius = 10
         self.player_chosen_color = RED
@@ -87,7 +87,7 @@ class State:
         self.objects = []
 
     def create_object(
-        self, position=None, obj_type="circle", with_gravity=False, manual_spawn=False
+        self, position=None, obj_type=None, with_gravity=False, manual_spawn=False
     ):
         if (
             not self.object_creation_available()
@@ -98,6 +98,10 @@ class State:
             position = relative_to_origin(
                 Vector2D(self.player_chosen_x, self.player_chosen_y)
             )
+
+        if obj_type is None:
+            obj_type = self.player_chosen_shape
+
         obj = None
 
         match obj_type:
@@ -123,7 +127,6 @@ class State:
             self.physics_evaluator.impose_gravity(obj)
 
     def handle_collisions(self):
-        print("Handling collisions\n")
         collisions = self.phys_world.find_collisions(self.objects)
         collision_manifolds = []
         for collision in collisions:
@@ -141,11 +144,9 @@ class State:
             if manifold.contact1 is not None:
                 contact_points.append(manifold.contact1)
             if manifold.contact2 is not None:
-                print("contact2 is not None", manifold.contact2)
                 contact_points.append(manifold.contact2)
 
         for point in contact_points:
-            print(point - Vector2D(*ORIGIN))
             circle = Circle(color=ORANGE, mass=10, position=point, radius=20)
             self.view_model.render_circle(circle)
 

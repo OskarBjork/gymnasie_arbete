@@ -15,7 +15,7 @@ def handle_events(events: list[Event], ui_manager):
             sys.exit()
 
         if (
-                event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED
+            event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED
         ):  # kan ändras till UI_TEXT_ENTRY_CHANGED när inmatningssäker
             if event.ui_object_id == "#radius_input":
                 return {"input_type": "radius", "text": event.text}
@@ -112,14 +112,14 @@ def delegate_event(event, state, view_model, ui_manager):
 
         case "rect":
             view_model.shape = "rect"
-            state.player_chosen_shape = Rectangle
+            state.player_chosen_shape = "rect"
             ui_manager.clear_and_reset()
             view_model.show_spawn_editor()
             view_model.show_mode_buttons()
 
         case "circle":
             view_model.shape = "circle"
-            state.player_chosen_shape = Circle
+            state.player_chosen_shape = "circle"
             ui_manager.clear_and_reset()
             view_model.show_spawn_editor()
             view_model.show_mode_buttons()
