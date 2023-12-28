@@ -61,12 +61,16 @@ class State:
 
             if obj.position.y > 1000:
                 obj.velocity.y = -obj.velocity.y
+                obj.position.y = 1000
             if obj.position.x > 1500:
                 obj.velocity.x = -obj.velocity.x
+                obj.position.x = 1500
             if obj.position.y < ORIGIN[1]:
                 obj.velocity.y = -obj.velocity.y
+                obj.position.y = ORIGIN[1]
             if obj.position.x < ORIGIN[0]:
                 obj.velocity.x = -obj.velocity.x
+                obj.position.x = ORIGIN[0]
             # if (
             #     obj.position.y > 2000
             #     or obj.position.x > 2000
