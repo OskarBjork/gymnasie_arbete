@@ -166,7 +166,7 @@ class PhysicsEvaluator:
             if axis_depth < min_overlap:
                 min_overlap = axis_depth
                 smallest_axis = normal
-        min_overlap = min_overlap / (normal.magnitude())
+        # min_overlap = min_overlap / (normal.magnitude())
         smallest_axis = smallest_axis.normalize()
         center_1 = polygon1.position
         center_2 = polygon2.position
