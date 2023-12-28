@@ -142,39 +142,53 @@ class PhysicsEvaluator:
         normals1 = self.get_normals(polygon1)
         normals2 = self.get_normals(polygon2)
 
-        all_normals = normals1 + normals2
+        depth = float("inf")
+        smallest_axis = Vector2D(0, 0)
 
-        min_overlap = float("inf")
-        smallest_axis = None
+        for i, va in enumerate(normals1):
+            vb = normals1[(i + 1) % len(normals1)]
 
-        for i, normal in enumerate(all_normals):
-            projection1 = projection(polygon1, normal)
-            projection2 = projection(polygon2, normal)
+            edge = Vector2D(vb.x - va.x, vb.y - va.y)
+            axis = Vector2D(-edge.y, edge.x)
+            axis = axis.normalize()
 
-            overlap = overlaps(projection1, projection2)
+            minA, maxA = polygon1.project(axis)
+            minB, maxB = polygon2.project(axis)
 
-            if not overlap:
-                return False, None, None  # Separating axis found
+            if minA >= maxB or minB >= maxA:
+                return False, None, None
 
-            min1 = projection1[0]
-            max1 = projection1[1]
-            min2 = projection2[0]
-            max2 = projection2[1]
+            axis_depth = min(maxB - minA, maxA - minB)
 
-            axis_depth = min(max2 - min1, max1 - min2)
+            if axis_depth < depth:
+                depth = axis_depth
+                smallest_axis = axis
 
-            if axis_depth < min_overlap:
-                min_overlap = axis_depth
-                smallest_axis = normal
-        min_overlap = min_overlap / (normal.magnitude())
-        smallest_axis = smallest_axis.normalize()
-        center_1 = polygon1.position
-        center_2 = polygon2.position
-        direction = center_2 - center_1
+        for i, va in enumerate(normals2):
+            vb = normals2[(i + 1) % len(normals2)]
 
-        if smallest_axis.dot(direction) < 0:
+            edge = Vector2D(vb.x - va.x, vb.y - va.y)
+            axis = Vector2D(-edge.y, edge.x)
+            axis = axis.normalize()
+
+            minA, maxA = polygon1.project(axis)
+            minB, maxB = polygon2.project(axis)
+
+            if minA >= maxB or minB >= maxA:
+                return False, None, None
+
+            axis_depth = min(maxB - minA, maxA - minB)
+
+            if axis_depth < depth:
+                depth = axis_depth
+                smallest_axis = axis
+
+        direction = polygon2.position - polygon1.position
+
+        if direction.dot(smallest_axis) < 0:
             smallest_axis = Vector2D(-smallest_axis.x, -smallest_axis.y)
-        mtv = smallest_axis * min_overlap
+
+        mtv = smallest_axis * depth
         return True, mtv, smallest_axis  # No separating axis found, polygons overlap
 
     def check_polygon_circle_collision(self, polygon, circle):
