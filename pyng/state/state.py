@@ -56,16 +56,24 @@ class State:
             obj.update_velocity(delta_time)
             obj.update_position(delta_time)
             if not obj.is_static:
-                obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+                # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
                 pass
-            if (
-                obj.position.y > 2000
-                or obj.position.x > 2000
-                or obj.position.y < ORIGIN[1]
-                or obj.position.x < ORIGIN[0]
-            ):
-                # self.del_object(obj)
-                pass
+
+            if obj.position.y > 1000:
+                obj.velocity.y = -obj.velocity.y
+            if obj.position.x > 1500:
+                obj.velocity.x = -obj.velocity.x
+            if obj.position.y < ORIGIN[1]:
+                obj.velocity.y = -obj.velocity.y
+            if obj.position.x < ORIGIN[0]:
+                obj.velocity.x = -obj.velocity.x
+            # if (
+            #     obj.position.y > 2000
+            #     or obj.position.x > 2000
+            #     or obj.position.y < ORIGIN[1]
+            #     or obj.position.x < ORIGIN[0]
+            # ):
+            #     pass
 
     def update_all_vertices(self):
         for obj in self.objects:
@@ -187,12 +195,14 @@ class State:
 
     def generate_random_object(self, type_of_object: str):
         if type_of_object == "circle":
+            radius = random.randint(1, 100)
             self.add_objects(
                 [
                     Circle(
                         color=random.choice(COLORS),
-                        mass=random.randint(1, 100),
-                        radius=random.randint(1, 100),
+                        mass=radius,
+                        # mass=10,
+                        radius=radius,
                         # velocity=Vector2D(
                         #     random.randint(-300, 300), random.randint(-300, 300)
                         # ),
@@ -200,17 +210,22 @@ class State:
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
                         + Vector2D(*ORIGIN),  # NOTE: Galen indentation
+                        velocity=Vector2D(
+                            random.randint(-1000, 1000), random.randint(-1000, 1000)
+                        ),
                     ),
                 ]
             )
         elif type_of_object == "polygon":
+            side_length = random.randint(1, 100)
             self.add_objects(
                 [
                     ConvexPolygon(
                         color=random.choice(COLORS),
-                        mass=random.randint(1, 100),
+                        mass=side_length,
+                        # mass=10,
                         num_of_sides=random.randint(3, 10),
-                        side_length=random.randint(1, 100),
+                        side_length=side_length,
                         # velocity=Vector2D(
                         #     random.randint(-300, 300), random.randint(-300, 300)
                         # ),
@@ -218,6 +233,9 @@ class State:
                             random.randint(100, 1000), random.randint(100, 1000)
                         )
                         + Vector2D(*ORIGIN),  # NOTE: Galen indentation
+                        velocity=Vector2D(
+                            random.randint(-1000, 1000), random.randint(-1000, 1000)
+                        ),
                     )
                 ],
             )

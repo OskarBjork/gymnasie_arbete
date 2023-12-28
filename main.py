@@ -190,10 +190,9 @@ def main():
         width=1300,
         is_static=True,
         id=None,
-        restitution=0,
     )
 
-    state.add_object(rect)
+    # state.add_object(rect)
     # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([obj1, obj2])
@@ -201,6 +200,7 @@ def main():
     running = True
     prev_time = time.time()
     frame_limit = 1 / 60
+    # state.generate_test_data()
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass

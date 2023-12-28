@@ -24,9 +24,9 @@ class PhysicsEvaluator:
             return
         collision_analysis = self.check_any_collision(obj, other_obj)
         collision_happened = collision_analysis[0]
-        normal = collision_analysis[2]
-        displacement = collision_analysis[1]
         if collision_happened:
+            normal = collision_analysis[2]
+            displacement = collision_analysis[1]
             contact_points = self.find_contact_points(obj, other_obj)
             manifold = CollisionManifold(
                 obj,
@@ -154,7 +154,7 @@ class PhysicsEvaluator:
             overlap = overlaps(projection1, projection2)
 
             if not overlap:
-                return False, None  # Separating axis found
+                return False, None, None  # Separating axis found
 
             min1 = projection1[0]
             max1 = projection1[1]
