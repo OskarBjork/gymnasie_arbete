@@ -68,14 +68,16 @@ class PhysicsEvaluator:
         if isinstance(object1, Circle) and isinstance(object2, Circle):
             self.resolve_circle_collision(object1, object2, manifold.depth)
         elif isinstance(object1, ConvexPolygon) and isinstance(object2, ConvexPolygon):
-            self.resolve_polygon_collision(object1, object2, manifold.depth)
+            self.resolve_polygon_collision(
+                object1, object2, manifold.depth, manifold.normal
+            )
         elif isinstance(object1, ConvexPolygon) and isinstance(object2, Circle):
             self.resolve_polygon_circle_collision(object2, object1, manifold.depth)
         elif isinstance(object1, Circle) and isinstance(object2, ConvexPolygon):
             self.resolve_polygon_circle_collision(object1, object2, manifold.depth)
 
     def resolve_polygon_collision(
-        self, obj: ConvexPolygon, other_obj: ConvexPolygon, mtv
+        self, obj: ConvexPolygon, other_obj: ConvexPolygon, mtv, normal
     ):
         if obj.is_static:
             other_obj.position = other_obj.position + mtv
@@ -84,7 +86,7 @@ class PhysicsEvaluator:
         else:
             obj.position = obj.position - (mtv / 2)
             other_obj.position = other_obj.position + (mtv / 2)
-        self.collision_response(obj, other_obj, mtv)
+        self.collision_response(obj, other_obj, normal)
 
     def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
         direction = obj.position - other_obj.position
@@ -264,40 +266,44 @@ class PhysicsEvaluator:
 
         obj2.velocity = obj1_momentum * obj2.inverse_mass
 
-    def collision_response(self, obj1, obj2, mtv):
-        if mtv.magnitude() == 0:
+    def collision_response(self, obj1, obj2, normal):
+        if normal.magnitude() == 0:
             return
-        mtv = mtv.normalize()
+        normal = normal.normalize()
         relative_velocity = obj1.velocity - obj2.velocity
         if (
             isinstance(obj1, ConvexPolygon)
             and isinstance(obj2, ConvexPolygon)
-            and relative_velocity.dot(mtv) < 0
+            and relative_velocity.dot(normal) < 0
         ):
             return
         if (
             isinstance(obj1, Circle) and isinstance(obj2, ConvexPolygon)
-        ) and relative_velocity.dot(mtv) > 0:
+        ) and relative_velocity.dot(normal) > 0:
             return
         if (
             isinstance(obj2, ConvexPolygon) and isinstance(obj1, Circle)
-        ) and relative_velocity.dot(mtv) > 0:
+        ) and relative_velocity.dot(normal) > 0:
             return
 
         e = min(obj1.restitution, obj2.restitution)
-        j = -(1 + e) * relative_velocity.dot(mtv)
+        j = -(1 + e) * relative_velocity.dot(normal)
         j /= obj1.inverse_mass + obj2.inverse_mass
 
-        impulse = mtv * j
-        # print("mtv: ", mtv)
+        impulse = normal * j
+        # print("normal: ", normal)
         # print(
         #     f"{obj2.id} Velocity Change", (impulse * obj1.inverse_mass).vector_round()
         # )
         # print(
         #     f"{obj1.id} Velocity Change", (impulse * obj2.inverse_mass).vector_round()
         # )
-        obj1.velocity = obj1.velocity + (mtv * (j * obj1.inverse_mass)).vector_round()
-        obj2.velocity = obj2.velocity - (mtv * (j * obj2.inverse_mass)).vector_round()
+        obj1.velocity = (
+            obj1.velocity + (normal * (j * obj1.inverse_mass)).vector_round()
+        )
+        obj2.velocity = (
+            obj2.velocity - (normal * (j * obj2.inverse_mass)).vector_round()
+        )
         # print(obj1.velocity, obj1.id)
         # print(obj2.velocity, obj2.id)
 

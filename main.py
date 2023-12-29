@@ -251,7 +251,7 @@ def main():
     running = True
     prev_time = time.time()
     frame_limit = 1 / 60
-    # state.generate_test_data()
+    state.generate_test_data(scale=5)
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass
@@ -264,7 +264,7 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
-        state.step(dt / 8)
+        state.step(dt)
 
         state.handle_collisions()
 

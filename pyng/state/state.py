@@ -198,7 +198,7 @@ class State:
             else:
                 return position
 
-    def generate_random_object(self, type_of_object: str):
+    def generate_random_object(self, type_of_object: str, scale=1):
         if type_of_object == "circle":
             radius = random.randint(1, 100)
             self.add_objects(
@@ -216,7 +216,8 @@ class State:
                         )
                         + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                         velocity=Vector2D(
-                            random.randint(-1000, 1000), random.randint(-1000, 1000)
+                            random.randint(-100, 100) * scale,
+                            random.randint(-100, 100) * scale,
                         ),
                     ),
                 ]
@@ -239,14 +240,15 @@ class State:
                         )
                         + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                         velocity=Vector2D(
-                            random.randint(-1000, 1000), random.randint(-1000, 1000)
+                            random.randint(-100, 100) * scale,
+                            random.randint(-100, 100) * scale,
                         ),
                         angle=random.randint(0, 360) * (math.pi / 180),
                     )
                 ],
             )
 
-    def generate_test_data(self):
+    def generate_test_data(self, scale=1):
         for _ in range(20):
             type_of_object = random.choice(["polygon", "circle"])
-            self.generate_random_object(type_of_object)
+            self.generate_random_object(type_of_object, scale)
