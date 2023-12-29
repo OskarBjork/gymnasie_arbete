@@ -19,6 +19,9 @@ class Vector2D:
     def magnitude(self) -> float:
         return vector_magnitude(self)
 
+    def vector_round(self):
+        return Vector2D(round(self.x, 5), round(self.y, 5))
+
     def normalize(self):
         """
         Att normalisera en vektor innebär att man ändrar

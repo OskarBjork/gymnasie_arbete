@@ -269,14 +269,37 @@ class PhysicsEvaluator:
             return
         mtv = mtv.normalize()
         relative_velocity = obj1.velocity - obj2.velocity
+        if (
+            isinstance(obj1, ConvexPolygon)
+            and isinstance(obj2, ConvexPolygon)
+            and relative_velocity.dot(mtv) < 0
+        ):
+            return
+        if (
+            isinstance(obj1, Circle) and isinstance(obj2, ConvexPolygon)
+        ) and relative_velocity.dot(mtv) > 0:
+            return
+        if (
+            isinstance(obj2, ConvexPolygon) and isinstance(obj1, Circle)
+        ) and relative_velocity.dot(mtv) > 0:
+            return
+
         e = min(obj1.restitution, obj2.restitution)
-        j = (
-            -(1 + e)
-            * relative_velocity.dot(mtv)
-            / (mtv.magnitude() ** 2 * (obj1.inverse_mass + obj2.inverse_mass))
-        )
-        obj1.velocity = obj1.velocity + (mtv * (j * obj1.inverse_mass))
-        obj2.velocity = obj2.velocity - (mtv * (j * obj2.inverse_mass))
+        j = -(1 + e) * relative_velocity.dot(mtv)
+        j /= obj1.inverse_mass + obj2.inverse_mass
+
+        impulse = mtv * j
+        # print("mtv: ", mtv)
+        # print(
+        #     f"{obj2.id} Velocity Change", (impulse * obj1.inverse_mass).vector_round()
+        # )
+        # print(
+        #     f"{obj1.id} Velocity Change", (impulse * obj2.inverse_mass).vector_round()
+        # )
+        obj1.velocity = obj1.velocity + (mtv * (j * obj1.inverse_mass)).vector_round()
+        obj2.velocity = obj2.velocity - (mtv * (j * obj2.inverse_mass)).vector_round()
+        # print(obj1.velocity, obj1.id)
+        # print(obj2.velocity, obj2.id)
 
     def point_segment_distance(self, point, a, b):
         ab = b - a

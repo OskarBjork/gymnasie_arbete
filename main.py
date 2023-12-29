@@ -12,6 +12,7 @@ import time
 import sys
 import math
 import random
+import os
 
 import pygame
 import pygame_gui
@@ -40,6 +41,10 @@ from pyng.config import (
     COLORS,
 )
 from simulation.event_handler import handle_events, delegate_event
+
+os.environ[
+    "SDL_VIDEO_WINDOW_POS"
+] = "1920, 0"  # Kommentera bort ifall man inte vill att fönstret ska öppnas på en annan skärm
 
 
 def main():
@@ -181,20 +186,33 @@ def main():
 
     rect = Rectangle(
         mass=10,
-        color=PURPLE,
-        position=Vector2D(750, 300),
+        color=BLUE,
+        position=Vector2D(800, 200),
         velocity=Vector2D(0, 0),
-        force=Vector2D(0, 0),
+        force=Vector2D(100, 50),
         angle=math.pi / 4,
         height=50,
-        width=50,
+        width=1000,
+        is_static=True,
+        id="blue",
+    )
+
+    polygon1 = ConvexPolygon(
+        mass=10,
+        color=BLUE,
+        num_of_sides=6,
+        side_length=50,
+        position=Vector2D(300, 100),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(1000, 500),
+        angle=math.pi / 4,
         is_static=False,
-        id=None,
+        id="blue",
     )
 
     rect2 = Rectangle(
         mass=10,
-        color=PURPLE,
+        color=RED,
         position=Vector2D(300, 100),
         velocity=Vector2D(100, 50),
         force=Vector2D(0, 0),
@@ -202,16 +220,16 @@ def main():
         height=50,
         width=50,
         is_static=False,
-        id=None,
+        id="red",
     )
 
     circle = Circle(
         mass=1.5,
         color=RED,
-        position=Vector2D(300, 100),
-        velocity=Vector2D(100, 50),
+        position=Vector2D(750, 300),
+        velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
-        radius=10,
+        radius=100,
         id="red",
     )
 
@@ -228,7 +246,7 @@ def main():
     # state.add_object(rect)
     # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
-    # state.add_objects([rect2, rect])
+    # state.add_objects([circle, polygon1])
 
     running = True
     prev_time = time.time()
@@ -246,7 +264,7 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
-        state.step(dt)
+        state.step(dt / 8)
 
         state.handle_collisions()
 

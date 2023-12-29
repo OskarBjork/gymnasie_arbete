@@ -130,8 +130,8 @@ class State:
                     color=RED,
                     mass=self.player_chosen_mass,
                     position=position,
-                    width=10,
-                    height=10,
+                    width=100,
+                    height=100,
                 )
 
         self.add_objects([obj])
@@ -229,7 +229,7 @@ class State:
                         color=random.choice(COLORS),
                         mass=side_length,
                         # mass=10,
-                        num_of_sides=random.randint(4, 6),
+                        num_of_sides=random.randint(3, 8),
                         side_length=side_length,
                         # velocity=Vector2D(
                         #     random.randint(-300, 300), random.randint(-300, 300)
@@ -248,5 +248,5 @@ class State:
 
     def generate_test_data(self):
         for _ in range(20):
-            type_of_object = random.choice(["polygon"])
+            type_of_object = random.choice(["polygon", "circle"])
             self.generate_random_object(type_of_object)
