@@ -187,12 +187,12 @@ def main():
     rect = Rectangle(
         mass=10,
         color=BLUE,
-        position=Vector2D(800, 200),
+        position=Vector2D(850, ORIGIN[1] + 100),
         velocity=Vector2D(0, 0),
         force=Vector2D(100, 50),
         angle=math.pi / 4,
         height=50,
-        width=1000,
+        width=1100,
         is_static=True,
         id="blue",
     )
@@ -264,8 +264,8 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
-        state.step(dt)
 
+        state.step(dt)
         state.handle_collisions()
 
         view_model.render_objects(state.objects)

@@ -65,6 +65,8 @@ class PhysicsEvaluator:
     def resolve_any_collision(self, manifold: CollisionManifold):
         object1 = manifold.body_A
         object2 = manifold.body_B
+        if object1.is_static and object2.is_static:
+            return
         if isinstance(object1, Circle) and isinstance(object2, Circle):
             self.resolve_circle_collision(object1, object2, manifold.depth)
         elif isinstance(object1, ConvexPolygon) and isinstance(object2, ConvexPolygon):

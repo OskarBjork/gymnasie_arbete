@@ -60,12 +60,12 @@ class State:
                 # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
                 pass
 
-            if obj.position.y > 1000:
+            if obj.position.y > 1000 + ORIGIN[1]:
                 obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
-                obj.position.y = 1000
-            if obj.position.x > 1500:
+                obj.position.y = 1000 + ORIGIN[1]
+            if obj.position.x > 1500 + ORIGIN[0]:
                 obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
-                obj.position.x = 1500
+                obj.position.x = 1500 + ORIGIN[0]
             if obj.position.y < ORIGIN[1]:
                 obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
                 obj.position.y = ORIGIN[1]
