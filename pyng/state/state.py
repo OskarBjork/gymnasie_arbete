@@ -7,6 +7,7 @@ from pyng.config import (
     COLORS,
     OBJECT_CREATION_COOLDOWN,
     ORANGE,
+    GLOBAL_ELASTICITY,
 )
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle, Point
 from pyng.state.physics_evaluator import PhysicsEvaluator
@@ -60,16 +61,16 @@ class State:
                 pass
 
             if obj.position.y > 1000:
-                obj.velocity.y = -obj.velocity.y
+                obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
                 obj.position.y = 1000
             if obj.position.x > 1500:
-                obj.velocity.x = -obj.velocity.x
+                obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
                 obj.position.x = 1500
             if obj.position.y < ORIGIN[1]:
-                obj.velocity.y = -obj.velocity.y
+                obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
                 obj.position.y = ORIGIN[1]
             if obj.position.x < ORIGIN[0]:
-                obj.velocity.x = -obj.velocity.x
+                obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
                 obj.position.x = ORIGIN[0]
             # if (
             #     obj.position.y > 2000
@@ -228,7 +229,7 @@ class State:
                         color=random.choice(COLORS),
                         mass=side_length,
                         # mass=10,
-                        num_of_sides=random.randint(3, 6),
+                        num_of_sides=random.randint(4, 6),
                         side_length=side_length,
                         # velocity=Vector2D(
                         #     random.randint(-300, 300), random.randint(-300, 300)
@@ -247,5 +248,5 @@ class State:
 
     def generate_test_data(self):
         for _ in range(20):
-            type_of_object = random.choice(["polygon", "circle"])
+            type_of_object = random.choice(["polygon"])
             self.generate_random_object(type_of_object)

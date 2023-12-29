@@ -10,7 +10,7 @@ from pyng.helper import (
     float_nearly_equal,
     vector_nearly_equal,
 )
-from pyng.config import GRAVITY_CONSTANT
+from pyng.config import GRAVITY_CONSTANT, PIXELS_PER_METER
 from pyng.space.collision import CollisionManifold
 import math
 

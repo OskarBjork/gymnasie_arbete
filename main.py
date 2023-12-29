@@ -192,15 +192,35 @@ def main():
         id=None,
     )
 
+    circle = Circle(
+        mass=1.5,
+        color=RED,
+        position=Vector2D(700, 300),
+        velocity=Vector2D(-50, 0),
+        force=Vector2D(0, 0),
+        radius=10,
+        id="red",
+    )
+
+    circle2 = Circle(
+        mass=0.5,
+        color=BLUE,
+        position=Vector2D(500, 300),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
+        radius=10,
+        id="blue",
+    )
+
     # state.add_object(rect)
     # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
-    # state.add_objects([obj1, obj2])
+    # state.add_objects([circle, circle2])
 
     running = True
     prev_time = time.time()
     frame_limit = 1 / 60
-    state.generate_test_data()
+    # state.generate_test_data()
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass

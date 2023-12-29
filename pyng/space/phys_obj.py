@@ -1,5 +1,5 @@
 from pyng.space.vectors import Vector2D
-from pyng.config import RED, ORIGIN
+from pyng.config import RED, ORIGIN, PIXELS_PER_METER, GLOBAL_ELASTICITY
 from pyng.space.interface.view_model import ViewModel, relative_to_origin
 import math
 
@@ -26,7 +26,7 @@ class PhysObj:
         self.color = color
         self.is_static = is_static
         self.id = id
-        self.restitution = 0.5
+        self.restitution = GLOBAL_ELASTICITY
 
     def is_inside_of(self, other_object) -> bool:
         pass
