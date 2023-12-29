@@ -155,7 +155,7 @@ def main():
     moving_box = ConvexPolygon(
         mass=100,
         color=PURPLE,
-        position=Vector2D(1200, 600),
+        position=Vector2D(500, 600),
         velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
@@ -182,21 +182,34 @@ def main():
     rect = Rectangle(
         mass=10,
         color=PURPLE,
-        position=Vector2D(1000, 300),
+        position=Vector2D(750, 300),
         velocity=Vector2D(0, 0),
         force=Vector2D(0, 0),
         angle=math.pi / 4,
         height=50,
-        width=1300,
-        is_static=True,
+        width=50,
+        is_static=False,
+        id=None,
+    )
+
+    rect2 = Rectangle(
+        mass=10,
+        color=PURPLE,
+        position=Vector2D(300, 100),
+        velocity=Vector2D(100, 50),
+        force=Vector2D(0, 0),
+        angle=math.pi / 4,
+        height=50,
+        width=50,
+        is_static=False,
         id=None,
     )
 
     circle = Circle(
         mass=1.5,
         color=RED,
-        position=Vector2D(700, 300),
-        velocity=Vector2D(-50, 0),
+        position=Vector2D(300, 100),
+        velocity=Vector2D(100, 50),
         force=Vector2D(0, 0),
         radius=10,
         id="red",
@@ -215,7 +228,7 @@ def main():
     # state.add_object(rect)
     # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
-    # state.add_objects([circle, circle2])
+    # state.add_objects([rect2, rect])
 
     running = True
     prev_time = time.time()
