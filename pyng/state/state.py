@@ -84,6 +84,8 @@ class State:
                 # ):
                 #     pass
 
+            self.handle_collisions()
+
     def update_all_vertices(self):
         for obj in self.objects:
             if isinstance(obj, Circle) or isinstance(obj, Point):
@@ -134,8 +136,8 @@ class State:
                     color=RED,
                     mass=self.player_chosen_mass,
                     position=position,
-                    width=100,
-                    height=100,
+                    width=50,
+                    height=50,
                 )
 
         self.add_objects([obj])

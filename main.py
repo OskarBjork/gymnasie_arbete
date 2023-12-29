@@ -267,7 +267,6 @@ def main():
         delegate_event(event, state, view_model, ui_manager)
 
         state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
-        state.handle_collisions()
 
         view_model.render_objects(state.objects)
 
