@@ -39,6 +39,7 @@ from pyng.config import (
     GRAY,
     LIGHT_BLUE,
     COLORS,
+    RESOLUTION_ITERATIONS,
 )
 from simulation.event_handler import handle_events, delegate_event
 
@@ -185,7 +186,7 @@ def main():
     )
 
     rect = Rectangle(
-        mass=10,
+        mass=1000000000,
         color=BLUE,
         position=Vector2D(850, ORIGIN[1] + 100),
         velocity=Vector2D(0, 0),
@@ -251,7 +252,7 @@ def main():
     running = True
     prev_time = time.time()
     frame_limit = 1 / 60
-    state.generate_test_data(scale=5)
+    # state.generate_test_data(scale=5)
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass
@@ -265,7 +266,7 @@ def main():
 
         delegate_event(event, state, view_model, ui_manager)
 
-        state.step(dt)
+        state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
         state.handle_collisions()
 
         view_model.render_objects(state.objects)

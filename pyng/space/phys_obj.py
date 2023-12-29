@@ -35,6 +35,11 @@ class PhysObj:
     def add_force(self, force: Vector2D):
         self.force = self.force + force
 
+    def step(self, delta_time: float, iterations=1):
+        delta_time = delta_time / iterations
+        self.update_velocity(delta_time)
+        self.update_position(delta_time)
+
     def update_velocity(self, delta_time: float):
         # self.velocity = self.velocity + (self.force / self.mass) * delta_time
         self.velocity = self.velocity + (self.force * self.inverse_mass) * delta_time

@@ -42,6 +42,8 @@ class State:
         self.player_chosen_color = RED
         self.player_chosen_x = 0
         self.player_chosen_y = 0
+        self.min_iterations = 1
+        self.max_iterations = 128
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
@@ -50,35 +52,37 @@ class State:
                 self.create_object(position=mouse_pos)
             # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
 
-    def step(self, delta_time: float):
-        self.update_all_vertices()
-        for obj in self.objects:
-            # TODO: Fixa +=
-            obj.update_velocity(delta_time)
-            obj.update_position(delta_time)
-            if not obj.is_static:
-                # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
-                pass
+    def step(self, delta_time: float, iterations=1):
+        iterations = max(self.min_iterations, iterations)
 
-            if obj.position.y > 1000 + ORIGIN[1]:
-                obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
-                obj.position.y = 1000 + ORIGIN[1]
-            if obj.position.x > 1500 + ORIGIN[0]:
-                obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
-                obj.position.x = 1500 + ORIGIN[0]
-            if obj.position.y < ORIGIN[1]:
-                obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
-                obj.position.y = ORIGIN[1]
-            if obj.position.x < ORIGIN[0]:
-                obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
-                obj.position.x = ORIGIN[0]
-            # if (
-            #     obj.position.y > 2000
-            #     or obj.position.x > 2000
-            #     or obj.position.y < ORIGIN[1]
-            #     or obj.position.x < ORIGIN[0]
-            # ):
-            #     pass
+        for _ in range(iterations):
+            self.update_all_vertices()
+            for obj in self.objects:
+                # TODO: Fixa +=
+                obj.step(delta_time, iterations)
+                if not obj.is_static:
+                    obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+                    pass
+
+                if obj.position.y > 1000 + ORIGIN[1]:
+                    obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
+                    obj.position.y = 1000 + ORIGIN[1]
+                if obj.position.x > 1500 + ORIGIN[0]:
+                    obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
+                    obj.position.x = 1500 + ORIGIN[0]
+                if obj.position.y < ORIGIN[1]:
+                    obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
+                    obj.position.y = ORIGIN[1]
+                if obj.position.x < ORIGIN[0]:
+                    obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
+                    obj.position.x = ORIGIN[0]
+                # if (
+                #     obj.position.y > 2000
+                #     or obj.position.x > 2000
+                #     or obj.position.y < ORIGIN[1]
+                #     or obj.position.x < ORIGIN[0]
+                # ):
+                #     pass
 
     def update_all_vertices(self):
         for obj in self.objects:
