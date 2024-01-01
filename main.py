@@ -1,13 +1,3 @@
-# TODO: Ta bort all third-part dependencies förutom pygame
-# TODO: Gör så att mindre upplösning ger samma information
-# TODO: Ta bort allt klotter härifrån och sätt det in i andra klasser
-# TODO: TYPE ANNOTATIONS!
-
-
-# TODO: Collision detection
-# Broad phase: bounding volume hierarchies
-# Narrow phase: Separating axis theorem
-
 import time
 import sys
 import math
@@ -42,6 +32,16 @@ from pyng.config import (
     RESOLUTION_ITERATIONS,
 )
 from simulation.event_handler import handle_events, delegate_event
+
+
+# TODO: Gör så att mindre upplösning ger samma information
+# TODO: Ta bort allt klotter härifrån och sätt det in i andra klasser
+# TODO: TYPE ANNOTATIONS!
+# TODO: Skapa ett sätt för användaren att mäta tid
+# TODO: Skapa ett sätt för användaren att mäta distans
+# TODO: Skapa ett sätt för användaren att inspektera objekt och se deras egenskaper
+# TODO: Skapa ett sätt för användaren att kontrollera objekt
+
 
 os.environ[
     "SDL_VIDEO_WINDOW_POS"
