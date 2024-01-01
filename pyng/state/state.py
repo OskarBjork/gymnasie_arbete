@@ -42,6 +42,7 @@ class State:
         self.player_chosen_color = RED
         self.player_chosen_x = 0
         self.player_chosen_y = 0
+        self.is_paused = False
         self.min_iterations = 1
         self.max_iterations = 128
         pass
@@ -50,7 +51,6 @@ class State:
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
                 self.create_object(position=mouse_pos)
-            # if view_model.ui_mode == True: #om man är i "spawn" läge, måste få tillgång till ui_mode på nåt sätt
 
     def step(self, delta_time: float, iterations=1):
         iterations = max(self.min_iterations, iterations)
@@ -110,7 +110,7 @@ class State:
         self, position=None, obj_type=None, with_gravity=False, manual_spawn=False
     ):
         if (
-            not self.object_creation_available()
+            not self.object_creation_available(position)
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
 
@@ -170,11 +170,30 @@ class State:
             circle = Circle(color=ORANGE, mass=10, position=point, radius=20)
             self.view_model.render_circle(circle)
 
-    def object_creation_available(self):
-        return (
+    def object_creation_available(self, creation_request_position):
+        if not ( # Kollar om tillräckligt med tid har gått sedan senaste objektet skapats.
             time.time() - self.time_since_last_object_creation
             > OBJECT_CREATION_COOLDOWN
-        )
+        ):
+            return False
+        
+        # Förhindrar att objektet skapas på samma koordinater som det tidigare, vilket annars skulle resultera i ett AssertionError.    
+        if len(self.objects) > 0:
+            if creation_request_position is None: # NOTE: Om input från UI   
+                if (
+                    self.objects[-1].position.x == self.player_chosen_x + ORIGIN[0]
+                and self.objects[-1].position.y == self.player_chosen_y + ORIGIN[1]
+                ):
+                    return False
+            else: # NOTE: Om input från mus
+                if (
+                    self.objects[-1].position.x == creation_request_position.x
+                and self.objects[-1].position.y == creation_request_position.y
+                ):
+                    return False   
+
+        # Om inget False returnas så returnas True istället
+        return True
 
     def generate_random_position(self):
         while True:

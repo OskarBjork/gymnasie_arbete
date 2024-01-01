@@ -66,7 +66,10 @@ def main():
 
     screen.fill(BLACK)
 
-    view_model.show_mode_buttons()
+    # TEST TEMPORÄRT
+    square_image = pygame.image.load("data/images/square.png").convert_alpha()
+
+    view_model.show_mode_buttons(square_image)
     view_model.show_spawn_editor()
 
     obj1 = ConvexPolygon(
@@ -245,7 +248,7 @@ def main():
     )
 
     # state.add_object(rect)
-    # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
+    state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([circle, polygon1])
 
@@ -265,8 +268,11 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
-
-        state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
+        
+        # Slutar beräkna fysiken ifall användaren har pausat simulationen
+        if not state.is_paused: 
+            state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
+            state.handle_collisions()
 
         view_model.render_objects(state.objects)
 
