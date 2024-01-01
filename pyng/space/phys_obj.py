@@ -21,6 +21,7 @@ class PhysObj:
             self.inverse_mass = 1 / self.mass
         else:
             self.inverse_mass = 0
+            self.rotational_inertia = 0
         self.position = position
         self.velocity = velocity
         self.force = force
@@ -213,6 +214,10 @@ class Rectangle(ConvexPolygon):
             is_static=is_static,
             id=id,
         )
+        self.rotational_inertia = (
+            1 / 12 * self.mass * (self.width**2 + self.height**2)
+        )
+        self.inverse_rotational_inertia = 1 / self.rotational_inertia
         self.calculate_bounding_box()
 
     def update_vertices(self):
@@ -268,6 +273,8 @@ class Circle(PhysObj):
     ):
         super().__init__(mass, color, position, velocity, force, is_static, id)
         self.radius = radius
+        self.rotational_inertia = 1 / 2 * self.mass * self.radius**2
+        self.inverse_rotational_inertia = 1 / self.rotational_inertia
         self.calculate_bounding_box()
 
     def render(self, view_model):
