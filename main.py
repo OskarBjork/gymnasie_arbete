@@ -1,17 +1,8 @@
-# TODO: Ta bort all third-part dependencies förutom pygame
-# TODO: Gör så att mindre upplösning ger samma information
-# TODO: Ta bort allt klotter härifrån och sätt det in i andra klasser
-# TODO: TYPE ANNOTATIONS!
-
-
-# TODO: Collision detection
-# Broad phase: bounding volume hierarchies
-# Narrow phase: Separating axis theorem
-
 import time
 import sys
 import math
 import random
+import os
 
 import pygame
 import pygame_gui
@@ -38,8 +29,23 @@ from pyng.config import (
     GRAY,
     LIGHT_BLUE,
     COLORS,
+    RESOLUTION_ITERATIONS,
 )
 from simulation.event_handler import handle_events, delegate_event
+
+
+# TODO: Gör så att mindre upplösning ger samma information
+# TODO: Ta bort allt klotter härifrån och sätt det in i andra klasser
+# TODO: TYPE ANNOTATIONS!
+# TODO: Skapa ett sätt för användaren att mäta tid
+# TODO: Skapa ett sätt för användaren att mäta distans
+# TODO: Skapa ett sätt för användaren att inspektera objekt och se deras egenskaper
+# TODO: Skapa ett sätt för användaren att kontrollera objekt
+
+
+os.environ[
+    "SDL_VIDEO_WINDOW_POS"
+] = "1920, 0"  # Kommentera bort ifall man inte vill att fönstret ska öppnas på en annan skärm
 
 
 def main():
@@ -158,7 +164,7 @@ def main():
     moving_box = ConvexPolygon(
         mass=100,
         color=PURPLE,
-        position=Vector2D(1200, 600),
+        position=Vector2D(500, 600),
         velocity=Vector2D(100, 0),
         num_of_sides=4,
         side_length=100,
@@ -183,27 +189,73 @@ def main():
     )
 
     rect = Rectangle(
-        mass=10,
-        color=PURPLE,
-        position=Vector2D(1000, 300),
+        mass=1000000000,
+        color=BLUE,
+        position=Vector2D(850, ORIGIN[1] + 100),
         velocity=Vector2D(0, 0),
+        force=Vector2D(100, 50),
+        angle=math.pi / 4,
+        height=50,
+        width=1100,
+        is_static=True,
+        id="blue",
+    )
+
+    polygon1 = ConvexPolygon(
+        mass=10,
+        color=BLUE,
+        num_of_sides=6,
+        side_length=50,
+        position=Vector2D(300, 100),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(1000, 500),
+        angle=math.pi / 4,
+        is_static=False,
+        id="blue",
+    )
+
+    rect2 = Rectangle(
+        mass=10,
+        color=RED,
+        position=Vector2D(300, 100),
+        velocity=Vector2D(100, 50),
         force=Vector2D(0, 0),
         angle=math.pi / 4,
         height=50,
-        width=1300,
-        is_static=True,
-        id=None,
+        width=50,
+        is_static=False,
+        id="red",
+    )
+
+    circle = Circle(
+        mass=1.5,
+        color=RED,
+        position=Vector2D(750, 300),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
+        radius=100,
+        id="red",
+    )
+
+    circle2 = Circle(
+        mass=0.5,
+        color=BLUE,
+        position=Vector2D(500, 300),
+        velocity=Vector2D(0, 0),
+        force=Vector2D(0, 0),
+        radius=10,
+        id="blue",
     )
 
     # state.add_object(rect)
     state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
-    # state.add_objects([obj1, obj2])
+    # state.add_objects([circle, polygon1])
 
     running = True
     prev_time = time.time()
     frame_limit = 1 / 60
-    # state.generate_test_data()
+    state.generate_test_data(scale=5)
     while running:
         ui_refresh_rate = clock.tick(FPS) / 1000
         # TODO: Omstrukturera tid in i egen funktion/klass
@@ -219,7 +271,7 @@ def main():
         
         # Slutar beräkna fysiken ifall användaren har pausat simulationen
         if not state.is_paused: 
-            state.step(dt)
+            state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
             state.handle_collisions()
 
         view_model.render_objects(state.objects)

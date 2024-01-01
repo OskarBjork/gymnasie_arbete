@@ -7,6 +7,7 @@ from pyng.config import (
     COLORS,
     OBJECT_CREATION_COOLDOWN,
     ORANGE,
+    GLOBAL_ELASTICITY,
 )
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle, Point
 from pyng.state.physics_evaluator import PhysicsEvaluator
@@ -42,6 +43,8 @@ class State:
         self.player_chosen_x = 0
         self.player_chosen_y = 0
         self.is_paused = False
+        self.min_iterations = 1
+        self.max_iterations = 128
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
@@ -49,31 +52,40 @@ class State:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
                 self.create_object(position=mouse_pos)
 
-    def step(self, delta_time: float):
-        self.update_all_vertices()
-        for obj in self.objects:
-            # TODO: Fixa +=
-            obj.update_velocity(delta_time)
-            obj.update_position(delta_time)
-            if not obj.is_static:
-                # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
-                pass
+    def step(self, delta_time: float, iterations=1):
+        iterations = max(self.min_iterations, iterations)
 
-            if obj.position.y > 1000:
-                obj.velocity.y = -obj.velocity.y
-            if obj.position.x > 1500:
-                obj.velocity.x = -obj.velocity.x
-            if obj.position.y < ORIGIN[1]:
-                obj.velocity.y = -obj.velocity.y
-            if obj.position.x < ORIGIN[0]:
-                obj.velocity.x = -obj.velocity.x
-            # if (
-            #     obj.position.y > 2000
-            #     or obj.position.x > 2000
-            #     or obj.position.y < ORIGIN[1]
-            #     or obj.position.x < ORIGIN[0]
-            # ):
-            #     pass
+        for _ in range(iterations):
+            self.update_all_vertices()
+            for obj in self.objects:
+                obj.calculate_bounding_box()
+                # TODO: Fixa +=
+                obj.step(delta_time, iterations)
+                if not obj.is_static:
+                    # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+                    pass
+
+                if obj.position.y > 1000 + ORIGIN[1]:
+                    obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
+                    obj.position.y = 1000 + ORIGIN[1]
+                if obj.position.x > 1500 + ORIGIN[0]:
+                    obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
+                    obj.position.x = 1500 + ORIGIN[0]
+                if obj.position.y < ORIGIN[1]:
+                    obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
+                    obj.position.y = ORIGIN[1]
+                if obj.position.x < ORIGIN[0]:
+                    obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
+                    obj.position.x = ORIGIN[0]
+                # if (
+                #     obj.position.y > 2000
+                #     or obj.position.x > 2000
+                #     or obj.position.y < ORIGIN[1]
+                #     or obj.position.x < ORIGIN[0]
+                # ):
+                #     pass
+
+            self.handle_collisions()
 
     def update_all_vertices(self):
         for obj in self.objects:
@@ -125,8 +137,8 @@ class State:
                     color=RED,
                     mass=self.player_chosen_mass,
                     position=position,
-                    width=100,
-                    height=100,
+                    width=50,
+                    height=50,
                 )
 
         self.add_objects([obj])
@@ -212,7 +224,7 @@ class State:
             else:
                 return position
 
-    def generate_random_object(self, type_of_object: str):
+    def generate_random_object(self, type_of_object: str, scale=1):
         if type_of_object == "circle":
             radius = random.randint(1, 100)
             self.add_objects(
@@ -230,7 +242,8 @@ class State:
                         )
                         + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                         velocity=Vector2D(
-                            random.randint(-1000, 1000), random.randint(-1000, 1000)
+                            random.randint(-100, 100) * scale,
+                            random.randint(-100, 100) * scale,
                         ),
                     ),
                 ]
@@ -243,7 +256,7 @@ class State:
                         color=random.choice(COLORS),
                         mass=side_length,
                         # mass=10,
-                        num_of_sides=random.randint(3, 10),
+                        num_of_sides=random.randint(3, 8),
                         side_length=side_length,
                         # velocity=Vector2D(
                         #     random.randint(-300, 300), random.randint(-300, 300)
@@ -253,13 +266,15 @@ class State:
                         )
                         + Vector2D(*ORIGIN),  # NOTE: Galen indentation
                         velocity=Vector2D(
-                            random.randint(-1000, 1000), random.randint(-1000, 1000)
+                            random.randint(-100, 100) * scale,
+                            random.randint(-100, 100) * scale,
                         ),
+                        angle=random.randint(0, 360) * (math.pi / 180),
                     )
                 ],
             )
 
-    def generate_test_data(self):
+    def generate_test_data(self, scale=1):
         for _ in range(20):
-            type_of_object = random.choice(["circle", "polygon"])
-            self.generate_random_object(type_of_object)
+            type_of_object = random.choice(["polygon", "circle"])
+            self.generate_random_object(type_of_object, scale)
