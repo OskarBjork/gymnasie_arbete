@@ -58,10 +58,11 @@ class State:
         for _ in range(iterations):
             self.update_all_vertices()
             for obj in self.objects:
+                obj.calculate_bounding_box()
                 # TODO: Fixa +=
                 obj.step(delta_time, iterations)
                 if not obj.is_static:
-                    obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
+                    # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
                     pass
 
                 if obj.position.y > 1000 + ORIGIN[1]:
