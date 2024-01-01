@@ -1,4 +1,4 @@
-from pyng.space.phys_obj import PhysObj, Point, Circle, ConvexPolygon
+from pyng.space.phys_obj import PhysObj, Point, Circle, ConvexPolygon, AABB
 from pyng.space.vectors import Vector2D
 from pyng.space.grid import Grid
 from pyng.config import ORIGIN, PIXELS_PER_METER, BLACK, RED, BLUE
@@ -10,7 +10,16 @@ class PhysWorld:
         pass
 
     def find_collisions(self, objects: [PhysObj]):
-        return self.sweep_and_prune(objects)
+        potential_collisions = []
+        for i in range(len(objects)):
+            body_A = objects[i]
+            for j in range(i + 1, len(objects)):
+                body_B = objects[j]
+                if self.intersect_AABB(body_A.aabb, body_B.aabb):
+                    potential_collisions.append((body_A, body_B))
+
+        return remove_duplicates(potential_collisions)
+        # return self.sweep_and_prune(objects)
 
     def sweep_and_prune(self, objects: [PhysObj]):
         projections_x, projections_y = self.get_projections_in_x_and_y_plane(objects)
@@ -45,3 +54,13 @@ class PhysWorld:
                     projections_y.append((min_proj, max_proj, obj))
 
         return projections_x, projections_y
+
+    def intersect_AABB(self, a: AABB, b: AABB):
+        if (
+            a.max.x <= b.min.x
+            or b.max.x <= a.min.x
+            or a.max.x <= b.min.x
+            or b.max.x <= a.min.x
+        ):
+            return False
+        return True

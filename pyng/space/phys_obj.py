@@ -1,6 +1,7 @@
 from pyng.space.vectors import Vector2D
-from pyng.config import RED, ORIGIN
+from pyng.config import RED, ORIGIN, PIXELS_PER_METER, GLOBAL_ELASTICITY
 from pyng.space.interface.view_model import ViewModel, relative_to_origin
+import math
 import math
 
 
@@ -20,19 +21,25 @@ class PhysObj:
             self.inverse_mass = 1 / self.mass
         else:
             self.inverse_mass = 0
+            self.rotational_inertia = 0
         self.position = position
         self.velocity = velocity
         self.force = force
         self.color = color
         self.is_static = is_static
         self.id = id
-        self.restitution = 0.5
+        self.restitution = GLOBAL_ELASTICITY
 
     def is_inside_of(self, other_object) -> bool:
         pass
 
     def add_force(self, force: Vector2D):
         self.force = self.force + force
+
+    def step(self, delta_time: float, iterations=1):
+        delta_time = delta_time / iterations
+        self.update_velocity(delta_time)
+        self.update_position(delta_time)
 
     def update_velocity(self, delta_time: float):
         # self.velocity = self.velocity + (self.force / self.mass) * delta_time
@@ -90,7 +97,7 @@ class ConvexPolygon(PhysObj):
         self.side_length = side_length
         self.angle = angle
         self.vertices = self.update_vertices()
-        self.bounding_box = self.calculate_polygon_bounding_box()
+        self.calculate_bounding_box()
         self.potential_collision = 0
 
     def update_vertices(self):
@@ -107,12 +114,24 @@ class ConvexPolygon(PhysObj):
         self.vertices = vertices
         return vertices
 
-    def calculate_polygon_bounding_box(self):
-        min_x = min(v.x for v in self.vertices)
-        max_x = max(v.x for v in self.vertices)
-        min_y = min(v.y for v in self.vertices)
-        max_y = max(v.y for v in self.vertices)
-        return [(min_x, min_y), (max_x, max_y)]
+    def calculate_bounding_box(self):
+        vertices = self.vertices
+        min_x = float("inf")
+        max_x = float("-inf")
+        min_y = float("inf")
+        max_y = float("-inf")
+
+        for vertex in vertices:
+            min_x = min(min_x, vertex.x)
+            max_x = max(max_x, vertex.x)
+            min_y = min(min_y, vertex.y)
+            max_y = max(max_y, vertex.y)
+
+        height = max_y - min_y
+        width = max_x - min_x
+
+        self.aabb = AABB(min_x, min_y, max_x, max_y, height, width)
+        self.aabb_updated = True
 
     def is_axis_aligned_rectangle(self) -> bool:
         """Återvänder sant om objektet är en rektangel som inte har roterats"""
@@ -195,6 +214,11 @@ class Rectangle(ConvexPolygon):
             is_static=is_static,
             id=id,
         )
+        self.rotational_inertia = (
+            1 / 12 * self.mass * (self.width**2 + self.height**2)
+        )
+        self.inverse_rotational_inertia = 1 / self.rotational_inertia
+        self.calculate_bounding_box()
 
     def update_vertices(self):
         p = self.position
@@ -249,6 +273,9 @@ class Circle(PhysObj):
     ):
         super().__init__(mass, color, position, velocity, force, is_static, id)
         self.radius = radius
+        self.rotational_inertia = 1 / 2 * self.mass * self.radius**2
+        self.inverse_rotational_inertia = 1 / self.rotational_inertia
+        self.calculate_bounding_box()
 
     def render(self, view_model):
         view_model.render_circle(self)
@@ -271,8 +298,22 @@ class Circle(PhysObj):
             min_proj, max_proj = max_proj, min_proj
         return min_proj, max_proj
 
+    def calculate_bounding_box(self):
+        min_x = self.position.x - self.radius
+        min_y = self.position.y - self.radius
+        max_x = self.position.x + self.radius
+        max_y = self.position.y + self.radius
 
-class CollisionResult:
-    def __init__(self, contact_point: Vector2D, normal: Vector2D):
-        self.contact_point = contact_point
-        self.normal = normal
+        height = max_y - min_y
+        width = max_x - min_x
+
+        self.aabb = AABB(min_x, min_y, max_x, max_y, height, width)
+        self.aabb_updated = True
+
+
+class AABB:
+    def __init__(self, min_x, min_y, max_x, max_y, height=None, width=None):
+        self.min = Vector2D(min_x, min_y)
+        self.max = Vector2D(max_x, max_y)
+        self.height = height
+        self.width = width
