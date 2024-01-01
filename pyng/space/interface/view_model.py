@@ -170,7 +170,7 @@ class ViewModel:
         self.show_grid()
         ui_manager.draw_ui(self.screen)
 
-    def show_mode_buttons(self):
+    def show_mode_buttons(self, square_image):
         pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((0, -50), (0.33 * ORIGIN[0], 45)),
             text="Manipulate",
@@ -188,6 +188,27 @@ class ViewModel:
             object_id="#spawner_view_changer_button",
             anchors={"left": "left", "bottom": "bottom"},
         )
+
+        pygame_gui.elements.UIButton( # ändra till en pause bild när du vet hur man gör det
+            relative_rect=pygame.Rect(
+                (10 + 0.66 * ORIGIN[0], -50), (0.2 * ORIGIN[0], 45)
+            ),
+            text=f"Pause",
+            manager=self.ui_manager,
+            object_id="#pause_button",
+            anchors={"left": "left", "bottom": "bottom"},
+        )
+        
+        # NOTE: Bild som visar att spelet är pausat
+        # pygame_gui.elements.UIImage(
+        #     relative_rect=(
+        #         (15 + 0.86 * ORIGIN[0], -50), (32, 32)
+        #         ),
+        #     image_surface=square_image,
+        #     manager=self.ui_manager,
+        #     object_id="#pause_image",
+        #     anchors={"left": "left", "bottom": "bottom"},
+        # )
 
         pass
 

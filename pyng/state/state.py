@@ -41,6 +41,7 @@ class State:
         self.player_chosen_color = RED
         self.player_chosen_x = 0
         self.player_chosen_y = 0
+        self.is_paused = False
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):

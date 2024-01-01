@@ -14,51 +14,57 @@ def handle_events(events: list[Event], ui_manager):
             pygame.quit()
             sys.exit()
 
-        if (
-            event.type == pygame_gui.UI_TEXT_ENTRY_FINISHED
-        ):  # kan ändras till UI_TEXT_ENTRY_CHANGED när inmatningssäker
-            if event.ui_object_id == "#radius_input":
-                return {"input_type": "radius", "text": event.text}
+        match event.type:
+            case pygame_gui.UI_TEXT_ENTRY_FINISHED:
+                # kan ändras till UI_TEXT_ENTRY_CHANGED när inmatningssäker
+                if event.ui_object_id == "#radius_input":
+                    return {"input_type": "radius", "text": event.text}
 
-            if event.ui_object_id == "#x_coordinate_input":
-                return {"input_type": "x_val", "text": event.text}
+                if event.ui_object_id == "#x_coordinate_input":
+                    return {"input_type": "x_val", "text": event.text}
 
-            if event.ui_object_id == "#y_coordinate_input":
-                return {"input_type": "y_val", "text": event.text}
+                if event.ui_object_id == "#y_coordinate_input":
+                    return {"input_type": "y_val", "text": event.text}
 
-            if event.ui_object_id == "#mass_input":
-                return {"input_type": "mass", "text": event.text}
+                if event.ui_object_id == "#mass_input":
+                    return {"input_type": "mass", "text": event.text}
+                
+            case pygame_gui.UI_BUTTON_PRESSED:
+                match event.ui_object_id:
+                    case "#manipulate_view_changer_button":
+                        return "manipulate_mode"
 
-        if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_object_id == "#manipulate_view_changer_button":
-                return "manipulate_mode"
+                    case "#spawner_view_changer_button":
+                        return "spawner_mode"
 
-            if event.ui_object_id == "#spawner_view_changer_button":
-                return "spawner_mode"
+                    case "#spawn_button":
+                        return "spawn"
+                    
+                    case "#pause_button":
+                        return "pause"
+            
+            case pygame_gui.UI_BUTTON_DOUBLE_CLICKED:         
+                if event.ui_object_id == "#clear_button":
+                    return "clear"
+            
+            case pygame_gui.UI_SELECTION_LIST_NEW_SELECTION:
+                match event.text:
+                    case "Rectangle":
+                        return "rect"
 
-            if event.ui_object_id == "#spawn_button":
-                return "spawn"
+                    case "Circle":
+                        return "circle"
 
-        if event.type == pygame_gui.UI_BUTTON_DOUBLE_CLICKED:
-            if event.ui_object_id == "#clear_button":
-                return "clear"
+                    case "Move":
+                        return "move"
 
-        if event.type == pygame_gui.UI_SELECTION_LIST_NEW_SELECTION:
-            if event.text == "Rectangle":
-                return "rect"
+                    case "Force":
+                        return "force"
 
-            if event.text == "Circle":
-                return "circle"
-
-            if event.text == "Move":
-                return "move"
-
-            if event.text == "Force":
-                return "force"
-
-            if event.text == "Velocity":
-                return "velocity"
-
+                    case "Velocity":
+                        return "velocity"
+                
+        # Jag vet inte hur man gör != i en match statement
         if event.type != pygame.KEYDOWN:
             continue
 
@@ -151,3 +157,9 @@ def delegate_event(event, state, view_model, ui_manager):
 
         case "spawn":
             state.create_object(obj_type=view_model.shape, manual_spawn=True)
+
+        case "pause":
+            if state.is_paused:
+                state.is_paused = False
+            else:
+                state.is_paused = True
