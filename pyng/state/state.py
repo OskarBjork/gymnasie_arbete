@@ -45,6 +45,7 @@ class State:
         self.is_paused = False
         self.min_iterations = 1
         self.max_iterations = 128
+        self.spawn_gravity = False #User toggleable, Motivering ifall otydligt: "spawn_gravity" pga att gravitationen hos nya objekt som spawnas påverkas av den 
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
@@ -143,7 +144,7 @@ class State:
 
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
-        if with_gravity:
+        if with_gravity or self.spawn_gravity:
             self.physics_evaluator.impose_gravity(obj)
 
     def handle_collisions(self):

@@ -40,6 +40,9 @@ def handle_events(events: list[Event], ui_manager):
                     case "#spawn_button":
                         return "spawn"
                     
+                    case "#spawn_gravity_toggle_button":
+                        return "toggle_spawn_gravity"
+                    
                     case "#pause_button":
                         return "pause"
             
@@ -157,6 +160,14 @@ def delegate_event(event, state, view_model, ui_manager):
 
         case "spawn":
             state.create_object(obj_type=view_model.shape, manual_spawn=True)
+
+        case "toggle_spawn_gravity":
+            if state.spawn_gravity:
+                state.spawn_gravity = False
+                view_model.spawn_gravity_toggle_button.set_text("Gravity: Off")
+            else:
+                state.spawn_gravity = True
+                view_model.spawn_gravity_toggle_button.set_text("Gravity: On")
 
         case "pause":
             if state.is_paused:

@@ -30,6 +30,7 @@ class ViewModel:
         self.ui_mode = True  # True om i spawn läge
         self.shape = "circle"
         self.tool = "force"
+        self.spawn_gravity_toggle_button = None
 
     def convert_coordinates(self, x, y) -> (float, float):
         return x, self.screen.get_height() - y
@@ -319,15 +320,14 @@ class ViewModel:
             object_id="#spawn_button",
         )
 
-        # Kanske inte ens behövs, eftersom när man är i "spawn skärmen"
-        pygame_gui.elements.UIButton(
+        self.spawn_gravity_toggle_button = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect(
-                (10 + 0.25 * ORIGIN[0], 285), (0.35 * ORIGIN[0], 40)
+                (10 + 0.25 * ORIGIN[0], 285), (0.37 * ORIGIN[0], 40)
             ),
-            text="Mouse Spawn",
+            text="Gravity: Off",
             manager=self.ui_manager,
-            tool_tip_text="Spawns the selected shape when you left click somewhere on the coordinate grid",
-            object_id="#mouse_spawn_button",
+            tool_tip_text="Spawned objects will have gravity if On",
+            object_id="#spawn_gravity_toggle_button",
         )
 
         if self.shape == "circle":
