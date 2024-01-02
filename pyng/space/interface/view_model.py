@@ -253,7 +253,7 @@ class ViewModel:
 
         pass
 
-    def show_spawn_editor(self):
+    def show_spawn_editor(self, spawn_gravity=False):
         # Möjligt att lägga till bilder av formerna som knappar eller bara bilder som ersättning eller komplement till en UISelectionList
         # pygame_gui.elements.UIImage(
         #     relative_rect=pygame.Rect((32, 320), (32, 32)),
@@ -329,6 +329,10 @@ class ViewModel:
             tool_tip_text="Spawned objects will have gravity if On",
             object_id="#spawn_gravity_toggle_button",
         )
+        
+        if spawn_gravity: # Ser till så att knappen inte visar felaktig information när den skapas på nytt
+            self.spawn_gravity_toggle_button.set_text("Gravity: On")
+
 
         if self.shape == "circle":
             pygame_gui.elements.UITextEntryLine(

@@ -116,21 +116,21 @@ def delegate_event(event, state, view_model, ui_manager):
         case "spawner_mode":
             view_model.ui_mode = True
             ui_manager.clear_and_reset()
-            view_model.show_spawn_editor()
+            view_model.show_spawn_editor(state.spawn_gravity)
             view_model.show_mode_buttons()
 
         case "rect":
             view_model.shape = "rect"
             state.player_chosen_shape = "rect"
             ui_manager.clear_and_reset()
-            view_model.show_spawn_editor()
+            view_model.show_spawn_editor(state.spawn_gravity)
             view_model.show_mode_buttons()
 
         case "circle":
             view_model.shape = "circle"
             state.player_chosen_shape = "circle"
             ui_manager.clear_and_reset()
-            view_model.show_spawn_editor()
+            view_model.show_spawn_editor(state.spawn_gravity)
             view_model.show_mode_buttons()
 
         case "move":
