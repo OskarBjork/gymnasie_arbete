@@ -25,13 +25,7 @@
             "active_text_shadow": "#10101070"
         },
         "#spawner_view_changer_button": {
-            "images":
-            {
-                "normal_image": {
-                    
-                    "path": "squre.png" 
-                }
-            }
+            
         },
         "misc":
         {
