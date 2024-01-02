@@ -170,7 +170,7 @@ class ViewModel:
         self.show_grid()
         ui_manager.draw_ui(self.screen)
 
-    def show_mode_buttons(self, square_image):
+    def show_mode_buttons(self):
         pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((0, -50), (0.33 * ORIGIN[0], 45)),
             text="Manipulate",

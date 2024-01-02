@@ -66,10 +66,7 @@ def main():
 
     screen.fill(BLACK)
 
-    # TEST TEMPORÄRT
-    square_image = pygame.image.load("data/images/square.png").convert_alpha()
-
-    view_model.show_mode_buttons(square_image)
+    view_model.show_mode_buttons()
     view_model.show_spawn_editor()
 
     obj1 = ConvexPolygon(
@@ -248,7 +245,7 @@ def main():
     )
 
     # state.add_object(rect)
-    state.add_objects([static_box2, moving_box, moving_circle, static_circle])
+    # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
     # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
     # state.add_objects([circle, polygon1])
 
