@@ -167,8 +167,9 @@ class State:
                 contact_points.append(manifold.contact2)
 
         for point in contact_points:
-            circle = Circle(color=ORANGE, mass=10, position=point, radius=20)
-            self.view_model.render_circle(circle)
+            if not point == Vector2D(0, 0):
+                circle = Circle(color=ORANGE, mass=10, position=point, radius=50)
+                self.view_model.render_circle(circle)
 
     def object_creation_available(self):
         return (
