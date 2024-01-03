@@ -12,6 +12,8 @@ class PhysObj:
         color: (int, int, int),
         position=Vector2D(*ORIGIN),  # Centrumet av formen
         velocity=Vector2D(0, 0),
+        angle=0,
+        angular_velocity=0,
         force=Vector2D(0, 0),
         is_static=False,
         id: str = None,
@@ -24,11 +26,18 @@ class PhysObj:
             self.rotational_inertia = 0
         self.position = position
         self.velocity = velocity
+        self.angle = angle
+        self.angular_velocity = angular_velocity
         self.force = force
         self.color = color
         self.is_static = is_static
         self.id = id
         self.restitution = GLOBAL_ELASTICITY
+        # if isinstance(angular_velocity, Vector2D):
+        #     print("angular velocity is 0")
+        #     print(self)
+        # else:
+        #     print("angular velocity is not 0")
 
     def is_inside_of(self, other_object) -> bool:
         pass
@@ -40,19 +49,24 @@ class PhysObj:
         delta_time = delta_time / iterations
         self.update_velocity(delta_time)
         self.update_position(delta_time)
+        self.update_angle(delta_time)
 
     def update_velocity(self, delta_time: float):
-        # self.velocity = self.velocity + (self.force / self.mass) * delta_time
+        if isinstance(self.force, bool):
+            return
         self.velocity = self.velocity + (self.force * self.inverse_mass) * delta_time
 
     def update_position(self, delta_time: float):
         self.position = self.position + self.velocity * delta_time
 
+    def update_angle(self, delta_time: float):
+        self.angle = self.angle + self.angular_velocity * delta_time
+
     def render(self, view_model):
         view_model.render_polygon(self)
 
     def __repr__(self) -> str:
-        return f"PhysObj(position={self.position} id = {self.id})"
+        return f"PhysObj(position={self.position} ang_vel={self.angular_velocity} id = {self.id})"
 
 
 class Point(PhysObj):
@@ -62,11 +76,22 @@ class Point(PhysObj):
         color: (int, int, int),
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
+        angular_velocity=0,
+        angle=0,
         force=Vector2D(0, 0),
         is_static=False,
         id: str = None,
     ):
-        super().__init__(mass, color, position, velocity, force, is_static, id)
+        super().__init__(
+            mass=mass,
+            color=color,
+            position=position,
+            velocity=velocity,
+            angular_velocity=angular_velocity,
+            angle=angle,
+            force=force,
+            is_static=is_static,
+        )
 
     def render(self, view_model):
         view_model.place_pixel(self.position.x, self.position.y, self.color)
@@ -85,18 +110,35 @@ class ConvexPolygon(PhysObj):
         color: (int, int, int),
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
+        angular_velocity=0,
         force=Vector2D(0, 0),
         num_of_sides=4,
-        side_length=1,
         angle=0,
+        side_length=1,
         is_static=False,
         id: str = None,
     ):
-        super().__init__(mass, color, position, velocity, force, is_static, id)
+        super().__init__(
+            mass=mass,
+            color=color,
+            position=position,
+            velocity=velocity,
+            angular_velocity=angular_velocity,
+            force=force,
+            angle=angle,
+            is_static=is_static,
+            id=id,
+        )
         self.num_of_sides = num_of_sides
         self.side_length = side_length
-        self.angle = angle
         self.vertices = self.update_vertices()
+        self.rotational_inertia = self.calculate_rotational_inertia()
+        if not is_static:
+            self.inverse_rotational_inertia = 1 / self.rotational_inertia
+        else:
+            self.inverse_rotational_inertia = 0
+        # self.rotational_inertia = 1000
+        # self.inverse_rotational_inertia = 1 / self.rotational_inertia
         self.calculate_bounding_box()
         self.potential_collision = 0
 
@@ -113,6 +155,31 @@ class ConvexPolygon(PhysObj):
             vertices.append(Vector2D(x, y))
         self.vertices = vertices
         return vertices
+
+    def calculate_rotational_inertia(self):
+        if self.is_static:
+            return 0
+
+        inertia = 0
+        vertices = self.vertices
+        num_vertices = len(vertices)
+
+        for i in range(num_vertices):
+            # Get the vertices of the current triangle
+            v1 = vertices[i]
+            v2 = vertices[(i + 1) % num_vertices]
+
+            # Calculate the area of the triangle
+            area = 0.5 * abs(v1.x * v2.y - v2.x * v1.y)
+
+            # Calculate the distance from the axis of rotation to the triangle
+            centroid = (v1 + v2) / 3
+            distance = centroid.get_distance_to(self.position)
+
+            # Add the moment of inertia of the triangle to the total
+            inertia += distance**2 * area
+
+        return inertia / 1000000
 
     def calculate_bounding_box(self):
         vertices = self.vertices
@@ -195,6 +262,7 @@ class Rectangle(ConvexPolygon):
         width: int,
         height: int,
         velocity=Vector2D(0, 0),
+        angular_velocity=0,
         force=Vector2D(0, 0),
         angle=math.pi / 4,
         is_static=False,
@@ -207,6 +275,7 @@ class Rectangle(ConvexPolygon):
             color=color,
             position=position,
             velocity=velocity,
+            angular_velocity=angular_velocity,
             force=force,
             num_of_sides=4,
             side_length=None,
@@ -217,7 +286,10 @@ class Rectangle(ConvexPolygon):
         self.rotational_inertia = (
             1 / 12 * self.mass * (self.width**2 + self.height**2)
         )
-        self.inverse_rotational_inertia = 1 / self.rotational_inertia
+        if not is_static:
+            self.inverse_rotational_inertia = 1 / self.rotational_inertia
+        else:
+            self.inverse_rotational_inertia = 0
         self.calculate_bounding_box()
 
     def update_vertices(self):
@@ -266,12 +338,22 @@ class Circle(PhysObj):
         color: (int, int, int),
         position=Vector2D(*ORIGIN),
         velocity=Vector2D(0, 0),
+        angular_velocity=0,
         force=Vector2D(0, 0),
         radius=1,
         is_static=False,
         id: str = None,
     ):
-        super().__init__(mass, color, position, velocity, force, is_static, id)
+        super().__init__(
+            mass=mass,
+            color=color,
+            position=position,
+            velocity=velocity,
+            angular_velocity=angular_velocity,
+            force=force,
+            is_static=is_static,
+            id=id,
+        )
         self.radius = radius
         self.rotational_inertia = 1 / 2 * self.mass * self.radius**2
         self.inverse_rotational_inertia = 1 / self.rotational_inertia

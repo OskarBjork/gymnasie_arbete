@@ -41,6 +41,9 @@ class Vector2D:
         """
         return self.x * other.x + self.y * other.y
 
+    def cross(self, other) -> float:
+        return self.x * other.y - self.y * other.x
+
     def __eq__(self, other) -> bool:
         return self.x == other.x and self.y == other.y
 

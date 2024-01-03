@@ -69,185 +69,24 @@ def main():
     view_model.show_mode_buttons()
     view_model.show_spawn_editor()
 
-    obj1 = ConvexPolygon(
-        mass=30,
-        color=GREEN,
-        position=Vector2D(1000, 670),
-        velocity=Vector2D(-200, 0),
-        num_of_sides=4,
-        side_length=100,
-        angle=math.pi / 4,
-        id="green",
-    )
-
-    obj2 = ConvexPolygon(
-        mass=30,
-        color=RED,
-        position=Vector2D(400, 670),
-        velocity=Vector2D(200, 0),
-        num_of_sides=4,
-        side_length=100,
-        angle=math.pi / 4,
-        id="red",
-    )
-
-    # state.generate_test_data()
-
-    # obj3 = ConvexPolygon(
-    #     mass=30,
-    #     color=BLUE,
-    #     position=Vector2D(200, 500),
-    #     # velocity=Vector2D(0, 10),
-    #     num_of_sides=4,
-    #     side_length=100,
-    #     angle=math.pi / 4 + math.pi / 2,
-    #     id="blue",
-    # )
-
-    # obj4 = ConvexPolygon(
-    #     mass=30,
-    #     color=ORANGE,
-    #     position=Vector2D(600, 550),
-    #     # velocity=Vector2D(100, 0),
-    #     num_of_sides=4,
-    #     side_length=100,
-    #     angle=math.pi / 4,
-    #     id="orange",
-    # )
-    # obj5 = ConvexPolygon(
-    #     mass=30,
-    #     color=PINK,
-    #     position=Vector2D(1000, 500),
-    #     velocity=Vector2D(0, 0),
-    #     num_of_sides=4,
-    #     side_length=100,
-    #     angle=math.pi / 6,
-    #     id="pink",
-    # )
-
-    # obj6 = ConvexPolygon(
-    #     mass=30,
-    #     color=PURPLE,
-    #     position=Vector2D(1500, 500),
-    #     velocity=Vector2D(0, 0),
-    #     num_of_sides=4,
-    #     side_length=100,
-    #     angle=math.pi / 4,
-    #     id="purple",
-    # )
-
-    static_box = ConvexPolygon(
-        mass=100,
-        color=BLUE,
-        position=Vector2D(700, 600),
-        velocity=Vector2D(0, 0),
-        num_of_sides=4,
-        side_length=500,
-        angle=math.pi / 4,
+    rect1 = Rectangle(
+        mass=1,
+        color=PINK,
+        width=1000,
+        height=100,
+        position=Vector2D(1000, 100),
         is_static=True,
     )
-
-    static_box2 = ConvexPolygon(
-        mass=100,
-        color=GREEN,
-        position=Vector2D(700, 1000),
-        velocity=Vector2D(0, 0),
-        num_of_sides=1000,
-        side_length=50,
-        angle=math.pi / 4,
-        is_static=True,
-    )
-
-    moving_box = ConvexPolygon(
-        mass=100,
-        color=PURPLE,
-        position=Vector2D(500, 600),
-        velocity=Vector2D(100, 0),
-        num_of_sides=4,
-        side_length=100,
-        angle=math.pi / 4,
-    )
-
-    moving_circle = Circle(
-        mass=100,
-        color=RED,
-        position=Vector2D(1200, 300),
-        velocity=Vector2D(50, 0),
-        radius=50,
-    )
-
-    static_circle = Circle(
-        mass=100,
-        color=YELLOW,
-        position=Vector2D(1380, 300),
-        velocity=Vector2D(0, 0),
-        radius=50,
-        is_static=True,
-    )
-
-    rect = Rectangle(
-        mass=1000000000,
-        color=BLUE,
-        position=Vector2D(850, ORIGIN[1] + 100),
-        velocity=Vector2D(0, 0),
-        force=Vector2D(100, 50),
-        angle=math.pi / 4,
-        height=50,
-        width=1100,
-        is_static=True,
-        id="blue",
-    )
-
-    polygon1 = ConvexPolygon(
-        mass=10,
-        color=BLUE,
-        num_of_sides=6,
-        side_length=50,
-        position=Vector2D(300, 100),
-        velocity=Vector2D(0, 0),
-        force=Vector2D(1000, 500),
-        angle=math.pi / 4,
-        is_static=False,
-        id="blue",
-    )
-
     rect2 = Rectangle(
-        mass=10,
+        mass=1,
         color=RED,
-        position=Vector2D(300, 100),
-        velocity=Vector2D(100, 50),
-        force=Vector2D(0, 0),
-        angle=math.pi / 4,
-        height=50,
-        width=50,
-        is_static=False,
-        id="red",
+        width=100,
+        height=100,
+        position=Vector2D(200, 400),
+        force=Vector2D(50, 50),
     )
 
-    circle = Circle(
-        mass=1.5,
-        color=RED,
-        position=Vector2D(750, 300),
-        velocity=Vector2D(0, 0),
-        force=Vector2D(0, 0),
-        radius=100,
-        id="red",
-    )
-
-    circle2 = Circle(
-        mass=0.5,
-        color=BLUE,
-        position=Vector2D(500, 300),
-        velocity=Vector2D(0, 0),
-        force=Vector2D(0, 0),
-        radius=10,
-        id="blue",
-    )
-
-    # state.add_object(rect)
-    # state.add_objects([static_box2, moving_box, moving_circle, static_circle])
-    # state.add_objects([obj1, obj2, obj3, obj4, obj5, obj6])
-    # state.add_objects([circle, polygon1])
+    # state.add_objects([rect1])
 
     running = True
     prev_time = time.time()
@@ -261,6 +100,8 @@ def main():
         prev_time = now
 
         view_model.clear()
+
+        # print(state.objects)
 
         event = handle_events(pygame.event.get(), ui_manager)
 

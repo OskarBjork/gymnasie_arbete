@@ -167,9 +167,8 @@ class State:
                 contact_points.append(manifold.contact2)
 
         for point in contact_points:
-            if not point == Vector2D(0, 0):
-                circle = Circle(color=ORANGE, mass=10, position=point, radius=50)
-                self.view_model.render_circle(circle)
+            circle = Circle(color=ORANGE, mass=10, position=point, radius=10)
+            self.view_model.render_circle(circle)
 
     def object_creation_available(self):
         return (
@@ -208,7 +207,7 @@ class State:
 
     def generate_random_object(self, type_of_object: str, scale=1):
         if type_of_object == "circle":
-            radius = random.randint(1, 100)
+            radius = random.randint(10, 100)
             self.add_objects(
                 [
                     Circle(
@@ -231,15 +230,15 @@ class State:
                 ]
             )
         elif type_of_object == "polygon":
-            side_length = random.randint(1, 100)
+            side_length = random.randint(10, 100)
             self.add_objects(
                 [
-                    ConvexPolygon(
+                    Rectangle(
                         color=random.choice(COLORS),
                         mass=side_length,
                         # mass=10,
-                        num_of_sides=random.randint(3, 8),
-                        side_length=side_length,
+                        width=side_length,
+                        height=side_length,
                         # velocity=Vector2D(
                         #     random.randint(-300, 300), random.randint(-300, 300)
                         # ),
