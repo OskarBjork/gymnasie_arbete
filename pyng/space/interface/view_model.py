@@ -4,12 +4,11 @@ import pygame
 import pygame_gui
 from pygame import Surface
 
-from pyng.config import RED, BLACK, WHITE, GRID_SCALE, PIXELS_PER_METER, ORIGIN
+from pyng.config import RED, BLACK, WHITE, OUTLINE_TEAL, GRID_SCALE, PIXELS_PER_METER, ORIGIN, OUTLINE_SIZE
 from pyng.space.vectors import Vector2D
-
+from pyng.space.phys_obj import Circle
 
 # TODO: Flytta
-
 
 def convert_coordinates(screen, x, y) -> (float, float):
     return x, screen.get_height() - y
@@ -31,6 +30,17 @@ class ViewModel:
         self.shape = "circle"
         self.tool = "force"
         self.spawn_gravity_toggle_button = None
+        self.info_text_box = None
+        self.selected_object = None
+        self.object_info_kwargs = {
+            "position_x": "", 
+            "position_y": "", 
+            "velocity_x": "", 
+            "velocity_y": "",
+            "force_x": "",
+            "force_y": "",
+            "mass": ""
+            }
 
     def convert_coordinates(self, x, y) -> (float, float):
         return x, self.screen.get_height() - y
@@ -41,6 +51,23 @@ class ViewModel:
     def update(self, ui_refresh_rate: float):
         pygame.display.update()
         self.ui_manager.update(ui_refresh_rate)
+
+    def update_object_info(self):
+        self.object_info_kwargs["position_x"] = int(self.selected_object.position.x) - ORIGIN[0]
+        self.object_info_kwargs["position_y"] = int(self.selected_object.position.y) - ORIGIN[1]
+
+        self.object_info_kwargs["velocity_x"] = int(self.selected_object.velocity.x)
+        self.object_info_kwargs["velocity_x"] = int(self.selected_object.velocity.y)
+        
+        self.object_info_kwargs["force_x"] = int(self.selected_object.force.x)
+        self.object_info_kwargs["force_x"] = int(self.selected_object.force.y)
+
+        self.object_info_kwargs["mass"] = self.selected_object.mass
+
+        # Rebuilds the UIelement in order to display the new text 
+        self.info_text_box.kill()
+        self.build_info_box()
+
 
     def place_pixel(self, x: int, y: int, color: tuple) -> None:
         converted_x, converted_y = self.convert_coordinates(x, y)
@@ -89,6 +116,7 @@ class ViewModel:
                 self.convert_coordinates(origin[0] - 50, origin[1] + y_offset),
                 20,
             )
+        
         if self.ui_mode == True:  # visar all text som ska vara på spawner skärmen
             self.render_text(
                 "Spawner",
@@ -133,6 +161,7 @@ class ViewModel:
                 (10, 20),
                 60,
             )
+
             match self.tool:
                 case "move":
                     pass
@@ -166,6 +195,26 @@ class ViewModel:
                         (10, 335),
                         20,
                     )
+
+            self.render_text(
+                "Object Info:",
+                BLACK,
+                (10, self.height - 380),
+                30,           
+            )
+
+    def render_or_uptade_selected_object_related(self):
+        if self.selected_object is not None: # Om ett objekt är valt
+            # Rendera Outline
+            if isinstance(self.selected_object, Circle):
+                outline = Circle(color=OUTLINE_TEAL, position=self.selected_object.position, mass=10, radius=self.selected_object.radius+OUTLINE_SIZE)
+                self.render_circle(outline)
+            else:
+                outline_radius = self.selected_object.aabb.min.get_distance_to(self.selected_object.aabb.max) / 2
+                outline = Circle(color=OUTLINE_TEAL, mass=10, position=self.selected_object.position, radius=outline_radius+OUTLINE_SIZE)
+                self.render_circle(outline)
+            # Uppdatera Info Rutan
+            self.update_object_info()
 
     def render_ui(self, ui_manager):
         self.show_grid()
@@ -212,6 +261,26 @@ class ViewModel:
         # )
 
         pass
+    
+    def build_info_box(self):
+        self.info_text_box = pygame_gui.elements.UITextBox(
+                html_text=
+                f"""
+                Position: {self.object_info_kwargs["position_x"]}x, {self.object_info_kwargs["position_y"]}y
+                <br>Velocity: {self.object_info_kwargs["velocity_x"]}x, {self.object_info_kwargs["velocity_y"]}y
+                <br>Force: {self.object_info_kwargs["force_x"]}x, {self.object_info_kwargs["force_y"]}y
+                <br>Mass: {self.object_info_kwargs["mass"]}
+                """,
+                relative_rect=pygame.Rect((0, -350), (0.85 * ORIGIN[0], 280)),
+                manager=self.ui_manager,
+                anchors={"left": "left", "bottom": "bottom"},
+                object_id="#info_text_box",
+            )
+    
+    def reset_info_box_info(self):
+        for element in self.object_info_kwargs:
+            self.object_info_kwargs[element] = ""
+        
 
     def show_manipulate_editor(self):
         pygame_gui.elements.UISelectionList(
@@ -251,9 +320,16 @@ class ViewModel:
                     object_id="#velocity_input",
                 )
 
+        if True: #self.selected_object is not None: #Om ett objekt är valt
+            self.build_info_box()
+        
         pass
 
     def show_spawn_editor(self, spawn_gravity=False):
+        if not self.selected_object == None:
+            self.selected_object = None
+            self.reset_info_box_info()
+        
         # Möjligt att lägga till bilder av formerna som knappar eller bara bilder som ersättning eller komplement till en UISelectionList
         # pygame_gui.elements.UIImage(
         #     relative_rect=pygame.Rect((32, 320), (32, 32)),
@@ -359,6 +435,16 @@ class ViewModel:
     def render_text(self, text: str, color: tuple, position: tuple, size: int) -> None:
         text_surface = self.create_text(text, color, position, size)
         self.screen.blit(text_surface, position)
+
+    def render_lable(self, text: str, position: tuple = (0, 0), size: int = 10, anchors: dict = {"left": "left", "top": "top"}, id: str = None):
+        # NOTE: UILabels SUGER! JAG HATAR DEM! JAG SPENDERADE ALLDELES FÖR MYCKET TID PÅ ATT FÅ DETHÄR SKRÄPET ATT FUNKA MEN DE ÄR SÅ DÅLIGT ATT DET INTE ENS GÅR. Trash >:(
+        pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect(position, (200, 300)),
+            text=text,
+            manager=self.ui_manager,
+            object_id=id,
+            anchors=anchors
+        )
 
     def render_objects(self, objects: list) -> None:
         for obj in objects:

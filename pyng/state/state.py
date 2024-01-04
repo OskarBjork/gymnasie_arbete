@@ -3,11 +3,14 @@ from pyng.space.vectors import Vector2D
 from pyng.config import (
     ORIGIN,
     RED,
+    LIGHT_BLUE,
     GRAVITY_CONSTANT,
     COLORS,
     OBJECT_CREATION_COOLDOWN,
     ORANGE,
     GLOBAL_ELASTICITY,
+    OUTLINE_SIZE,
+    OUTLINE_TEAL,
 )
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle, Point
 from pyng.state.physics_evaluator import PhysicsEvaluator
@@ -52,6 +55,22 @@ class State:
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
                 self.create_object(position=mouse_pos)
+
+            else: # om man är i manipulate läge
+                selected_object = self.find_object(position=mouse_pos)
+                if not selected_object == False: # Om ett objekt hittades
+                    view_model.selected_object = selected_object
+                    view_model.update_object_info()
+
+    def find_object(self, position):
+        for object in self.objects:
+            object.calculate_bounding_box
+            if ( # AABB med musen
+                object.aabb.min.x < position.x < object.aabb.max.x 
+                and object.aabb.min.y < position.y < object.aabb.max.y
+            ):
+                return object
+        return False # om inget objekt hittades
 
     def step(self, delta_time: float, iterations=1):
         iterations = max(self.min_iterations, iterations)

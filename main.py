@@ -271,6 +271,8 @@ def main():
             state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
             state.handle_collisions()
 
+        view_model.render_or_uptade_selected_object_related()
+
         view_model.render_objects(state.objects)
 
         view_model.render_ui(ui_manager)
