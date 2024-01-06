@@ -40,11 +40,13 @@ class State:
         self.default_object = Circle(color=RED, mass=10, radius=10)
         self.player_chosen_mass = 10
         self.player_chosen_shape = "circle"
-        self.player_chosen_tool = "force"
         self.player_chosen_radius = 10
         self.player_chosen_color = RED
         self.player_chosen_x = 0
         self.player_chosen_y = 0
+        self.player_force = Vector2D(0, 0)
+        self.player_velocity = Vector2D(0, 0)
+        self.player_teleport_coordinates = Vector2D(0, 0)
         self.is_paused = False
         self.min_iterations = 1
         self.max_iterations = 128
@@ -298,3 +300,31 @@ class State:
         for _ in range(20):
             type_of_object = random.choice(["polygon", "circle"])
             self.generate_random_object(type_of_object, scale)
+
+    def change_selected_object_attribute(self, type):
+        # kollar först ifall ett objekt är valt
+        if not self.view_model.selected_object is None:
+            match type:
+                case "set":
+                    match self.view_model.tool:
+                        #går inte att skriva self.view_model.selected_object.force = self.player_force för de är objekt
+                        case "force":
+                            self.view_model.selected_object.force.x = self.player_force.x
+                            self.view_model.selected_object.force.y = self.player_force.y
+                        case "velocity":
+                            self.view_model.selected_object.velocity.x = self.player_velocity.x
+                            self.view_model.selected_object.velocity.y = self.player_velocity.y
+                case "add":
+                    match self.view_model.tool:
+                        case "force":
+                            self.view_model.selected_object.force = self.view_model.selected_object.force + self.player_force
+                        case "velocity":
+                            self.view_model.selected_object.velocity = self.view_model.selected_object.velocity + self.player_velocity
+                case "teleport":
+                    self.view_model.selected_object.position.x = self.player_teleport_coordinates.x + ORIGIN[0]
+                    self.view_model.selected_object.position.y = self.player_teleport_coordinates.y + ORIGIN[1]
+
+    def reset_manipulate_data(self):
+        self.player_force = Vector2D(0, 0)
+        self.player_velocity = Vector2D(0, 0)
+        self.player_teleport_coordinates = Vector2D(0, 0)

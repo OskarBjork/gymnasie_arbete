@@ -57,10 +57,10 @@ class ViewModel:
         self.object_info_kwargs["position_y"] = int(self.selected_object.position.y) - ORIGIN[1]
 
         self.object_info_kwargs["velocity_x"] = int(self.selected_object.velocity.x)
-        self.object_info_kwargs["velocity_x"] = int(self.selected_object.velocity.y)
+        self.object_info_kwargs["velocity_y"] = int(self.selected_object.velocity.y)
         
-        self.object_info_kwargs["force_x"] = int(self.selected_object.force.x)
-        self.object_info_kwargs["force_x"] = int(self.selected_object.force.y)
+        self.object_info_kwargs["force_x"] = self.selected_object.force.x
+        self.object_info_kwargs["force_y"] = self.selected_object.force.y
 
         self.object_info_kwargs["mass"] = self.selected_object.mass
 
@@ -164,7 +164,12 @@ class ViewModel:
 
             match self.tool:
                 case "move":
-                    pass
+                    self.render_text(
+                        "Teleporter Coordinates:",
+                        BLACK,
+                        (10, 245),
+                        20,
+                    )
 
                 case "force":
                     self.render_text(
@@ -174,25 +179,11 @@ class ViewModel:
                         20,
                     )
 
-                    self.render_text(
-                        "Angle [rad]:",
-                        BLACK,
-                        (10, 335),
-                        20,
-                    )
-
                 case "velocity":
                     self.render_text(
-                        "Velocity [m/s]:",
+                        "Velocity x, y [m/s]:",
                         BLACK,
                         (10, 245),
-                        20,
-                    )
-
-                    self.render_text(
-                        "Angle [rad]:",
-                        BLACK,
-                        (10, 335),
                         20,
                     )
 
@@ -280,7 +271,20 @@ class ViewModel:
     def reset_info_box_info(self):
         for element in self.object_info_kwargs:
             self.object_info_kwargs[element] = ""
-        
+
+    def create_confirm_buttons(self, height):
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((8, height), (0.2 * ORIGIN[0], 45)),
+            text="Set",
+            tool_tip_text="Press to set the values specified above to the selected object",
+            object_id="#set_button"
+        )
+        pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((8 + 0.2 * ORIGIN[0], height), (0.2 * ORIGIN[0], 45)),
+            text="Add",
+            tool_tip_text="Press to add the specified values to the selected objects current values",
+            object_id="#add_button"
+        )       
 
     def show_manipulate_editor(self):
         pygame_gui.elements.UISelectionList(
@@ -293,32 +297,57 @@ class ViewModel:
         )
         match self.tool:
             case "move":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((5, 265), (0.3 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#x_teleport_input",
+                    placeholder_text="x"
+                )
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0.3 * ORIGIN[0], 265), (0.3 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#y_teleport_input",
+                    placeholder_text="y"
+                )
+                pygame_gui.elements.UIButton(
+                    relative_rect=pygame.Rect((8, 320), (0.35 * ORIGIN[0], 45)),
+                    text="Teleport",
+                    tool_tip_text="Teleport selected object to your coordinates",
+                    object_id="#teleport_button"
+                )
                 pass
+                
 
             case "force":
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 265), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((5, 265), (0.3 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
-                    object_id="#force_input",
+                    object_id="#x_force_input",
+                    placeholder_text="x"
                 )
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 355), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((0.3 * ORIGIN[0], 265), (0.3 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
-                    object_id="#angle_input",
+                    object_id="#y_force_input",
+                    placeholder_text="y"
                 )
+                self.create_confirm_buttons(320)
 
             case "velocity":
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 265), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((5, 265), (0.3 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
-                    object_id="#angle_input",
+                    object_id="#x_velocity_input",
+                    placeholder_text="x"
                 )
 
                 pygame_gui.elements.UITextEntryLine(
-                    relative_rect=pygame.Rect((5, 355), (0.7 * ORIGIN[0], 55)),
+                    relative_rect=pygame.Rect((0.3 * ORIGIN[0], 265), (0.3 * ORIGIN[0], 55)),
                     manager=self.ui_manager,
-                    object_id="#velocity_input",
+                    object_id="#y_velocity_input",
+                    placeholder_text="y"
                 )
+                self.create_confirm_buttons(320)
 
         if True: #self.selected_object is not None: #Om ett objekt är valt
             self.build_info_box()
@@ -326,6 +355,7 @@ class ViewModel:
         pass
 
     def show_spawn_editor(self, spawn_gravity=False):
+        # unselects object
         if not self.selected_object == None:
             self.selected_object = None
             self.reset_info_box_info()
