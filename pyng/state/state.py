@@ -3,11 +3,14 @@ from pyng.space.vectors import Vector2D
 from pyng.config import (
     ORIGIN,
     RED,
+    LIGHT_BLUE,
     GRAVITY_CONSTANT,
     COLORS,
     OBJECT_CREATION_COOLDOWN,
     ORANGE,
     GLOBAL_ELASTICITY,
+    OUTLINE_SIZE,
+    OUTLINE_TEAL,
 )
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle, Point
 from pyng.state.physics_evaluator import PhysicsEvaluator
@@ -37,20 +40,39 @@ class State:
         self.default_object = Circle(color=RED, mass=10, radius=10)
         self.player_chosen_mass = 10
         self.player_chosen_shape = "circle"
-        self.player_chosen_tool = "force"
         self.player_chosen_radius = 10
         self.player_chosen_color = RED
         self.player_chosen_x = 0
         self.player_chosen_y = 0
+        self.player_force = Vector2D(0, 0)
+        self.player_velocity = Vector2D(0, 0)
+        self.player_teleport_coordinates = Vector2D(0, 0)
         self.is_paused = False
         self.min_iterations = 1
         self.max_iterations = 128
+        self.spawn_gravity = False #User toggleable, Motivering ifall otydligt: "spawn_gravity" pga att gravitationen hos nya objekt som spawnas påverkas av den 
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
         if mouse_pos.x > ORIGIN[0] and mouse_pos.y > ORIGIN[1]:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
                 self.create_object(position=mouse_pos)
+
+            else: # om man är i manipulate läge
+                selected_object = self.find_object(position=mouse_pos)
+                if not selected_object == False: # Om ett objekt hittades
+                    view_model.selected_object = selected_object
+                    view_model.update_object_info()
+
+    def find_object(self, position):
+        for object in self.objects:
+            object.calculate_bounding_box
+            if ( # AABB med musen
+                object.aabb.min.x < position.x < object.aabb.max.x 
+                and object.aabb.min.y < position.y < object.aabb.max.y
+            ):
+                return object
+        return False # om inget objekt hittades
 
     def step(self, delta_time: float, iterations=1):
         iterations = max(self.min_iterations, iterations)
@@ -143,7 +165,7 @@ class State:
 
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
-        if with_gravity:
+        if with_gravity or self.spawn_gravity:
             self.physics_evaluator.impose_gravity(obj)
 
     def handle_collisions(self):
@@ -278,3 +300,31 @@ class State:
         for _ in range(20):
             type_of_object = random.choice(["polygon", "circle"])
             self.generate_random_object(type_of_object, scale)
+
+    def change_selected_object_attribute(self, type):
+        # kollar först ifall ett objekt är valt
+        if not self.view_model.selected_object is None:
+            match type:
+                case "set":
+                    match self.view_model.tool:
+                        #går inte att skriva self.view_model.selected_object.force = self.player_force för de är objekt
+                        case "force":
+                            self.view_model.selected_object.force.x = self.player_force.x
+                            self.view_model.selected_object.force.y = self.player_force.y
+                        case "velocity":
+                            self.view_model.selected_object.velocity.x = self.player_velocity.x
+                            self.view_model.selected_object.velocity.y = self.player_velocity.y
+                case "add":
+                    match self.view_model.tool:
+                        case "force":
+                            self.view_model.selected_object.force = self.view_model.selected_object.force + self.player_force
+                        case "velocity":
+                            self.view_model.selected_object.velocity = self.view_model.selected_object.velocity + self.player_velocity
+                case "teleport":
+                    self.view_model.selected_object.position.x = self.player_teleport_coordinates.x + ORIGIN[0]
+                    self.view_model.selected_object.position.y = self.player_teleport_coordinates.y + ORIGIN[1]
+
+    def reset_manipulate_data(self):
+        self.player_force = Vector2D(0, 0)
+        self.player_velocity = Vector2D(0, 0)
+        self.player_teleport_coordinates = Vector2D(0, 0)
