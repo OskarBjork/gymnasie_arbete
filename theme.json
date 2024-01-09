@@ -25,18 +25,13 @@
             "active_text_shadow": "#10101070"
         },
         "#spawner_view_changer_button": {
-            "images":
-            {
-                "normal_image": {
-                    "path": "squre.png" 
-                }
-            }
+            
         },
         "misc":
         {
             "border_width": "2",
             "shadow_width": "1",
-            "tool_tip_delay": "1.0",
+            "tool_tip_delay": "0.75",
             "text_horiz_alignment": "center",
             "text_vert_alignment": "center",
             "text_horiz_alignment_padding": "10",
@@ -97,11 +92,58 @@
             "list_item_height": "40"
         }
     },
+
     "selection_list.@selection_list_item":
     {
         "misc":
         {
             "border_width": "2"
         }
-     }
+    },
+
+    "text_box":
+    {
+        "colours":
+        {
+            "dark_bg":"#c7c7c7",
+            "normal_border": "#0080ff",
+            "normal_text": "#2C3E50"
+        },
+
+        "font":{
+            "size": 20
+        },
+
+        "misc":
+        {
+            "shape": "rectangle",
+            "border_width": "1",
+            "shadow_width": "10",
+            "line_spacing": "0.75"
+        }   
+    },
+
+    "label":
+    {
+        "colours":
+        {
+            "normal_text": "#2e97ff",
+            "text_shadow": "#505050"
+        },
+        "font":
+        {
+            "name": "montserrat",
+            "size": "60",
+            "bold": "0",
+            "italic": "0"
+        },
+        "misc":
+        {
+            "text_shadow": "0",
+            "text_shadow_size": "0",
+            "text_shadow_offset": "0,0",
+            "text_horiz_alignment": "left",
+            "text_vert_alignment": "top"
+        }
+    }
 }

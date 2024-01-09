@@ -1,6 +1,6 @@
 from pyng.space.vectors import Vector2D
 from pyng.config import RED, ORIGIN, PIXELS_PER_METER, GLOBAL_ELASTICITY
-from pyng.space.interface.view_model import ViewModel, relative_to_origin
+# from pyng.space.interface.view_model import ViewModel, relative_to_origin
 import math
 import math
 

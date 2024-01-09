@@ -106,8 +106,13 @@ def main():
         event = handle_events(pygame.event.get(), ui_manager)
 
         delegate_event(event, state, view_model, ui_manager)
+        
+        # Slutar beräkna fysiken ifall användaren har pausat simulationen
+        if not state.is_paused: 
+            state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
+            state.handle_collisions()
 
-        state.step(delta_time=dt, iterations=RESOLUTION_ITERATIONS)
+        view_model.render_or_uptade_selected_object_related()
 
         view_model.render_objects(state.objects)
 
