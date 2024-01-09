@@ -68,19 +68,18 @@ class PhysicsEvaluator:
         if object1.is_static and object2.is_static:
             return
         if isinstance(object1, Circle) and isinstance(object2, Circle):
-            self.resolve_circle_collision(object1, object2, manifold.depth)
+            self.resolve_circle_collision(manifold)
         elif isinstance(object1, ConvexPolygon) and isinstance(object2, ConvexPolygon):
-            self.resolve_polygon_collision(
-                object1, object2, manifold.depth, manifold.normal
-            )
+            self.resolve_polygon_collision(manifold)
         elif isinstance(object1, ConvexPolygon) and isinstance(object2, Circle):
-            self.resolve_polygon_circle_collision(object2, object1, manifold.depth)
+            self.resolve_polygon_circle_collision(manifold)
         elif isinstance(object1, Circle) and isinstance(object2, ConvexPolygon):
-            self.resolve_polygon_circle_collision(object1, object2, manifold.depth)
+            self.resolve_polygon_circle_collision(manifold)
 
-    def resolve_polygon_collision(
-        self, obj: ConvexPolygon, other_obj: ConvexPolygon, mtv, normal
-    ):
+    def resolve_polygon_collision(self, manifold: CollisionManifold):
+        obj = manifold.body_A
+        other_obj = manifold.body_B
+        mtv = manifold.depth
         if obj.is_static:
             other_obj.position = other_obj.position + mtv
         elif other_obj.is_static:
@@ -88,29 +87,41 @@ class PhysicsEvaluator:
         else:
             obj.position = obj.position - (mtv / 2)
             other_obj.position = other_obj.position + (mtv / 2)
-        self.collision_response(obj, other_obj, normal)
+        self.collision_response_rotation(manifold)
 
-    def resolve_circle_collision(self, obj: Circle, other_obj: Circle, overlap_length):
-        direction = obj.position - other_obj.position
+    def resolve_circle_collision(self, manifold: CollisionManifold):
+        body_A = manifold.body_A
+        body_B = manifold.body_B
+
+        direction = body_A.position - body_B.position
 
         if not direction.magnitude() > 0:
             return  # FIXME: Hantera situationen
         direction = direction.normalize()
 
-        magnitude = overlap_length / 2
+        magnitude = manifold.depth / 2
 
         direction = direction * magnitude
 
-        if other_obj.is_static:
-            obj.position = obj.position + direction
-        elif obj.is_static:
-            other_obj.position = other_obj.position - direction
+        if body_B.is_static:
+            body_A.position = body_A.position + direction
+        elif body_A.is_static:
+            body_B.position = body_B.position - direction
         else:
-            obj.position = obj.position + direction
-            other_obj.position = other_obj.position - direction
-        self.collision_response(obj, other_obj, direction)
+            body_A.position = body_A.position + direction
+            body_B.position = body_B.position - direction
+        self.collision_response_rotation(manifold)
 
-    def resolve_polygon_circle_collision(self, circle, polygon, mtv):
+    def resolve_polygon_circle_collision(self, manifold: CollisionManifold):
+        polygon = (
+            manifold.body_A
+            if isinstance(manifold.body_A, ConvexPolygon)
+            else manifold.body_B
+        )
+        circle = (
+            manifold.body_B if isinstance(manifold.body_B, Circle) else manifold.body_A
+        )
+        mtv = manifold.depth
         if circle.is_static:
             polygon.position = polygon.position - mtv
         elif polygon.is_static:
@@ -118,7 +129,7 @@ class PhysicsEvaluator:
         else:
             circle.position = circle.position + (mtv / 2)
             polygon.position = polygon.position - (mtv / 2)
-        self.collision_response(circle, polygon, mtv)
+        self.collision_response_rotation(manifold)
 
     def check_circle_collision(self, circle1: Circle, circle2: Circle):
         distance = circle1.position.distance_to(circle2.position)
@@ -268,7 +279,9 @@ class PhysicsEvaluator:
 
         obj2.velocity = obj1_momentum * obj2.inverse_mass
 
-    def collision_response(self, obj1, obj2, normal):
+    def collision_response(self, manifold: CollisionManifold):
+        obj1 = manifold.body_A
+        obj2 = manifold.body_B
         if normal.magnitude() == 0:
             return
         normal = normal.normalize()
@@ -300,14 +313,87 @@ class PhysicsEvaluator:
         # print(
         #     f"{obj1.id} Velocity Change", (impulse * obj2.inverse_mass).vector_round()
         # )
-        obj1.velocity = (
-            obj1.velocity + (normal * (j * obj1.inverse_mass)).vector_round()
-        )
-        obj2.velocity = (
-            obj2.velocity - (normal * (j * obj2.inverse_mass)).vector_round()
-        )
+        obj1.velocity = obj1.velocity + (impulse * obj1.inverse_mass)
+        obj2.velocity = obj2.velocity - (impulse * obj2.inverse_mass)
         # print(obj1.velocity, obj1.id)
         # print(obj2.velocity, obj2.id)
+
+    def collision_response_rotation(self, manifold):
+        body_A = manifold.body_A
+        # print(body_A)
+        body_B = manifold.body_B
+        normal = manifold.normal
+        contact1 = manifold.contact1
+        contact2 = manifold.contact2
+        contact_count = manifold.contact_count
+
+        e = min(body_A.restitution, body_B.restitution)
+
+        contact_list = [contact1, contact2]
+
+        ra_list = []
+        rb_list = []
+
+        impulse_list = []
+
+        for i, contact in enumerate(contact_list):
+            if contact is None:
+                continue
+            ra = contact - body_A.position
+            rb = contact - body_B.position
+
+            ra_list.append(ra)
+            rb_list.append(rb)
+
+            ra_perp = Vector2D(-ra.y, ra.x)
+            rb_perp = Vector2D(-rb.y, rb.x)
+
+            angular_linear_velocity_A = ra_perp * body_A.angular_velocity
+            angular_linear_velocity_B = rb_perp * body_B.angular_velocity
+
+            relative_velocity = (angular_linear_velocity_A + body_A.velocity) - (
+                angular_linear_velocity_B + body_B.velocity
+            )
+
+            contact_velocity_magnitude = relative_velocity.dot(normal)
+
+            # if contact_velocity_magnitude > 0:
+            #     return
+
+            ra_perp_dot_normal = ra_perp.dot(normal)
+            rb_perp_dot_normal = rb_perp.dot(normal)
+
+            denominator = (
+                body_A.inverse_mass
+                + body_B.inverse_mass
+                + ra_perp_dot_normal**2 * body_A.inverse_rotational_inertia
+                + rb_perp_dot_normal**2 * body_B.inverse_rotational_inertia
+            )
+
+            j = -(1 + e) * contact_velocity_magnitude
+            j /= denominator
+            j /= contact_count
+
+            impulse = normal * j
+            impulse_list.append(impulse)
+
+        for i, impulse in enumerate(impulse_list):
+            ra = ra_list[i]
+            rb = rb_list[i]
+
+            body_A.velocity = body_A.velocity + (impulse * body_A.inverse_mass)
+
+            body_A.angular_velocity = (
+                body_A.angular_velocity
+                + ra.cross(impulse) * body_A.inverse_rotational_inertia
+            )
+
+            body_B.velocity = body_B.velocity - (impulse * body_B.inverse_mass)
+
+            body_B.angular_velocity = (
+                body_B.angular_velocity
+                - rb.cross(impulse) * body_B.inverse_rotational_inertia
+            )
 
     def point_segment_distance(self, point, a, b):
         ab = b - a
@@ -339,8 +425,8 @@ class PhysicsEvaluator:
         ]  # Detta kommer ge tillbaka en punkt på skärmen och inte i världen
 
     def find_polygon_polygon_contact_points(self, polygon1, polygon2):
-        contact1 = Vector2D(0, 0)
-        contact2 = Vector2D(0, 0)
+        contact1 = None
+        contact2 = None
         contact_count = 0
 
         min_dist_squared = float("inf")
