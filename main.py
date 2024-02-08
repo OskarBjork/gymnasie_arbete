@@ -39,13 +39,14 @@ from simulation.event_handler import handle_events, delegate_event
 # TODO: TYPE ANNOTATIONS!
 # TODO: Skapa ett sätt för användaren att mäta tid
 # TODO: Skapa ett sätt för användaren att mäta distans
-# TODO: Skapa ett sätt för användaren att inspektera objekt och se deras egenskaper
+
 # TODO: Skapa ett sätt för användaren att kontrollera objekt
+# TODO: Skapa godtycklig polygon
 
 
-os.environ[
-    "SDL_VIDEO_WINDOW_POS"
-] = "1920, 0"  # Kommentera bort ifall man inte vill att fönstret ska öppnas på en annan skärm
+# os.environ[
+#     "SDL_VIDEO_WINDOW_POS"
+# ] = "1920, 0"  # Kommentera bort ifall man inte vill att fönstret ska öppnas på en annan skärm
 
 
 def main():

@@ -47,6 +47,7 @@ class State:
         self.player_force = Vector2D(0, 0)
         self.player_velocity = Vector2D(0, 0)
         self.player_teleport_coordinates = Vector2D(0, 0)
+        self.player_rect_dimensions = [0,0]
         self.is_paused = False
         self.min_iterations = 1
         self.max_iterations = 128
@@ -159,9 +160,11 @@ class State:
                     color=RED,
                     mass=self.player_chosen_mass,
                     position=position,
-                    width=50,
-                    height=50,
+                    width= self.player_rect_dimensions[0],
+                    height= self.player_rect_dimensions[1],
                 )
+            case "polygon":
+                pass
 
         self.add_objects([obj])
         self.time_since_last_object_creation = time.time()
@@ -309,6 +312,7 @@ class State:
                     match self.view_model.tool:
                         #går inte att skriva self.view_model.selected_object.force = self.player_force för de är objekt
                         case "force":
+                            print(self.view_model.selected_object)
                             self.view_model.selected_object.force.x = self.player_force.x
                             self.view_model.selected_object.force.y = self.player_force.y
                         case "velocity":

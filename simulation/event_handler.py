@@ -49,6 +49,12 @@ def handle_events(events: list[Event], ui_manager):
                     
                     case "#y_teleport_input":
                         return {"input_type": "y_teleport", "text": event.text}
+                    
+                    case "#width_input":
+                        return {"input_type": "rect_width", "text": event.text}
+                    
+                    case "#height_input":
+                        return {"input_type": "rect_height", "text": event.text}
                 
                 
             case pygame_gui.UI_BUTTON_PRESSED:
@@ -88,6 +94,9 @@ def handle_events(events: list[Event], ui_manager):
 
                     case "Circle":
                         return "circle"
+                    
+                    case "Polygon":
+                        return "polygon"
 
                     case "Move":
                         return "move"
@@ -185,7 +194,12 @@ def delegate_event(event, state, view_model, ui_manager):
                 return
             case "y_teleport":
                 state.player_teleport_coordinates.y = int(event["text"])
-                return
+                return  
+            
+            case "rect_width":
+                state.player_rect_dimensions[0] = int(event["text"])
+            case "rect_height":
+                state.player_rect_dimensions[1] = int(event["text"])
             
             case "arrow_key":
                 if not view_model.selected_object is None:
@@ -226,6 +240,13 @@ def delegate_event(event, state, view_model, ui_manager):
 
         case "circle":
             view_model.shape = "circle"
+            state.player_chosen_shape = "circle"
+            ui_manager.clear_and_reset()
+            view_model.show_spawn_editor(state.spawn_gravity)
+            view_model.show_mode_buttons()
+
+        case "polygon":
+            view_model.shape = "polygon"
             state.player_chosen_shape = "circle"
             ui_manager.clear_and_reset()
             view_model.show_spawn_editor(state.spawn_gravity)
