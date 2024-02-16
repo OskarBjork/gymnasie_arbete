@@ -97,12 +97,13 @@ def main():
         angle=math.pi / 2,
         is_static=True,
     )
-    balanceBoard = ConvexPolygon(
+    balanceBoard = Rectangle(
         mass=1,
         color=RED,
         width=200,
         height=10,
         position=Vector2D(200 + ORIGIN[0], 128 + 5 + ORIGIN[1]),
+        angle=0
     )
 
     state.add_objects([balanceBoard, balanceBoardBase])
