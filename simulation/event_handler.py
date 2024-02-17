@@ -5,7 +5,7 @@ import pygame_gui
 from pygame.event import Event
 from pyng.space.vectors import Vector2D
 from pyng.space.phys_obj import PhysObj, Circle, ConvexPolygon, Rectangle
-
+from pyng.config import PIXELS_PER_METER
 
 def handle_events(events: list[Event], ui_manager):
     move_force = Vector2D(0, 0)
@@ -165,7 +165,7 @@ def delegate_event(event, state, view_model, ui_manager):
                 return
             
             case "mass":
-                state.player_chosen_mass = int(event["text"])
+                state.player_chosen_mass = float(event["text"])
                 return
             
             case "x_val":
@@ -183,10 +183,10 @@ def delegate_event(event, state, view_model, ui_manager):
                 return
             
             case "x_velocity":
-                state.player_velocity.x = int(event["text"])
+                state.player_velocity.x = float(event["text"]) * PIXELS_PER_METER
                 return
             case "y_velocity":
-                state.player_velocity.y = int(event["text"])
+                state.player_velocity.y = float(event["text"]) * PIXELS_PER_METER
                 return
             
             case "x_teleport":
