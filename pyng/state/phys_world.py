@@ -59,8 +59,8 @@ class PhysWorld:
         if (
             a.max.x <= b.min.x
             or b.max.x <= a.min.x
-            or a.max.x <= b.min.x
-            or b.max.x <= a.min.x
+            or a.max.y <= b.min.y
+            or b.max.y <= a.min.y
         ):
             return False
         return True
