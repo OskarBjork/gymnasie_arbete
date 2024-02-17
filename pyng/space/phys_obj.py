@@ -1,6 +1,13 @@
 from pyng.space.vectors import Vector2D
 from pyng.space.matrices import Matrix2x2
-from pyng.config import RED, ORIGIN, PIXELS_PER_METER, GLOBAL_ELASTICITY
+from pyng.config import (
+    RED,
+    ORIGIN,
+    PIXELS_PER_METER,
+    GLOBAL_ELASTICITY,
+    GRAVITY_CONSTANT,
+)
+
 # from pyng.space.interface.view_model import ViewModel, relative_to_origin
 import math
 import math
@@ -34,6 +41,7 @@ class PhysObj:
         self.is_static = is_static
         self.id = id
         self.restitution = GLOBAL_ELASTICITY
+        self.has_gravity = False
         # if isinstance(angular_velocity, Vector2D):
         #     print("angular velocity is 0")
         #     print(self)
@@ -62,6 +70,14 @@ class PhysObj:
 
     def update_angle(self, delta_time: float):
         self.angle = self.angle + self.angular_velocity * delta_time
+
+    def add_all_forces(self):
+        if self.has_gravity:
+            self.add_force(Vector2D(0, GRAVITY_CONSTANT * self.mass))
+        # self.add_force(self.velocity * -0.1)  # Luftmotstånd
+
+    def clear_forces(self):
+        self.force = Vector2D(0, 0)
 
     def render(self, view_model):
         view_model.render_polygon(self)
@@ -284,9 +300,7 @@ class Rectangle(ConvexPolygon):
             is_static=is_static,
             id=id,
         )
-        self.rotational_inertia = (
-            1 / 12 * self.mass * (self.width**2 + self.height**2)
-        )
+        self.rotational_inertia = 1 / 12 * self.mass * (self.width**2 + self.height**2)
         if not is_static:
             self.inverse_rotational_inertia = 1 / self.rotational_inertia
         else:
@@ -300,19 +314,20 @@ class Rectangle(ConvexPolygon):
         h = self.height
         angle = self.angle
         points = [
-            Vector2D(-w/2, -h/2),
-            Vector2D(w/2, -h/2),
-            Vector2D(w/2, h/2),
-            Vector2D(-w/2, h/2)
+            Vector2D(-w / 2, -h / 2),
+            Vector2D(w / 2, -h / 2),
+            Vector2D(w / 2, h / 2),
+            Vector2D(-w / 2, h / 2),
         ]
-        rotation_matrix = Matrix2x2(math.cos(angle), -math.sin(angle),
-                                    math.sin(angle), math.cos(angle))
+        rotation_matrix = Matrix2x2(
+            math.cos(angle), -math.sin(angle), math.sin(angle), math.cos(angle)
+        )
         # NOTE: Kunde använt loop men kände ej för det
         vertices = [
             rotation_matrix.mult_vector2d(points[0]) + Vector2D(p.x, p.y),
             rotation_matrix.mult_vector2d(points[1]) + Vector2D(p.x, p.y),
             rotation_matrix.mult_vector2d(points[2]) + Vector2D(p.x, p.y),
-            rotation_matrix.mult_vector2d(points[3]) + Vector2D(p.x, p.y)
+            rotation_matrix.mult_vector2d(points[3]) + Vector2D(p.x, p.y),
         ]
         self.vertices = vertices
         return vertices
