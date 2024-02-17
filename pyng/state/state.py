@@ -51,7 +51,7 @@ class State:
         self.is_paused = False
         self.min_iterations = 1
         self.max_iterations = 128
-        self.spawn_gravity = False #User toggleable, Motivering ifall otydligt: "spawn_gravity" pga att gravitationen hos nya objekt som spawnas påverkas av den 
+        self.spawn_gravity = False  # User toggleable, Motivering ifall otydligt: "spawn_gravity" pga att gravitationen hos nya objekt som spawnas påverkas av den
         pass
 
     def parse_mouse_click(self, mouse_pos: Vector2D, view_model):
@@ -59,21 +59,21 @@ class State:
             if view_model.ui_mode == True:  # om man är i "spawn" läge
                 self.create_object(position=mouse_pos)
 
-            else: # om man är i manipulate läge
+            else:  # om man är i manipulate läge
                 selected_object = self.find_object(position=mouse_pos)
-                if not selected_object == False: # Om ett objekt hittades
+                if not selected_object == False:  # Om ett objekt hittades
                     view_model.selected_object = selected_object
                     view_model.update_object_info()
 
     def find_object(self, position):
         for object in self.objects:
             object.calculate_bounding_box
-            if ( # AABB med musen
-                object.aabb.min.x < position.x < object.aabb.max.x 
+            if (  # AABB med musen
+                object.aabb.min.x < position.x < object.aabb.max.x
                 and object.aabb.min.y < position.y < object.aabb.max.y
             ):
                 return object
-        return False # om inget objekt hittades
+        return False  # om inget objekt hittades
 
     def step(self, delta_time: float, iterations=1):
         iterations = max(self.min_iterations, iterations)
@@ -81,30 +81,29 @@ class State:
         for _ in range(iterations):
             self.update_all_vertices()
             for obj in self.objects:
+                obj.clear_forces()
                 obj.calculate_bounding_box()
+                obj.add_all_forces()
                 # TODO: Fixa +=
                 obj.step(delta_time, iterations)
                 if not obj.is_static:
                     # obj.force = Vector2D(0, GRAVITY_CONSTANT * obj.mass)
                     pass
-                
 
                 # NOTE: Väggarna runt skärmen. Tog bort för experiment
-                # if obj.position.y > 1000 + ORIGIN[1]:
-                #     obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
-                #     obj.position.y = 1000 + ORIGIN[1]
-                # if obj.position.x > 1500 + ORIGIN[0]:
-                #     obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
-                #     obj.position.x = 1500 + ORIGIN[0]
-                # if obj.position.y < ORIGIN[1]:
-                #     obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
-                #     obj.position.y = ORIGIN[1]
-                # if obj.position.x < ORIGIN[0]:
-                #     obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
-                #     obj.position.x = ORIGIN[0]
+                if obj.position.y > 1000 + ORIGIN[1]:
+                    obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
+                    obj.position.y = 1000 + ORIGIN[1]
+                if obj.position.x > 1500 + ORIGIN[0]:
+                    obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
+                    obj.position.x = 1500 + ORIGIN[0]
+                if obj.position.y < ORIGIN[1]:
+                    obj.velocity.y = -obj.velocity.y * GLOBAL_ELASTICITY
+                    obj.position.y = ORIGIN[1]
+                if obj.position.x < ORIGIN[0]:
+                    obj.velocity.x = -obj.velocity.x * GLOBAL_ELASTICITY
+                    obj.position.x = ORIGIN[0]
 
-
-            
                 # if (
                 #     obj.position.y > 2000
                 #     or obj.position.x > 2000
@@ -137,8 +136,8 @@ class State:
     def create_object(
         self, position=None, obj_type=None, with_gravity=False, manual_spawn=False
     ):
-        if (
-            not self.object_creation_available(position)
+        if not self.object_creation_available(
+            position
         ):  # Kollar om det gått 0.1 sekunder sedan senaste objektet skapades
             return
 
@@ -175,6 +174,7 @@ class State:
         self.time_since_last_object_creation = time.time()
         if with_gravity or self.spawn_gravity:
             self.physics_evaluator.impose_gravity(obj)
+            obj.has_gravity = True
 
     def handle_collisions(self):
         collisions = self.phys_world.find_collisions(self.objects)
@@ -201,26 +201,26 @@ class State:
             self.view_model.render_circle(circle)
 
     def object_creation_available(self, creation_request_position):
-        if not ( # Kollar om tillräckligt med tid har gått sedan senaste objektet skapats.
+        if not (  # Kollar om tillräckligt med tid har gått sedan senaste objektet skapats.
             time.time() - self.time_since_last_object_creation
             > OBJECT_CREATION_COOLDOWN
         ):
             return False
-        
-        # Förhindrar att objektet skapas på samma koordinater som det tidigare, vilket annars skulle resultera i ett AssertionError.    
+
+        # Förhindrar att objektet skapas på samma koordinater som det tidigare, vilket annars skulle resultera i ett AssertionError.
         if len(self.objects) > 0:
-            if creation_request_position is None: # NOTE: Om input från UI   
+            if creation_request_position is None:  # NOTE: Om input från UI
                 if (
                     self.objects[-1].position.x == self.player_chosen_x + ORIGIN[0]
-                and self.objects[-1].position.y == self.player_chosen_y + ORIGIN[1]
+                    and self.objects[-1].position.y == self.player_chosen_y + ORIGIN[1]
                 ):
                     return False
-            else: # NOTE: Om input från mus
+            else:  # NOTE: Om input från mus
                 if (
                     self.objects[-1].position.x == creation_request_position.x
-                and self.objects[-1].position.y == creation_request_position.y
+                    and self.objects[-1].position.y == creation_request_position.y
                 ):
-                    return False   
+                    return False
 
         # Om inget False returnas så returnas True istället
         return True
@@ -315,23 +315,43 @@ class State:
             match type:
                 case "set":
                     match self.view_model.tool:
-                        #går inte att skriva self.view_model.selected_object.force = self.player_force för de är objekt
+                        # går inte att skriva self.view_model.selected_object.force = self.player_force för de är objekt
                         case "force":
+                            self.view_model.selected_object.force.x = (
+                                self.player_force.x
+                            )
+                            self.view_model.selected_object.force.y = (
+                                self.player_force.y
+                            )
                             print(self.view_model.selected_object)
                             self.view_model.selected_object.force.x = self.player_force.x
                             self.view_model.selected_object.force.y = self.player_force.y
                         case "velocity":
-                            self.view_model.selected_object.velocity.x = self.player_velocity.x
-                            self.view_model.selected_object.velocity.y = self.player_velocity.y
+                            self.view_model.selected_object.velocity.x = (
+                                self.player_velocity.x
+                            )
+                            self.view_model.selected_object.velocity.y = (
+                                self.player_velocity.y
+                            )
                 case "add":
                     match self.view_model.tool:
                         case "force":
-                            self.view_model.selected_object.force = self.view_model.selected_object.force + self.player_force
+                            self.view_model.selected_object.force = (
+                                self.view_model.selected_object.force
+                                + self.player_force
+                            )
                         case "velocity":
-                            self.view_model.selected_object.velocity = self.view_model.selected_object.velocity + self.player_velocity
+                            self.view_model.selected_object.velocity = (
+                                self.view_model.selected_object.velocity
+                                + self.player_velocity
+                            )
                 case "teleport":
-                    self.view_model.selected_object.position.x = self.player_teleport_coordinates.x + ORIGIN[0]
-                    self.view_model.selected_object.position.y = self.player_teleport_coordinates.y + ORIGIN[1]
+                    self.view_model.selected_object.position.x = (
+                        self.player_teleport_coordinates.x + ORIGIN[0]
+                    )
+                    self.view_model.selected_object.position.y = (
+                        self.player_teleport_coordinates.y + ORIGIN[1]
+                    )
 
     def reset_manipulate_data(self):
         self.player_force = Vector2D(0, 0)
