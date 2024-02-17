@@ -6,6 +6,7 @@ from pyng.config import (
     PIXELS_PER_METER,
     GLOBAL_ELASTICITY,
     GRAVITY_CONSTANT,
+    AIR_RESISTANCE_CONSTANT,
 )
 
 # from pyng.space.interface.view_model import ViewModel, relative_to_origin
@@ -35,6 +36,7 @@ class PhysObj:
         self.position = position
         self.velocity = velocity
         self.angle = angle
+        self.torque = 0
         self.angular_velocity = angular_velocity
         self.force = force
         self.color = color
@@ -59,6 +61,7 @@ class PhysObj:
         self.update_velocity(delta_time)
         self.update_position(delta_time)
         self.update_angle(delta_time)
+        # self.update_angular_velocity(delta_time)
 
     def update_velocity(self, delta_time: float):
         if isinstance(self.force, bool):
@@ -71,10 +74,35 @@ class PhysObj:
     def update_angle(self, delta_time: float):
         self.angle = self.angle + self.angular_velocity * delta_time
 
+    def update_angular_velocity(self, delta_time: float):
+        self.angular_velocity = (
+            self.angular_velocity
+            + self.inverse_rotational_inertia * self.torque * delta_time
+        )
+
+    def add_torque(self, torque: float):
+        self.torque = torque
+
+    def add_all_torques(self):
+        self.torque = 0
+        air_resistance_torque = -AIR_RESISTANCE_CONSTANT * self.angular_velocity
+        self.add_torque(air_resistance_torque)
+
     def add_all_forces(self):
         if self.has_gravity:
             self.add_force(Vector2D(0, GRAVITY_CONSTANT * self.mass))
-        # self.add_force(self.velocity * -0.1)  # Luftmotstånd
+
+        Fx = (
+            -AIR_RESISTANCE_CONSTANT
+            * (self.velocity.x**2 + self.velocity.y**2) ** (1 / 2)
+            * self.velocity.x
+        )
+        Fy = (
+            -AIR_RESISTANCE_CONSTANT
+            * (self.velocity.x**2 + self.velocity.y**2) ** (1 / 2)
+            * self.velocity.y
+        )
+        self.add_force(Vector2D(Fx, Fy))  # Luftmotstånd
 
     def clear_forces(self):
         self.force = Vector2D(0, 0)
