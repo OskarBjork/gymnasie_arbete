@@ -1,4 +1,5 @@
 from pyng.space.vectors import Vector2D
+from pyng.space.matrices import Matrix2x2
 from pyng.config import RED, ORIGIN, PIXELS_PER_METER, GLOBAL_ELASTICITY
 # from pyng.space.interface.view_model import ViewModel, relative_to_origin
 import math
@@ -298,12 +299,21 @@ class Rectangle(ConvexPolygon):
         w = self.width
         h = self.height
         angle = self.angle
-        vertices = []
-        for i in range(k):
-            rotated_angle = angle + 2 * math.pi * i / k
-            x = p.x + w * math.cos(rotated_angle)
-            y = p.y + h * math.sin(rotated_angle)
-            vertices.append(Vector2D(x, y))
+        points = [
+            Vector2D(-w/2, -h/2),
+            Vector2D(w/2, -h/2),
+            Vector2D(w/2, h/2),
+            Vector2D(-w/2, h/2)
+        ]
+        rotation_matrix = Matrix2x2(math.cos(angle), -math.sin(angle),
+                                    math.sin(angle), math.cos(angle))
+        # NOTE: Kunde använt loop men kände ej för det
+        vertices = [
+            rotation_matrix.mult_vector2d(points[0]) + Vector2D(p.x, p.y),
+            rotation_matrix.mult_vector2d(points[1]) + Vector2D(p.x, p.y),
+            rotation_matrix.mult_vector2d(points[2]) + Vector2D(p.x, p.y),
+            rotation_matrix.mult_vector2d(points[3]) + Vector2D(p.x, p.y)
+        ]
         self.vertices = vertices
         return vertices
 
