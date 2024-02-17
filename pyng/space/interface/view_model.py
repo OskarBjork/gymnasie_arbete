@@ -368,7 +368,7 @@ class ViewModel:
 
         pygame_gui.elements.UISelectionList(
             relative_rect=pygame.Rect((-5, 100), (0.35 * ORIGIN[0], 102)),
-            item_list=["Rectangle", "Circle"],
+            item_list=["Rectangle", "Circle", "Polygon"],
             manager=self.ui_manager,
             allow_multi_select=False,
             allow_double_clicks=False,
@@ -440,20 +440,51 @@ class ViewModel:
             self.spawn_gravity_toggle_button.set_text("Gravity: On")
 
 
-        if self.shape == "circle":
-            pygame_gui.elements.UITextEntryLine(
-                relative_rect=pygame.Rect((0, 370), (0.7 * ORIGIN[0], 55)),
-                manager=self.ui_manager,
-                object_id="#radius_input",
-            )
+        match self.shape:
+            case "circle":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0, 370), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#radius_input",
+                )
 
-            pygame_gui.elements.UITextEntryLine(
-                relative_rect=pygame.Rect((0, 470), (0.7 * ORIGIN[0], 55)),
-                manager=self.ui_manager,
-                object_id="#mass_input",
-            )
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0, 470), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#mass_input",
+                )
+            case "rectangle":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0, 370), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#width_input",
+                )
+                
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0, 470), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#height_input",
+                )
 
-        pass
+            case "polygon":
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0, 370), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#side_length_input",
+                )
+                
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0, 470), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#num_of_sides_input",
+                )
+                
+                pygame_gui.elements.UITextEntryLine(
+                    relative_rect=pygame.Rect((0, 570), (0.7 * ORIGIN[0], 55)),
+                    manager=self.ui_manager,
+                    object_id="#mass_input",
+                )
+
 
     def set_caption(self, caption: str) -> None:
         pygame.display.set_caption(caption)
